@@ -5,7 +5,7 @@ Converts VFR file into desired GIS format supported by OGR library.
 
 Requires GDAL/OGR library version 1.11 or later.
 
-Usage: vfr2ogr.py [-f] /path/to/filename --format=<output format> --dsn=<OGR datasource>
+Usage: vfr2ogr.py [-f] /path/to/filename [--format=<output format>] [--dsn=<OGR datasource>]
 
 -f       List supported output formats
 --format Output format
