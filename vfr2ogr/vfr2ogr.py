@@ -65,8 +65,30 @@ def list_layers(ds):
         print "Number of features in %-20s: %d" % (layer.GetName(), featureCount)
 
 # convert VFR into specified format
-def convert_vfr(ids, odsn, frm):
-    pass
+def convert_vfr(ids, odsn, frmt):
+    odrv = ogr.GetDriverByName(frmt)
+    if odrv is None:
+        fatal("Unable to start driver '%s'" % frmt)
+    
+    # try to open datasource
+    ods = odrv.Open(odsn, True)
+    if ods is None:
+        # if fails, try to create new datasource
+        ods = odrv.CreateDataSource(odsn)
+    if ods is None:
+        fatal("Unable to open/create new datasource '%s'" % odsn)
+    
+    nlayers = ids.GetLayerCount()
+    for i in range(nlayers):
+        layer = ids.GetLayer(i)
+        layerName = layer.GetName()
+        print >> sys.stderr, "Exporing layer %-20s ..." % layerName,
+        olayer = ods.CopyLayer(layer, layerName)
+        if olayer is None:
+            fatal("Unable to export layer '%s'. Exiting..." % layerName)
+        print >> sys.stderr, " %-5d features" % olayer.GetFeatureCount()
+    
+    ods.Destroy()
 
 def main():
     # check requirements
@@ -126,7 +148,9 @@ def main():
         if odsn is None:
             fatal("Output datasource not defined")
         else:
-            convert_vfr(filename, odsn, oformat)
+            convert_vfr(ids, odsn, oformat)
+    
+    ids.Destroy()
     
     return 0
 
