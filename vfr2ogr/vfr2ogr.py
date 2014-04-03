@@ -7,9 +7,9 @@ Requires GDAL/OGR library version 1.11 or later.
 
 Usage: vfr2ogr.py [-f] /path/to/filename --format=<output format> --dsn=<OGR datasource>
 
-       -f       List supported output formats
-       --format Output format
-       --dsn    Output OGR datasource
+-f       List supported output formats
+--format Output format
+--dsn    Output O
 """
 
 import os
@@ -17,7 +17,7 @@ import sys
 import getopt
 
 try:
-  from osgeo import gdal, ogr
+    from osgeo import gdal, ogr
 except:
     sys.exit('ERROR: Import of ogr from osgeo failed')
 
@@ -57,18 +57,16 @@ def list_formats():
     for i in sorted(formatsList):
         print i
 
-# convert VFR into specified format
-def convert_vfr(vfr, odsn, frm):
-    idrv = ogr.GetDriverByName("GML")
-    idsn = idrv.Open(vfr, False)
-    if idsn is None:
-        fatal("Unable to open '%s'" % vfr)
-
-    nlayers = idsn.GetLayerCount()
+def list_layers(ds):
+    nlayers = ds.GetLayerCount()
     for i in range(nlayers):
-        layer = idsn.GetLayer(i)
+        layer = ds.GetLayer(i)
         featureCount = layer.GetFeatureCount()
         print "Number of features in %-20s: %d" % (layer.GetName(), featureCount)
+
+# convert VFR into specified format
+def convert_vfr(ids, odsn, frm):
+    pass
 
 def main():
     # check requirements
@@ -77,7 +75,7 @@ def main():
     if len(sys.argv) < 2: # at least one argument required (-f or filename)
         usage()
         sys.exit(2)
- 
+        
     if sys.argv[1] == '-f':
         list_formats()
         sys.exit(0)
@@ -115,13 +113,20 @@ def main():
         else:
             assert False, "unhandled option"
     
-    if oformat is None:
-        fatal("Output format not defined")
+    idrv = ogr.GetDriverByName("GML")
+    if idrv is None:
+        fatal("Unable to select GML driver")
+    ids = idrv.Open(filename, False)
+    if ids is None:
+        fatal("Unable to open '%s'" % vfr)
 
-    if odsn is None:
-        fatal("Output datasource not defined")
-    
-    convert_vfr(filename, odsn, oformat)
+    if oformat is None:
+        list_layers(ids)
+    else:
+        if odsn is None:
+            fatal("Output datasource not defined")
+        else:
+            convert_vfr(filename, odsn, oformat)
     
     return 0
 
