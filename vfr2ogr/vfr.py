@@ -71,7 +71,7 @@ def list_layers(ds):
         print "Number of features in %-20s: %d" % (layer.GetName(), featureCount)
 
 # convert VFR into specified format
-def convert_vfr(ids, odsn, frmt, overwrite):
+def convert_vfr(ids, odsn, frmt, overwrite, options=[]):
     odrv = ogr.GetDriverByName(frmt)
     if odrv is None:
         fatal("Unable to start driver '%s'" % frmt)
@@ -84,7 +84,6 @@ def convert_vfr(ids, odsn, frmt, overwrite):
     if ods is None:
         fatal("Unable to open/create new datasource '%s'" % odsn)
     
-    options = []
     if overwrite:
         options.append("OVERWRITE=YES")
 

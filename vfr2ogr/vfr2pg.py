@@ -77,7 +77,11 @@ def main():
         if host:
             odsn += " host=%s" % host
         
-        time = convert_vfr(ids, odsn, "PostgreSQL", overwrite)
+        options = []
+        if schema:
+            options.append('SCHEMA=%s' % schema)
+        
+        time = convert_vfr(ids, odsn, "PostgreSQL", overwrite, options)
         message("Time elapsed: %d sec" % time)
     
     ids.Destroy()
