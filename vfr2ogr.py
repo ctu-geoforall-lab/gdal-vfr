@@ -15,7 +15,7 @@ Usage: vfr2ogr.py [-f] /path/to/vfr/filename [--format=<output format>] [--dsn=<
 
 import getopt
 
-from vfr import *
+from vfr2ogr.vfr import *
 
 # print usage
 def usage():

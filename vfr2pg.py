@@ -16,7 +16,7 @@ Usage: vfr2py.py /path/to/vfr/filename --dbname <database name>  [--schema <sche
 
 import getopt
 
-from vfr import *
+from vfr2ogr.vfr import *
 
 # print usage
 def usage():
