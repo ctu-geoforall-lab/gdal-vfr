@@ -77,7 +77,7 @@ def main():
         if host:
             odsn += " host=%s" % host
         
-        options = []
+        options = ["GEOMETRY_NAME=definicnibod"] # TODO: fix GDAL/OGR
         if schema:
             options.append('SCHEMA=%s' % schema)
         
