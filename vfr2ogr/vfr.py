@@ -30,8 +30,7 @@ def check_file(filename):
     if filename.startswith('-'):
         fatal('No input file specified')
     if not os.path.isfile(filename):
-        usage()
-        fatal("'%s' doesn't exists or is not a file" % filename)
+        fatal("'%s' doesn't exists or it's not a file" % filename)
     
     return filename
 
