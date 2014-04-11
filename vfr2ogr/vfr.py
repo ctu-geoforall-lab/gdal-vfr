@@ -4,8 +4,8 @@ import time
 
 try:
     from osgeo import gdal, ogr
-except:
-    sys.exit('ERROR: Import of ogr from osgeo failed')
+except ImportError, e:
+    sys.exit('ERROR: Import of ogr from osgeo failed. %s' % e)
 
 def fatal(msg):
     sys.exit('ERROR: ' + msg)
