@@ -5,10 +5,12 @@ Converts VFR file into desired GIS format supported by OGR library.
 
 Requires GDAL/OGR library version 1.11 or later.
 
-Usage: vfr2ogr.py [-f] /path/to/vfr/filename [--format=<output format>] [--dsn=<OGR datasource>]
+Usage: vfr2ogr.py [-f] [--file=/path/to/vfr/filename] [--platnost=p|h] [--prirustek=d.m.y] [--data=z|k] [--udaje=z|g|o|v] [--kraj=US|MS|..] [--orp=<nazev>] [--obec=<kod>]
+                  [--format=<output format>] [--dsn=<OGR datasource>]
 
        -f         List supported output formats
        -o         Overwrite existing files
+       --file     Path to xml.gz file
        --format   Output format
        --dsn      Output OGR datasource
 """

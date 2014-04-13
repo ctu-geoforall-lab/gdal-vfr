@@ -1,0 +1,81 @@
+<GMLFeatureClassList>
+  <GMLFeatureClass>
+    <!-- Seznam států -->
+    <Name>Staty</Name>
+    <ElementPath>Data|Staty|Stat</ElementPath>
+    <SRSName>urn:ogc:def:crs:EPSG::5514</SRSName>
+    <!-- Požadovaná geometrie definičního bodu státu -->
+    <GeomPropertyDefn>
+      <Name>DefinicniBod</Name> 
+      <ElementPath>Geometrie|DefinicniBod</ElementPath> 
+      <Type>MultiPoint</Type>
+    </GeomPropertyDefn>
+    <!-- Požadovaná originální geometrie hranice státu -->
+    <GeomPropertyDefn>
+      <Name>OriginalniHranice</Name> 
+      <ElementPath>Geometrie|OriginalniHranice</ElementPath> 
+      <Type>MultiPolygon</Type>
+    </GeomPropertyDefn>
+    <!-- Požadovaná generalizovaná geometrie hranice státu (stupeň generalizace 5) -->
+    <GeomPropertyDefn>
+      <Name>GeneralizovaneHranice</Name> 
+      <ElementPath>Geometrie|GeneralizovaneHranice5</ElementPath> 
+      <Type>MultiPolygon</Type>
+    </GeomPropertyDefn>
+    <!-- Kód státu -->
+    <PropertyDefn>
+      <Name>Kod</Name>
+      <ElementPath>Kod</ElementPath>
+      <Type>Integer</Type>
+    </PropertyDefn>
+    <!-- Název státu -->
+    <PropertyDefn>
+      <Name>Nazev</Name>
+      <ElementPath>Nazev</ElementPath>
+      <Type>String</Type>
+      <Width>32</Width>
+    </PropertyDefn>
+    <!-- Identifikátor nesprávnosti na prvku (?) -->
+    <PropertyDefn>
+      <Name>Nespravny</Name>
+      <ElementPath>Nespravny</ElementPath>
+      <Type>String</Type>
+      <Width>5</Width>
+    </PropertyDefn>
+    <!-- Konec platnosti -->    
+    <PropertyDefn>
+      <Name>PlatiOd</Name>
+      <ElementPath>PlatiOd</ElementPath>
+      <Type>String</Type>
+      <Width>19</Width>
+    </PropertyDefn>
+    <!-- Požadovaný začátek platnosti -->    
+    <PropertyDefn>
+      <Name>PlatiDo</Name>
+      <ElementPath>PlatiDo</ElementPath>
+      <Type>String</Type>
+      <Width>19</Width>
+    </PropertyDefn>
+    <!-- Požadované ID transakce RUIAN -->
+    <PropertyDefn>
+      <Name>IdTransakce</Name>
+      <ElementPath>IdTransakce</ElementPath>
+      <Type>Integer</Type>
+      <Width>18</Width>
+    </PropertyDefn>
+    <!-- Požadované ID návrhu změny v ISUI -->
+    <PropertyDefn>
+      <Name>GlobalniIdNavrhuZmeny</Name>
+      <ElementPath>GlobalniIdNavrhuZmeny</ElementPath>
+      <Type>Integer</Type>
+      <Width>18</Width>
+    </PropertyDefn>
+    <!-- >Požadovaný kód územního celku v NUTS / LAU -->
+    <PropertyDefn>
+      <Name>NutsLau</Name>
+      <ElementPath>NutsLau</ElementPath>
+      <Type>String</Type>
+      <Width>2</Width>
+    </PropertyDefn>
+  </GMLFeatureClass>
+</GMLFeatureClassList>
