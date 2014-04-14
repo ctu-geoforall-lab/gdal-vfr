@@ -7,7 +7,6 @@ try:
 except ImportError, e:
     sys.exit('ERROR: Import of ogr from osgeo failed. %s' % e)
 
-
 # check GDAL/OGR library, version >= 1.11 required
 def check_ogr():
     # check required version

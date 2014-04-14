@@ -1,4 +1,5 @@
 import os
+import sys
 
 def check_file(filename):
     if filename.startswith('-'):

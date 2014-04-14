@@ -31,12 +31,15 @@ def main():
     check_ogr()
     
     # parse cmd arguments
-    options = { 'dbname' : None, 'schema' : None, 'user' : None, 'passwd' : None, 'host' : None }
+    options = { 'dbname' : None, 'schema' : None, 'user' : None, 'passwd' : None, 'host' : None, 'overwrite' : False }
     filename = parse_cmd(sys.argv, "ho", ["help", "overwrite",
                                           "file=", "date=", "type=",
                                           "dbname=", "schema=", "user=", "passwd=", "host="],
                          options)
-    
+    if not filename:
+        usage()
+        sys.exit(1)
+
     # open input file by GML driver
     ids = open_file(filename)
     
@@ -45,11 +48,11 @@ def main():
         list_layers(ids)
     else:
         odsn = "PG:dbname=%s" % options['dbname']
-        if user:
+        if options['user']:
             odsn += " user=%s" % options['user']
-        if passwd:
+        if options['passwd']:
             odsn += " passwd=%s" % options['passwd']
-        if host:
+        if options['host']:
             odsn += " host=%s" % options['host']
         
         lco_options = ["GEOMETRY_NAME=definicnibod"] # TODO: fix GDAL/OGR

@@ -33,23 +33,26 @@ def main():
     check_ogr()
 
     # parse cmd arguments
-    options = { 'oformat' : None, 'dsn' : None, 'overwrite' : False }
+    options = { 'format' : None, 'dsn' : None, 'overwrite' : False }
     filename = parse_cmd(sys.argv, "hfo", ["help", "overwrite",
                                 "file=", "date=", "type=",
                                 "format=", "dsn="], options)
+    if not filename:
+        usage()
+        sys.exit(1)
     
     # open input file by GML driver
     ids = open_file(filename)
     
-    if options['oformat'] is None:
+    if options['format'] is None:
         # list available layers and exit
         list_layers(ids)
     else:
-        if options['odsn'] is None:
+        if options['dsn'] is None:
             fatal("Output datasource not defined")
         else:
             # convert VFR ...
-            time = convert_vfr(ids, odsn, options['oformat'], options['overwrite'])
+            time = convert_vfr(ids, options['dsn'], options['format'], options['overwrite'])
             message("Time elapsed: %d sec" % time)
     
     ids.Destroy()

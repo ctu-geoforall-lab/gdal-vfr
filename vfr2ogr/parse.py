@@ -1,6 +1,7 @@
 import getopt
 
 from utils import *
+from vfr import list_formats
 
 def parse_cmd(argv, flags, params, outdir):
     try:
@@ -11,25 +12,25 @@ def parse_cmd(argv, flags, params, outdir):
     
     filename = date = ftype = None
     for o, a in opts:
-        if o == "--file":
+        so = o[2:]
+        if so in outdir:
+            if a:
+                outdir[so] = a
+            else:
+                outdir[so] = True
+        elif o == "--file":
             filename = a
         elif o == "--date":
             date = a
         elif o == "--type":
             ftype = a
-        elif o in ("-o",  "--overwrite"):
-            outdir['overwrite'] = True
         elif o in ("-h", "--help"):
             return None
         elif o == "-f": # unused
             list_formats()
             sys.exit(0)
-        elif o == "--format":
-            outdir['oformat'] = a
-        elif o == "--dsn":
-            outdir['odsn'] = a
         else:
-            assert False, "unhandled option"
+            assert False, "unhandled option: %s" % o
     
     if not filename and not date:
         fatal("--file or --date requested")
