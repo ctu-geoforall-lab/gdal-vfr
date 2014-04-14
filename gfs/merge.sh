@@ -28,4 +28,13 @@ merge "vfr_st_v1.gfs" "Staty" \
     "KatastralniUzemi" \
     "Zsj"
 
+merge "vfr_ob_v1.gfs" "Obce" \
+    "CastiObci" \
+    "KatastralniUzemi" \
+    "Zsj" \
+    "Ulice" \
+    "Parcely" \
+    "StavebniObjekty" \
+    "AdresniMista"
+
 exit 0

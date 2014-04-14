@@ -57,5 +57,12 @@
       <Type>Integer</Type>
       <Width>18</Width>
     </PropertyDefn>
+    <!-- ID návrhu změn v ISUI -->
+    <PropertyDefn>
+      <Name>GlobalniIdNavrhuZmeny</Name>
+      <ElementPath>GlobalniIdNavrhuZmeny</ElementPath>
+      <Type>Integer</Type>
+      <Width>18</Width>
+    </PropertyDefn>
   </GMLFeatureClass>
 </GMLFeatureClassList>
