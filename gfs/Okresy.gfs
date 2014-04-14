@@ -1,34 +1,34 @@
 <GMLFeatureClassList>
+  <!-- Okresy -->
   <GMLFeatureClass>
-    <!-- Seznam států -->
-    <Name>Staty</Name>
-    <ElementPath>Data|Staty|Stat</ElementPath>
+    <Name>Okresy</Name>
+    <ElementPath>Data|Okresy|Okres</ElementPath>
     <SRSName>urn:ogc:def:crs:EPSG::5514</SRSName>
-    <!-- Geometrie definičního bodu státu -->
+    <!-- Geometrie definičního bodu okresu -->
     <GeomPropertyDefn>
       <Name>DefinicniBod</Name> 
       <ElementPath>Geometrie|DefinicniBod</ElementPath> 
       <Type>Point</Type>
     </GeomPropertyDefn>
-    <!-- Originální geometrie hranice státu -->
+    <!-- Originální geometrie hranice okresu -->
     <GeomPropertyDefn>
       <Name>OriginalniHranice</Name> 
       <ElementPath>Geometrie|OriginalniHranice</ElementPath> 
       <Type>MultiPolygon</Type>
     </GeomPropertyDefn>
-    <!-- Generalizovaná geometrie hranice státu (stupeň generalizace 5) -->
+    <!-- Generalizovaná geometrie hranice okresu (stupeň generalizace 4) -->
     <GeomPropertyDefn>
       <Name>GeneralizovaneHranice</Name> 
-      <ElementPath>Geometrie|GeneralizovaneHranice5</ElementPath> 
+      <ElementPath>Geometrie|GeneralizovaneHranice4</ElementPath> 
       <Type>MultiPolygon</Type>
     </GeomPropertyDefn>
-    <!-- Kód státu -->
+    <!-- Kód okresu -->
     <PropertyDefn>
       <Name>Kod</Name>
       <ElementPath>Kod</ElementPath>
       <Type>Integer</Type>
     </PropertyDefn>
-    <!-- Název státu -->
+    <!-- Název okresu -->
     <PropertyDefn>
       <Name>Nazev</Name>
       <ElementPath>Nazev</ElementPath>
@@ -41,6 +41,18 @@
       <ElementPath>Nespravny</ElementPath>
       <Type>String</Type>
       <Width>5</Width>
+    </PropertyDefn>
+    <!-- Nadřazený kraj -->
+    <PropertyDefn>
+      <Name>Kraj_Kod</Name>
+      <ElementPath>Kraj|Kod</ElementPath>
+      <Type>Integer</Type>
+    </PropertyDefn>
+    <!-- Nadřazený VÚSC -->
+    <PropertyDefn>
+      <Name>Vusc_Kod</Name>
+      <ElementPath>Vusc|Kod</ElementPath>
+      <Type>Integer</Type>
     </PropertyDefn>
     <!-- Začátek platnosti -->
     <PropertyDefn>
@@ -63,7 +75,7 @@
       <Type>Integer</Type>
       <Width>18</Width>
     </PropertyDefn>
-    <!-- ID návrhu změny v ISUI -->
+    <!-- ID návrhu změn v ISUI -->
     <PropertyDefn>
       <Name>GlobalniIdNavrhuZmeny</Name>
       <ElementPath>GlobalniIdNavrhuZmeny</ElementPath>
@@ -75,7 +87,7 @@
       <Name>NutsLau</Name>
       <ElementPath>NutsLau</ElementPath>
       <Type>String</Type>
-      <Width>2</Width>
+      <Width>6</Width>
     </PropertyDefn>
   </GMLFeatureClass>
-</GMLFeatureClassList>b
+</GMLFeatureClassList>

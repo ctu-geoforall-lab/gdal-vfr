@@ -1,34 +1,35 @@
 <GMLFeatureClassList>
+  <!-- VÚSC -->
   <GMLFeatureClass>
-    <!-- Seznam států -->
-    <Name>Staty</Name>
-    <ElementPath>Data|Staty|Stat</ElementPath>
+    <Name>Vusc</Name>
+    <ElementPath>Data|Vusc|Vusc</ElementPath>
     <SRSName>urn:ogc:def:crs:EPSG::5514</SRSName>
-    <!-- Geometrie definičního bodu státu -->
+    <!-- Geometrie definičního bodu VÚSC -->
     <GeomPropertyDefn>
       <Name>DefinicniBod</Name> 
       <ElementPath>Geometrie|DefinicniBod</ElementPath> 
       <Type>Point</Type>
     </GeomPropertyDefn>
-    <!-- Originální geometrie hranice státu -->
+    <!-- Originální geometrie hranice VÚSC -->
     <GeomPropertyDefn>
       <Name>OriginalniHranice</Name> 
       <ElementPath>Geometrie|OriginalniHranice</ElementPath> 
       <Type>MultiPolygon</Type>
     </GeomPropertyDefn>
-    <!-- Generalizovaná geometrie hranice státu (stupeň generalizace 5) -->
+    <!-- Generalizovaná geometrie hranice VÚSC (stupeň generalizace 5) -->
     <GeomPropertyDefn>
       <Name>GeneralizovaneHranice</Name> 
       <ElementPath>Geometrie|GeneralizovaneHranice5</ElementPath> 
       <Type>MultiPolygon</Type>
     </GeomPropertyDefn>
-    <!-- Kód státu -->
+    <!-- Kód VÚSC -->
     <PropertyDefn>
       <Name>Kod</Name>
       <ElementPath>Kod</ElementPath>
       <Type>Integer</Type>
+      <Width>6</Width>
     </PropertyDefn>
-    <!-- Název státu -->
+    <!-- Název VÚSC -->
     <PropertyDefn>
       <Name>Nazev</Name>
       <ElementPath>Nazev</ElementPath>
@@ -41,6 +42,12 @@
       <ElementPath>Nespravny</ElementPath>
       <Type>String</Type>
       <Width>5</Width>
+    </PropertyDefn>
+    <!-- Nadřazený region soudržnosti -->
+    <PropertyDefn>
+      <Name>RegionSoudrznosti_Kod</Name>
+      <ElementPath>RegionSoudrznosti|Kod</ElementPath>
+      <Type>Integer</Type>
     </PropertyDefn>
     <!-- Začátek platnosti -->
     <PropertyDefn>
@@ -63,7 +70,7 @@
       <Type>Integer</Type>
       <Width>18</Width>
     </PropertyDefn>
-    <!-- ID návrhu změny v ISUI -->
+    <!--  ID návrhu změn v ISUI -->
     <PropertyDefn>
       <Name>GlobalniIdNavrhuZmeny</Name>
       <ElementPath>GlobalniIdNavrhuZmeny</ElementPath>
@@ -75,7 +82,7 @@
       <Name>NutsLau</Name>
       <ElementPath>NutsLau</ElementPath>
       <Type>String</Type>
-      <Width>2</Width>
+      <Width>5</Width>
     </PropertyDefn>
   </GMLFeatureClass>
-</GMLFeatureClassList>b
+</GMLFeatureClassList>

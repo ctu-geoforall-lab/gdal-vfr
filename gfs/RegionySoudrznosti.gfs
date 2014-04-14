@@ -1,16 +1,16 @@
 <GMLFeatureClassList>
+  <!-- Regiony soudržnosti -->
   <GMLFeatureClass>
-    <!-- Seznam států -->
-    <Name>Staty</Name>
-    <ElementPath>Data|Staty|Stat</ElementPath>
+    <Name>RegionySoudrznosti</Name>
+    <ElementPath>Data|RegionySoudrznosti|RegionySoudrznosti</ElementPath>
     <SRSName>urn:ogc:def:crs:EPSG::5514</SRSName>
-    <!-- Geometrie definičního bodu státu -->
+    <!-- Geometrie definičního bodu regionu soudržnosti -->
     <GeomPropertyDefn>
       <Name>DefinicniBod</Name> 
       <ElementPath>Geometrie|DefinicniBod</ElementPath> 
       <Type>Point</Type>
     </GeomPropertyDefn>
-    <!-- Originální geometrie hranice státu -->
+    <!-- Originální geometrie hranice regionu soudržnosti -->
     <GeomPropertyDefn>
       <Name>OriginalniHranice</Name> 
       <ElementPath>Geometrie|OriginalniHranice</ElementPath> 
@@ -22,13 +22,13 @@
       <ElementPath>Geometrie|GeneralizovaneHranice5</ElementPath> 
       <Type>MultiPolygon</Type>
     </GeomPropertyDefn>
-    <!-- Kód státu -->
+    <!-- Kód regionu soudržnosti -->
     <PropertyDefn>
       <Name>Kod</Name>
       <ElementPath>Kod</ElementPath>
       <Type>Integer</Type>
     </PropertyDefn>
-    <!-- Název státu -->
+    <!-- Název regionu soudržnosti -->
     <PropertyDefn>
       <Name>Nazev</Name>
       <ElementPath>Nazev</ElementPath>
@@ -41,6 +41,12 @@
       <ElementPath>Nespravny</ElementPath>
       <Type>String</Type>
       <Width>5</Width>
+    </PropertyDefn>
+    <!-- Nadřazený stát -->
+    <PropertyDefn>
+      <Name>Stat_Kod</Name>
+      <ElementPath>Stat|Kod</ElementPath>
+      <Type>Integer</Type>
     </PropertyDefn>
     <!-- Začátek platnosti -->
     <PropertyDefn>
@@ -63,7 +69,7 @@
       <Type>Integer</Type>
       <Width>18</Width>
     </PropertyDefn>
-    <!-- ID návrhu změny v ISUI -->
+    <!-- ID návrhu změn v ISUI -->
     <PropertyDefn>
       <Name>GlobalniIdNavrhuZmeny</Name>
       <ElementPath>GlobalniIdNavrhuZmeny</ElementPath>
@@ -75,7 +81,7 @@
       <Name>NutsLau</Name>
       <ElementPath>NutsLau</ElementPath>
       <Type>String</Type>
-      <Width>2</Width>
+      <Width>4</Width>
     </PropertyDefn>
   </GMLFeatureClass>
-</GMLFeatureClassList>b
+</GMLFeatureClassList>

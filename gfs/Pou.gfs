@@ -1,39 +1,39 @@
 <GMLFeatureClassList>
+  <!-- POU -->
   <GMLFeatureClass>
-    <!-- Seznam států -->
-    <Name>Staty</Name>
-    <ElementPath>Data|Staty|Stat</ElementPath>
+    <Name>Pou</Name>
+    <ElementPath>Data|Pou|Pou</ElementPath>
     <SRSName>urn:ogc:def:crs:EPSG::5514</SRSName>
-    <!-- Geometrie definičního bodu státu -->
+    <!-- Geometrie definičního bodu POU -->
     <GeomPropertyDefn>
       <Name>DefinicniBod</Name> 
       <ElementPath>Geometrie|DefinicniBod</ElementPath> 
-      <Type>Point</Type>
+      <Type>MultiPoint</Type>
     </GeomPropertyDefn>
-    <!-- Originální geometrie hranice státu -->
+    <!-- Originální geometrie hranice POU -->
     <GeomPropertyDefn>
       <Name>OriginalniHranice</Name> 
       <ElementPath>Geometrie|OriginalniHranice</ElementPath> 
       <Type>MultiPolygon</Type>
     </GeomPropertyDefn>
-    <!-- Generalizovaná geometrie hranice státu (stupeň generalizace 5) -->
+    <!-- Generalizovaná geometrie hranice POU (stupeň generalizace 4) -->
     <GeomPropertyDefn>
       <Name>GeneralizovaneHranice</Name> 
-      <ElementPath>Geometrie|GeneralizovaneHranice5</ElementPath> 
+      <ElementPath>Geometrie|GeneralizovaneHranice4</ElementPath> 
       <Type>MultiPolygon</Type>
     </GeomPropertyDefn>
-    <!-- Kód státu -->
+    <!-- Kód POU -->
     <PropertyDefn>
       <Name>Kod</Name>
       <ElementPath>Kod</ElementPath>
       <Type>Integer</Type>
     </PropertyDefn>
-    <!-- Název státu -->
+    <!-- Název POU -->
     <PropertyDefn>
       <Name>Nazev</Name>
       <ElementPath>Nazev</ElementPath>
       <Type>String</Type>
-      <Width>32</Width>
+      <Width>48</Width>
     </PropertyDefn>
     <!-- Identifikátor nesprávnosti na prvku (?) -->
     <PropertyDefn>
@@ -41,6 +41,20 @@
       <ElementPath>Nespravny</ElementPath>
       <Type>String</Type>
       <Width>5</Width>
+    </PropertyDefn>
+    <!-- Kód správni obce -->
+    <PropertyDefn>
+      <Name>SpravniObecKod</Name>
+      <ElementPath>SpravniObecKod</ElementPath>
+      <Type>Integer</Type>
+      <Width>6</Width>
+    </PropertyDefn>
+    <!-- Nadřazený ORP -->
+    <PropertyDefn>
+      <Name>Orp_Kod</Name>
+      <ElementPath>Orp|Kod</ElementPath>
+      <Type>Integer</Type>
+      <Width>6</Width>
     </PropertyDefn>
     <!-- Začátek platnosti -->
     <PropertyDefn>
@@ -63,19 +77,12 @@
       <Type>Integer</Type>
       <Width>18</Width>
     </PropertyDefn>
-    <!-- ID návrhu změny v ISUI -->
+    <!-- ID návrhu změn v ISUI -->
     <PropertyDefn>
       <Name>GlobalniIdNavrhuZmeny</Name>
       <ElementPath>GlobalniIdNavrhuZmeny</ElementPath>
       <Type>Integer</Type>
       <Width>18</Width>
     </PropertyDefn>
-    <!-- Kód územního celku v NUTS / LAU -->
-    <PropertyDefn>
-      <Name>NutsLau</Name>
-      <ElementPath>NutsLau</ElementPath>
-      <Type>String</Type>
-      <Width>2</Width>
-    </PropertyDefn>
   </GMLFeatureClass>
-</GMLFeatureClassList>b
+</GMLFeatureClassList>
