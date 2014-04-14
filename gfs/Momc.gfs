@@ -1,8 +1,8 @@
 <GMLFeatureClassList>
   <!-- MOMC -->
   <GMLFeatureClass>
-    <Name>Mop</Name>
-    <ElementPath>Data|Mop|Mop</ElementPath>
+    <Name>Momc</Name>
+    <ElementPath>Data|Momc|Momc</ElementPath>
     <SRSName>urn:ogc:def:crs:EPSG::5514</SRSName>
     <!-- Geometrie definičního bodu MOMC -->
     <GeomPropertyDefn>

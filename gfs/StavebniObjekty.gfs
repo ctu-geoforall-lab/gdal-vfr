@@ -33,7 +33,7 @@
     <PropertyDefn>
       <Name>CisloDomovni</Name>
       <ElementPath>CislaDomovni|CisloDomovni</ElementPath>
-      <Type>IntegerList</Type>
+      <Type>Integer</Type>
     </PropertyDefn>
     <!-- Jedna z parcel, na nichž je stavební objekt postaven, zvolená
          pro identifikaci objektu (tzv. definiční parcela) -->
@@ -187,7 +187,7 @@
       <ElementPath>ZpusobyOchrany|TypOchranyKod</ElementPath>
       <Type>Integer</Type>
     </PropertyDefn>
-        <!-- Způsob ochrany stavebního objektu - ID transakce v RUIAN -->
+    <!-- Způsob ochrany stavebního objektu - ID transakce v RUIAN -->
     <PropertyDefn>
       <Name>ZpusobOchranyIdTransakce</Name>
       <ElementPath>ZpusobyOchrany|IdTransakce</ElementPath>
@@ -206,5 +206,5 @@
       <ElementPath>DetailniTEA|Kod</ElementPath>
       <Type>IntegerList</Type>
     </PropertyDefn>
- </GMLFeatureClass>
+  </GMLFeatureClass>
 </GMLFeatureClassList>

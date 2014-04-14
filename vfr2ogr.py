@@ -5,12 +5,17 @@ Converts VFR file into desired GIS format supported by OGR library.
 
 Requires GDAL/OGR library version 1.11 or later.
 
-Usage: vfr2ogr.py [-f] [--file=/path/to/vfr/filename] [--platnost=p|h] [--prirustek=d.m.y] [--data=z|k] [--udaje=z|g|o|v] [--kraj=US|MS|..] [--orp=<nazev>] [--obec=<kod>]
-                  [--format=<output format>] [--dsn=<OGR datasource>]
+One of options must be given:
+       --file
+       --date and --ftype
+
+Usage: vfr2ogr.py [-f] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--ftype=ST_ABCD|OB_000000_ABCD] [--format=<output format>] [--dsn=<OGR datasource>]
 
        -f         List supported output formats
        -o         Overwrite existing files
        --file     Path to xml.gz file
+       --date     Date in format YYYYMMDD
+       --ftyoe    Type of request in format XY_ABCD, eg. 'ST_UKSH' or 'OB_000000_ABCD'
        --format   Output format
        --dsn      Output OGR datasource
 """
@@ -31,25 +36,25 @@ def main():
         usage()
         sys.exit(2)
         
-    if sys.argv[1] == '-f':
-        list_formats()
-        sys.exit(0)
-
-    # check if input VFR file exists
-    filename = check_file(sys.argv[1])
-    
     # parse options
     try:
-        opts, args = getopt.getopt(sys.argv[2:], "hfo", ["help", "overwrite", "format=", "dsn="])
+        opts, args = getopt.getopt(sys.argv[1:], "hfo", ["help", "overwrite", "file=", "date=", "type=", "format=", "dsn="])
     except getopt.GetoptError as err:
         print str(err) 
         usage()
         sys.exit(2)
     
     overwrite = False
+    filename = date = ftype = None
     oformat = odsn = None
     for o, a in opts:
-        if o in ("-o",  "--overwrite"):
+        if o == "--file":
+            filename = a
+        elif o == "--date":
+            date = a
+        elif o == "--type":
+            ftype = a
+        elif o in ("-o",  "--overwrite"):
             overwrite = True
         elif o in ("-h", "--help"):
             usage()
@@ -63,6 +68,21 @@ def main():
             odsn = a
         else:
             assert False, "unhandled option"
+    
+    if not filename and not date:
+        fatal("--file or --date requested")
+    if filename and date:
+        fatal("--file and --date are mutually exclusive")
+    if date and not ftype:
+        fatal("--ftype requested")
+    
+    if filename:
+        # check if input VFR file exists
+        filename = check_file(filename)
+    else:
+        url = "http://vdp.cuzk.cz/vymenny_format/soucasna/%s_%s.xml.gz" % (date, ftype)
+        message("Downloading %s..." % url)
+        filename = "/vsicurl/" + url
     
     # open input file by GML driver
     ids = open_file(filename)
