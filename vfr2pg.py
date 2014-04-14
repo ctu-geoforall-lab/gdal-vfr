@@ -18,7 +18,7 @@ Usage: vfr2py.py [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--f
        --host     Host name
 """
 
-from vfr2ogr.vfr import *
+from vfr2ogr.ogr import *
 from vfr2ogr.utils import *
 from vfr2ogr.parse import parse_cmd
 
