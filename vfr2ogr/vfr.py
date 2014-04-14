@@ -7,14 +7,7 @@ try:
 except ImportError, e:
     sys.exit('ERROR: Import of ogr from osgeo failed. %s' % e)
 
-def fatal(msg):
-    sys.exit('ERROR: ' + msg)
 
-def message(msg):
-    sys.stderr.write('-' * 80 + os.linesep)
-    sys.stderr.write(msg + os.linesep)
-    sys.stderr.write('-' * 80 + os.linesep)
-    
 # check GDAL/OGR library, version >= 1.11 required
 def check_ogr():
     # check required version
@@ -25,14 +18,6 @@ def check_ogr():
     # check if OGR comes with GML driver
     if not ogr.GetDriverByName('GML'):
         fatal('GML driver required')
-
-def check_file(filename):
-    if filename.startswith('-'):
-        fatal('No input file specified')
-    if not os.path.isfile(filename):
-        fatal("'%s' doesn't exists or it's not a file" % filename)
-    
-    return filename
 
 def open_file(filename):
     drv = ogr.GetDriverByName("GML")

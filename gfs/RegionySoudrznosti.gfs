@@ -2,7 +2,7 @@
   <!-- Regiony soudržnosti -->
   <GMLFeatureClass>
     <Name>RegionySoudrznosti</Name>
-    <ElementPath>Data|RegionySoudrznosti|RegionySoudrznosti</ElementPath>
+    <ElementPath>Data|RegionySoudrznosti|RegionSoudrznosti</ElementPath>
     <SRSName>urn:ogc:def:crs:EPSG::5514</SRSName>
     <!-- Geometrie definičního bodu regionu soudržnosti -->
     <GeomPropertyDefn>
