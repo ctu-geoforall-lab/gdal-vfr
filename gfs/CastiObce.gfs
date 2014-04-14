@@ -1,39 +1,27 @@
 <GMLFeatureClassList>
-  <!-- Kraje -->
+  <!-- CastiObci -->
   <GMLFeatureClass>
-    <Name>Kraje</Name>
-    <ElementPath>Data|Kraje|Kraj</ElementPath>
+    <Name>CastiObci</Name>
+    <ElementPath>Data|CastiObci|CastObce</ElementPath>
     <SRSName>urn:ogc:def:crs:EPSG::5514</SRSName>
-    <!-- Geometrie definičního bodu kraje -->
+    <!-- Geometrie definičního bodu části obce -->
     <GeomPropertyDefn>
       <Name>DefinicniBod</Name> 
       <ElementPath>Geometrie|DefinicniBod</ElementPath> 
       <Type>Point</Type>
     </GeomPropertyDefn>
-    <!-- Originální geometrie hranice kraje -->
-    <GeomPropertyDefn>
-      <Name>OriginalniHranice</Name> 
-      <ElementPath>Geometrie|OriginalniHranice</ElementPath> 
-      <Type>MultiPolygon</Type>
-    </GeomPropertyDefn>
-    <!-- Generalizovaná geometrie hranice kraje (stupeň generalizace 5) -->
-    <GeomPropertyDefn>
-      <Name>GeneralizovaneHranice</Name> 
-      <ElementPath>Geometrie|GeneralizovaneHranice5</ElementPath> 
-      <Type>MultiPolygon</Type>
-    </GeomPropertyDefn>
-    <!-- Kód kraje -->
+    <!-- Kód části obce -->
     <PropertyDefn>
       <Name>Kod</Name>
       <ElementPath>Kod</ElementPath>
       <Type>Integer</Type>
     </PropertyDefn>
-    <!-- Název kraje -->
+    <!-- Název části obce -->
     <PropertyDefn>
       <Name>Nazev</Name>
       <ElementPath>Nazev</ElementPath>
       <Type>String</Type>
-      <Width>32</Width>
+      <Width>48</Width>
     </PropertyDefn>
     <!-- Identifikátor nesprávnosti na prvku (?) -->
     <PropertyDefn>
@@ -42,10 +30,10 @@
       <Type>String</Type>
       <Width>5</Width>
     </PropertyDefn>
-    <!-- Nadřazený stát -->
+    <!-- Nadřazená obec -->
     <PropertyDefn>
-      <Name>StatKod</Name>
-      <ElementPath>Stat|Kod</ElementPath>
+      <Name>ObecKod</Name>
+      <ElementPath>Obec|Kod</ElementPath>
       <Type>Integer</Type>
     </PropertyDefn>
     <!-- Začátek platnosti -->
@@ -76,12 +64,36 @@
       <Type>Integer</Type>
       <Width>18</Width>
     </PropertyDefn>
-    <!-- Kód územního celku v NUTS / LAU -->
+    <!-- Mluvnické charakteristiky 2 až 7 pád -->
     <PropertyDefn>
-      <Name>NutsLau</Name>
-      <ElementPath>NutsLau</ElementPath>
+      <Name>MluvnickeCharakteristikyPad2</Name>
+      <ElementPath>MluvnickeCharakteristiky|Pad2</ElementPath>
       <Type>String</Type>
-      <Width>4</Width>
+      <Width>48</Width>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>MluvnickeCharakteristikyPad3</Name>
+      <ElementPath>MluvnickeCharakteristiky|Pad3</ElementPath>
+      <Type>String</Type>
+      <Width>48</Width>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>MluvnickeCharakteristikyPad4</Name>
+      <ElementPath>MluvnickeCharakteristiky|Pad4</ElementPath>
+      <Type>String</Type>
+      <Width>48</Width>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>MluvnickeCharakteristikyPad6</Name>
+      <ElementPath>MluvnickeCharakteristiky|Pad6</ElementPath>
+      <Type>String</Type>
+      <Width>48</Width>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>MluvnickeCharakteristikyPad7</Name>
+      <ElementPath>MluvnickeCharakteristiky|Pad7</ElementPath>
+      <Type>String</Type>
+      <Width>48</Width>
     </PropertyDefn>
   </GMLFeatureClass>
 </GMLFeatureClassList>

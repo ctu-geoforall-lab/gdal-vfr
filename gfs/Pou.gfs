@@ -51,7 +51,7 @@
     </PropertyDefn>
     <!-- Nadřazený ORP -->
     <PropertyDefn>
-      <Name>Orp_Kod</Name>
+      <Name>OrpKod</Name>
       <ElementPath>Orp|Kod</ElementPath>
       <Type>Integer</Type>
       <Width>6</Width>

@@ -45,7 +45,7 @@
     </PropertyDefn>
     <!-- Nadřazený region soudržnosti -->
     <PropertyDefn>
-      <Name>RegionSoudrznosti_Kod</Name>
+      <Name>RegionSoudrznostiKod</Name>
       <ElementPath>RegionSoudrznosti|Kod</ElementPath>
       <Type>Integer</Type>
     </PropertyDefn>

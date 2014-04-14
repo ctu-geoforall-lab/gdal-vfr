@@ -44,7 +44,7 @@
     </PropertyDefn>
     <!-- Nadřazený stát -->
     <PropertyDefn>
-      <Name>Stat_Kod</Name>
+      <Name>StatKod</Name>
       <ElementPath>Stat|Kod</ElementPath>
       <Type>Integer</Type>
     </PropertyDefn>

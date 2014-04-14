@@ -1,34 +1,28 @@
 <GMLFeatureClassList>
-  <!-- Kraje -->
+  <!-- MOP -->
   <GMLFeatureClass>
-    <Name>Kraje</Name>
-    <ElementPath>Data|Kraje|Kraj</ElementPath>
+    <Name>Mop</Name>
+    <ElementPath>Data|Mop|Mop</ElementPath>
     <SRSName>urn:ogc:def:crs:EPSG::5514</SRSName>
-    <!-- Geometrie definičního bodu kraje -->
+    <!-- Geometrie definičního bodu MOP -->
     <GeomPropertyDefn>
       <Name>DefinicniBod</Name> 
       <ElementPath>Geometrie|DefinicniBod</ElementPath> 
       <Type>Point</Type>
     </GeomPropertyDefn>
-    <!-- Originální geometrie hranice kraje -->
+    <!-- Originální geometrie hranice MOP -->
     <GeomPropertyDefn>
       <Name>OriginalniHranice</Name> 
       <ElementPath>Geometrie|OriginalniHranice</ElementPath> 
       <Type>MultiPolygon</Type>
     </GeomPropertyDefn>
-    <!-- Generalizovaná geometrie hranice kraje (stupeň generalizace 5) -->
-    <GeomPropertyDefn>
-      <Name>GeneralizovaneHranice</Name> 
-      <ElementPath>Geometrie|GeneralizovaneHranice5</ElementPath> 
-      <Type>MultiPolygon</Type>
-    </GeomPropertyDefn>
-    <!-- Kód kraje -->
+    <!-- Kód MOP -->
     <PropertyDefn>
       <Name>Kod</Name>
       <ElementPath>Kod</ElementPath>
       <Type>Integer</Type>
     </PropertyDefn>
-    <!-- Název kraje -->
+    <!-- Název MOP -->
     <PropertyDefn>
       <Name>Nazev</Name>
       <ElementPath>Nazev</ElementPath>
@@ -42,10 +36,10 @@
       <Type>String</Type>
       <Width>5</Width>
     </PropertyDefn>
-    <!-- Nadřazený stát -->
+    <!-- Nadřazená obec -->
     <PropertyDefn>
-      <Name>StatKod</Name>
-      <ElementPath>Stat|Kod</ElementPath>
+      <Name>ObecKod</Name>
+      <ElementPath>Obec|Kod</ElementPath>
       <Type>Integer</Type>
     </PropertyDefn>
     <!-- Začátek platnosti -->
@@ -75,13 +69,6 @@
       <ElementPath>GlobalniIdNavrhuZmeny</ElementPath>
       <Type>Integer</Type>
       <Width>18</Width>
-    </PropertyDefn>
-    <!-- Kód územního celku v NUTS / LAU -->
-    <PropertyDefn>
-      <Name>NutsLau</Name>
-      <ElementPath>NutsLau</ElementPath>
-      <Type>String</Type>
-      <Width>4</Width>
     </PropertyDefn>
   </GMLFeatureClass>
 </GMLFeatureClassList>
