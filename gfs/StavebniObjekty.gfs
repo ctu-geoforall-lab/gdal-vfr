@@ -1,0 +1,210 @@
+<GMLFeatureClassList>
+  <!-- Stavební objekty -->
+  <GMLFeatureClass>
+    <Name>StavebniObjekty</Name>
+    <ElementPath>Data|StavebniObjekty|StavebniObjekt</ElementPath>
+    <SRSName>urn:ogc:def:crs:EPSG::5514</SRSName>
+    <!-- Geometrie definičního bodu stavebního objektu -->
+    <GeomPropertyDefn>
+      <Name>DefinicniBod</Name> 
+      <ElementPath>Geometrie|DefinicniBod</ElementPath> 
+      <Type>Point</Type>
+    </GeomPropertyDefn>
+    <!-- Originální geometrie hranice stavebního objektu ? -->
+    <GeomPropertyDefn>
+      <Name>OriginalniHranice</Name> 
+      <ElementPath>Geometrie|OriginalniHranice</ElementPath> 
+      <Type>Polygon</Type>
+    </GeomPropertyDefn>
+    <!-- Kód stavebního objektu -->
+    <PropertyDefn>
+      <Name>Kod</Name>
+      <ElementPath>Kod</ElementPath>
+      <Type>Integer</Type>
+    </PropertyDefn>
+    <!-- Identifikátor nesprávnosti na prvku (?) -->
+    <PropertyDefn>
+      <Name>Nespravny</Name>
+      <ElementPath>Nespravny</ElementPath>
+      <Type>String</Type>
+      <Width>5</Width>
+    </PropertyDefn>
+    <!-- Seznam čísel domovních stavebního objektu -->
+    <PropertyDefn>
+      <Name>CisloDomovni</Name>
+      <ElementPath>CislaDomovni|CisloDomovni</ElementPath>
+      <Type>IntegerList</Type>
+    </PropertyDefn>
+    <!-- Jedna z parcel, na nichž je stavební objekt postaven, zvolená
+         pro identifikaci objektu (tzv. definiční parcela) -->
+    <PropertyDefn>
+      <Name>IdentifikacniParcelaId</Name>
+      <ElementPath>IdentifikacniParcela|Id</ElementPath>
+      <Type>Integer</Type>
+      <Width>18</Width>
+    </PropertyDefn>
+    <!-- Typ stavebního objektu -->
+    <PropertyDefn>
+      <Name>TypStavebnihoObjektuKod</Name>
+      <ElementPath>TypStavebnihoObjektuKod</ElementPath>
+      <Type>Integer</Type>
+    </PropertyDefn>
+    <!-- Způsob využití -->
+    <PropertyDefn>
+      <Name>ZpusobVyuzitiKod</Name>
+      <ElementPath>ZpusobVyuzitiKod</ElementPath>
+      <Type>Integer</Type>
+    </PropertyDefn>
+    <!-- Nadřazená část obce -->
+    <PropertyDefn>
+      <Name>CastObceKod</Name>
+      <ElementPath>CastObce|Kod</ElementPath>
+      <Type>Integer</Type>
+    </PropertyDefn>
+    <!-- Nadřazený MOMC -->
+    <PropertyDefn>
+      <Name>MomcKod</Name>
+      <ElementPath>Momc|Kod</ElementPath>
+      <Type>Integer</Type>
+    </PropertyDefn>
+    <!-- Začátek platnosti -->
+    <PropertyDefn>
+      <Name>PlatiOd</Name>
+      <ElementPath>PlatiOd</ElementPath>
+      <Type>String</Type>
+      <Width>19</Width>
+    </PropertyDefn>
+    <!-- Konec platnosti -->
+    <PropertyDefn>
+      <Name>PlatiDo</Name>
+      <ElementPath>PlatiDo</ElementPath>
+      <Type>String</Type>
+      <Width>19</Width>
+    </PropertyDefn>
+    <!-- ID transakce v RUIAN -->
+    <PropertyDefn>
+      <Name>IdTransakce</Name>
+      <ElementPath>IdTransakce</ElementPath>
+      <Type>Integer</Type>
+      <Width>18</Width>
+    </PropertyDefn>
+    <!-- ID návrhu změn v ISUI -->
+    <PropertyDefn>
+      <Name>GlobalniIdNavrhuZmeny</Name>
+      <ElementPath>GlobalniIdNavrhuZmeny</ElementPath>
+      <Type>Integer</Type>
+      <Width>18</Width>
+    </PropertyDefn>
+    <!-- ID budovy v ISKN -->
+    <PropertyDefn>
+      <Name>IsknBudovaId</Name>
+      <ElementPath>IsknBudovaId</ElementPath>
+      <Type>Integer</Type>
+      <Width>18</Width>
+    </PropertyDefn>
+    <!-- Datum dokončení stavebního objektu -->
+    <PropertyDefn>
+      <Name>Dokonceni</Name>
+      <ElementPath>Dokonceni</ElementPath>
+      <Type>String</Type>
+      <Width>19</Width>
+    </PropertyDefn>
+    <!-- Druh svislé nosné konstrukce -->
+    <PropertyDefn>
+      <Name>DruhKonstrukceKod</Name>
+      <ElementPath>DruhKonstrukceKod</ElementPath>
+      <Type>Integer</Type>
+    </PropertyDefn>
+    <!-- Obestavěný prostor v m3 -->
+    <PropertyDefn>
+      <Name>ObestavenyProstor</Name>
+      <ElementPath>ObestavenyProstor</ElementPath>
+      <Type>Integer</Type>
+    </PropertyDefn>
+    <!-- Počet bytů u stavebního objektu s byty -->
+    <PropertyDefn>
+      <Name>PocetBytu</Name>
+      <ElementPath>PocetBytu</ElementPath>
+      <Type>Integer</Type>
+    </PropertyDefn>
+    <!-- Počet nadzemních a podzemních podlaží -->
+    <PropertyDefn>
+      <Name>PocetPodlazi</Name>
+      <ElementPath>PocetPodlazi</ElementPath>
+      <Type>Integer</Type>
+    </PropertyDefn>
+    <!-- Podlahová plocha v m2 -->
+    <PropertyDefn>
+      <Name>PodlahovaPlocha</Name>
+      <ElementPath>PodlahovaPlocha</ElementPath>
+      <Type>Integer</Type>
+    </PropertyDefn>
+    <!-- Připojení na kanalizační síť -->
+    <PropertyDefn>
+      <Name>PripojeniKanalizaceKod</Name>
+      <ElementPath>PripojeniKanalizaceKod</ElementPath>
+      <Type>Integer</Type>
+    </PropertyDefn>
+    <!-- Připojení na rozvod plynu -->
+    <PropertyDefn>
+      <Name>PripojeniPlynKod</Name>
+      <ElementPath>PripojeniPlynKod</ElementPath>
+      <Type>Integer</Type>
+    </PropertyDefn>
+    <!-- Připojení na vodovod -->
+    <PropertyDefn>
+      <Name>PripojeniVodovodKod</Name>
+      <ElementPath>PripojeniVodovodKod</ElementPath>
+      <Type>Integer</Type>
+    </PropertyDefn>
+    <!-- Vybavení výtahem -->
+    <PropertyDefn>
+      <Name>VybaveniVytahemKod</Name>
+      <ElementPath>VybaveniVytahemKod</ElementPath>
+      <Type>Integer</Type>
+    </PropertyDefn>
+    <!-- Zastavěná plocha v m2 -->
+    <PropertyDefn>
+      <Name>ZastavenaPlocha</Name>
+      <ElementPath>ZastavenaPlocha</ElementPath>
+      <Type>Integer</Type>
+    </PropertyDefn>
+    <!-- Způsob vytápění -->
+    <PropertyDefn>
+      <Name>ZpusobVytapeniKod</Name>
+      <ElementPath>ZpusobVytapeniKod</ElementPath>
+      <Type>Integer</Type>
+    </PropertyDefn>
+    <!-- Způsob ochrany stavebního objektu - kód ochrany -->
+    <PropertyDefn>
+      <Name>ZpusobOchranyKod</Name>
+      <ElementPath>ZpusobyOchranyPozemku|ZpusobOchrany|Kod</ElementPath>
+      <Type>Integer</Type>
+    </PropertyDefn>
+    <!-- Způsob ochrany stavebního objektu - typ ochrany -->
+    <PropertyDefn>
+      <Name>ZpusobOchranyTypOchranyKod</Name>
+      <ElementPath>ZpusobyOchrany|TypOchranyKod</ElementPath>
+      <Type>Integer</Type>
+    </PropertyDefn>
+        <!-- Způsob ochrany stavebního objektu - ID transakce v RUIAN -->
+    <PropertyDefn>
+      <Name>ZpusobOchranyIdTransakce</Name>
+      <ElementPath>ZpusobyOchrany|IdTransakce</ElementPath>
+      <Type>Integer</Type>
+    </PropertyDefn>
+    <!-- Způsob ochrany stavebního objektu - ID řízení v ISKN -->
+    <PropertyDefn>
+      <Name>ZpusobOchranyRizeniId</Name>
+      <ElementPath>ZpusobyOchrany|RizeniId</ElementPath>
+      <Type>Integer</Type>
+      <Width>18</Width>
+    </PropertyDefn>
+    <!-- Detailní tecnicko-ekonomické atributy (TEA) (?) -->
+    <PropertyDefn>
+      <Name>DetailniTEAKod</Name>
+      <ElementPath>DetailniTEA|Kod</ElementPath>
+      <Type>IntegerList</Type>
+    </PropertyDefn>
+ </GMLFeatureClass>
+</GMLFeatureClassList>

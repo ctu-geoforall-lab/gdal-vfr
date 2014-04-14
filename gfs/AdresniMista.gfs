@@ -1,0 +1,111 @@
+<GMLFeatureClassList>
+  <!-- Adresní místa -->
+  <GMLFeatureClass>
+    <Name>AdresniMista</Name>
+    <ElementPath>Data|AdresniMista|AdresniMisto</ElementPath>
+    <SRSName>urn:ogc:def:crs:EPSG::5514</SRSName>
+    <!-- Definiční bod typu Adresní bod -->
+    <GeomPropertyDefn>
+      <Name>AdresniBod</Name> 
+      <ElementPath>Geometrie|AdresniBod</ElementPath> 
+      <Type>Point</Type>
+    </GeomPropertyDefn>
+    <!-- Definiční bod typu Přístup pro záchrannou službu -->
+    <GeomPropertyDefn>
+      <Name>Zachranka</Name> 
+      <ElementPath>Geometrie|Zachranka</ElementPath> 
+      <Type>Point</Type>
+    </GeomPropertyDefn>
+    <!-- Definiční bod typu Přístup pro hasiče -->
+    <GeomPropertyDefn>
+      <Name>Hasici</Name> 
+      <ElementPath>Geometrie|Hasici</ElementPath> 
+      <Type>Point</Type>
+    </GeomPropertyDefn>
+    <!-- Kód adresního místa -->
+    <PropertyDefn>
+      <Name>Kod</Name>
+      <ElementPath>Kod</ElementPath>
+      <Type>Integer</Type>
+    </PropertyDefn>
+    <!-- Identifikátor nesprávnosti na prvku (?) -->
+    <PropertyDefn>
+      <Name>Nespravny</Name>
+      <ElementPath>Nespravny</ElementPath>
+      <Type>String</Type>
+      <Width>5</Width>
+    </PropertyDefn>
+    <!-- Číslo domovní -->
+    <PropertyDefn>
+      <Name>CisloDomovni</Name>
+      <ElementPath>CisloDomovni</ElementPath>
+      <Type>Integer</Type>
+    </PropertyDefn>
+    <!-- Číselná část čísla orientačního -->
+    <PropertyDefn>
+      <Name>CisloOrientacni</Name>
+      <ElementPath>CisloOrientacni</ElementPath>
+      <Type>Integer</Type>
+    </PropertyDefn>
+    <!-- Koncové písmeno čísla orientačního -->
+    <PropertyDefn>
+      <Name>CisloOrientacniPismeno</Name>
+      <ElementPath>CisloOrientacniPismeno</ElementPath>
+      <Type>String</Type>
+      <Width>1</Width>
+    </PropertyDefn>
+    <!-- PSČ adresní pošty -->
+    <PropertyDefn>
+      <Name>Psc</Name>
+      <ElementPath>Psc</ElementPath>
+      <Type>Integer</Type>
+    </PropertyDefn>
+    <!-- Nadřazený stavební objekt -->
+    <PropertyDefn>
+      <Name>StavebniObjektKod</Name>
+      <ElementPath>StavebniObjekt|Kod</ElementPath>
+      <Type>Integer</Type>
+    </PropertyDefn>
+    <!-- Nadřazená ulice -->
+    <PropertyDefn>
+      <Name>UliceKod</Name>
+      <ElementPath>Ulice|Kod</ElementPath>
+      <Type>Integer</Type>
+    </PropertyDefn>
+    <!-- Začátek platnosti -->
+    <PropertyDefn>
+      <Name>PlatiOd</Name>
+      <ElementPath>PlatiOd</ElementPath>
+      <Type>String</Type>
+      <Width>19</Width>
+    </PropertyDefn>
+    <!-- Konec platnosti -->
+    <PropertyDefn>
+      <Name>PlatiDo</Name>
+      <ElementPath>PlatiDo</ElementPath>
+      <Type>String</Type>
+      <Width>19</Width>
+    </PropertyDefn>
+    <!-- ID transakce v RUIAN -->
+    <PropertyDefn>
+      <Name>IdTransakce</Name>
+      <ElementPath>IdTransakce</ElementPath>
+      <Type>Integer</Type>
+      <Width>18</Width>
+    </PropertyDefn>
+    <!-- ID návrhu změn v ISUI -->
+    <PropertyDefn>
+      <Name>GlobalniIdNavrhuZmeny</Name>
+      <ElementPath>GlobalniIdNavrhuZmeny</ElementPath>
+      <Type>Integer</Type>
+      <Width>18</Width>
+    </PropertyDefn>
+    <!-- ID budovy v ISKN -->
+    <PropertyDefn>
+      <Name>IsknBudovaId</Name>
+      <ElementPath>IsknBudovaId</ElementPath>
+      <Type>Integer</Type>
+      <Width>18</Width>
+    </PropertyDefn>
+  </GMLFeatureClass>
+</GMLFeatureClassList>

@@ -1,0 +1,117 @@
+<GMLFeatureClassList>
+  <!-- ZSJ -->
+  <GMLFeatureClass>
+    <Name>Zsj</Name>
+    <ElementPath>Data|Zsj|Zsj</ElementPath>
+    <SRSName>urn:ogc:def:crs:EPSG::5514</SRSName>
+    <!-- Geometrie definičního bodu ZSJ -->
+    <GeomPropertyDefn>
+      <Name>DefinicniBod</Name> 
+      <ElementPath>Geometrie|DefinicniBod</ElementPath> 
+      <Type>MultiPoint</Type>
+    </GeomPropertyDefn>
+    <!-- Originální geometrie hranice ZSJ -->
+    <GeomPropertyDefn>
+      <Name>OriginalniHranice</Name> 
+      <ElementPath>Geometrie|OriginalniHranice</ElementPath> 
+      <Type>MultiPolygon</Type>
+    </GeomPropertyDefn>
+    <!-- Kód ZSJ -->
+    <PropertyDefn>
+      <Name>Kod</Name>
+      <ElementPath>Kod</ElementPath>
+      <Type>Integer</Type>
+    </PropertyDefn>
+    <!-- Název ZSJ -->
+    <PropertyDefn>
+      <Name>Nazev</Name>
+      <ElementPath>Nazev</ElementPath>
+      <Type>String</Type>
+      <Width>48</Width>
+    </PropertyDefn>
+    <!-- Identifikátor nesprávnosti na prvku (?) -->
+    <PropertyDefn>
+      <Name>Nespravny</Name>
+      <ElementPath>Nespravny</ElementPath>
+      <Type>String</Type>
+      <Width>5</Width>
+    </PropertyDefn>
+    <!-- Nadřazené katastrální území -->
+    <PropertyDefn>
+      <Name>KatastralniUzemiKod</Name>
+      <ElementPath>KatastralniUzemi|Kod</ElementPath>
+      <Type>Integer</Type>
+    </PropertyDefn>
+    <!-- Začátek platnosti -->
+    <PropertyDefn>
+      <Name>PlatiOd</Name>
+      <ElementPath>PlatiOd</ElementPath>
+      <Type>String</Type>
+      <Width>19</Width>
+    </PropertyDefn>
+    <!-- Konec platnosti -->
+    <PropertyDefn>
+      <Name>PlatiDo</Name>
+      <ElementPath>PlatiDo</ElementPath>
+      <Type>String</Type>
+      <Width>19</Width>
+    </PropertyDefn>
+    <!-- ID transakce v RUIAN -->
+    <PropertyDefn>
+      <Name>IdTransakce</Name>
+      <ElementPath>IdTransakce</ElementPath>
+      <Type>Integer</Type>
+      <Width>18</Width>
+    </PropertyDefn>
+    <!-- ID návrhu změn v ISUI -->
+    <PropertyDefn>
+      <Name>GlobalniIdNavrhuZmeny</Name>
+      <ElementPath>GlobalniIdNavrhuZmeny</ElementPath>
+      <Type>Integer</Type>
+      <Width>18</Width>
+    </PropertyDefn>
+    <!-- Mluvnické charakteristiky 2 až 7 pád -->
+    <PropertyDefn>
+      <Name>MluvnickeCharakteristikyPad2</Name>
+      <ElementPath>MluvnickeCharakteristiky|Pad2</ElementPath>
+      <Type>String</Type>
+      <Width>48</Width>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>MluvnickeCharakteristikyPad3</Name>
+      <ElementPath>MluvnickeCharakteristiky|Pad3</ElementPath>
+      <Type>String</Type>
+      <Width>48</Width>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>MluvnickeCharakteristikyPad4</Name>
+      <ElementPath>MluvnickeCharakteristiky|Pad4</ElementPath>
+      <Type>String</Type>
+      <Width>48</Width>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>MluvnickeCharakteristikyPad6</Name>
+      <ElementPath>MluvnickeCharakteristiky|Pad6</ElementPath>
+      <Type>String</Type>
+      <Width>48</Width>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>MluvnickeCharakteristikyPad7</Name>
+      <ElementPath>MluvnickeCharakteristiky|Pad7</ElementPath>
+      <Type>String</Type>
+      <Width>48</Width>
+    </PropertyDefn>
+    <!-- Výměra ZSJ v metrech čtverečních -->
+    <PropertyDefn>
+      <Name>Vymera</Name>
+      <ElementPath>Vymera</ElementPath>
+      <Type>Integer</Type>
+      <Width>18</Width>
+    </PropertyDefn>
+    <!-- Převažující charakter využití ZSJ -->
+    <PropertyDefn>
+      <Name>CharakterZsjKod</Name>
+      <ElementPath>CharakterZsjKod</ElementPath>
+      <Type>Integer</Type>
+    </PropertyDefn>
+  </GMLFeatureClass>
