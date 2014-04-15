@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 
 """
-Imports VFR data to PostGIS database
+Imports VFR data to Oracle Spatial database
 
 Requires GDAL/OGR library version 1.11 or later.
 
 Usage: vfr2py.py [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--ftype=ST_ABCD|OB_000000_ABCD] --dbname <database name>  [--schema <schema name>] [--user <user name>] [--passwd <password>] [--host <host name>]
 
-       -o         Overwrite existing PostGIS tables
+       -o         Overwrite existing Oracle tables
        -e         Extended layer list statistics 
        --file     Path to xml.gz file
        --date     Date in format 'YYYYMMDD'
@@ -49,25 +49,22 @@ def main():
     # open input file by GML driver
     ids = open_file(filename)
     
-    if options['dbname'] is None:
+    if options['user'] is None:
         # list available layers and exit
         layer_list = list_layers(ids, options['extended'])
         if options['extended']:
             compare_list(layer_list, parse_xml_gz(filename))
     else:
-        odsn = "PG:dbname=%s" % options['dbname']
-        if options['user']:
-            odsn += " user=%s" % options['user']
-        if options['passwd']:
-            odsn += " passwd=%s" % options['passwd']
+        if not options['user'] or not options['passwd']:
+            fatal("--user and --passwd required")
+            
+        odsn = "OCI:%s/%s" % (options['user'], options['passwd'])
         if options['host']:
-            odsn += " host=%s" % options['host']
+            odsn += "@%s" % options['host']
+        if options['dbname']:
+            odsn += "/%s" % options['dbname']
         
-        lco_options = []
-        if options['schema']:
-            lco_options.append('SCHEMA=%s' % schema)
-        
-        time = convert_vfr(ids, odsn, "PostgreSQL", options['overwrite'], lco_options)
+        time = convert_vfr(ids, odsn, "OCI", options['overwrite'])
         message("Time elapsed: %d sec" % time)
     
     ids.Destroy()

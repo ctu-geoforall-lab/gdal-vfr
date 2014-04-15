@@ -83,7 +83,7 @@ def list_layers(ds, extended = False):
 def convert_vfr(ids, odsn, frmt, overwrite, options=[]):
     odrv = ogr.GetDriverByName(frmt)
     if odrv is None:
-        fatal("Unable to start driver '%s'" % frmt)
+        fatal("Format '%s' is not supported" % frmt)
     
     # try to open datasource
     ods = odrv.Open(odsn, True)
