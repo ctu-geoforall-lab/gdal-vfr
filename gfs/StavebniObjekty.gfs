@@ -8,7 +8,7 @@
     <GeomPropertyDefn>
       <Name>DefinicniBod</Name> 
       <ElementPath>Geometrie|DefinicniBod</ElementPath> 
-      <Type>MultiPoint</Type>
+      <Type>Point</Type>
     </GeomPropertyDefn>
     <!-- Originální geometrie hranice stavebního objektu ? -->
     <GeomPropertyDefn>
