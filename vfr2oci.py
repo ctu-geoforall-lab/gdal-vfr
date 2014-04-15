@@ -5,13 +5,14 @@ Imports VFR data to Oracle Spatial database
 
 Requires GDAL/OGR library version 1.11 or later.
 
-Usage: vfr2py.py [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--ftype=ST_ABCD|OB_000000_ABCD] --dbname <database name>  [--schema <schema name>] [--user <user name>] [--passwd <password>] [--host <host name>]
+Usage: vfr2oci.py [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type=ST_ABCD|OB_000000_ABCD] --dbname <database name>  [--schema <schema name>] [--user <user name>] [--passwd <password>] [--host <host name>]
 
        -o         Overwrite existing Oracle tables
        -e         Extended layer list statistics 
        --file     Path to xml.gz file
        --date     Date in format 'YYYYMMDD'
-       --ftype    Type of request in format XY_ABCD, eg. 'ST_UKSH' or 'OB_000000_ABCD'
+       --type    Type of request in format XY_ABCD, eg. 'ST_UKSH' or 'OB_000000_ABCD'
+       --layer    Import only selected layers separated by comma (if not given all layers are processed)
        --dbname   Output PostGIS database
        --schema   Schema name (default: public)
        --user     User name
@@ -36,10 +37,10 @@ def main():
     
     # parse cmd arguments
     options = { 'dbname' : None, 'schema' : None, 'user' : None, 'passwd' : None, 'host' : None, 
-                'overwrite' : False, 'extended' : False }
+                'overwrite' : False, 'extended' : False, 'layer': []}
     try:
         filename = parse_cmd(sys.argv, "heo", ["help", "overwrite", "extended",
-                                              "file=", "date=", "type=",
+                                              "file=", "date=", "type=", "layer=",
                                               "dbname=", "schema=", "user=", "passwd=", "host="],
                              options)
     except GetoptError, e:
@@ -64,7 +65,8 @@ def main():
         if options['dbname']:
             odsn += "/%s" % options['dbname']
         
-        time = convert_vfr(ids, odsn, "OCI", options['overwrite'])
+        lco_options = [ "srid=5514" ]
+        time = convert_vfr(ids, odsn, "OCI", options['layer'], options['overwrite'], lco_options)
         message("Time elapsed: %d sec" % time)
     
     ids.Destroy()
