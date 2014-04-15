@@ -9,7 +9,7 @@ One of options must be given:
        --file
        --date and --ftype
 
-Usage: vfr2ogr.py [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type=ST_ABCD|OB_000000_ABCD] [--format=<output format>] [--dsn=<OGR datasource>] [--layer=layer1,layer2,...]
+Usage: vfr2ogr.py [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type=ST_ABCD|OB_000000_ABCD] [--layer=layer1,layer2,...] [--format=<output format>] [--dsn=<OGR datasource>] 
 
        -f         List supported output formats
        -e         Extended layer list statistics 
@@ -17,9 +17,9 @@ Usage: vfr2ogr.py [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--
        --file     Path to xml.gz file
        --date     Date in format 'YYYYMMDD'
        --type     Type of request in format XY_ABCD, eg. 'ST_UKSH' or 'OB_000000_ABCD'
+       --layer    Import only selected layers separated by comma (if not given all layers are processed)
        --format   Output format
        --dsn      Output OGR datasource
-       --layer    Import only selected layers separated by comma (if not given all layers are processed)
 """
 
 import sys
@@ -42,8 +42,8 @@ def main():
                 'layer' : []}
     try:
         filename = parse_cmd(sys.argv, "hfeo", ["help", "overwrite", "extended",
-                                               "file=", "date=", "type=",
-                                               "format=", "dsn=", "layer="], options)
+                                               "file=", "date=", "type=", "layer=",
+                                               "format=", "dsn="], options)
     except GetoptError, e:
         usage()
         fatal(e)
