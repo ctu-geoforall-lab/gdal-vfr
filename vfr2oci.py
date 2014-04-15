@@ -20,6 +20,7 @@ Usage: vfr2oci.py [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--
        --host     Host name
 """
 
+import os
 import sys
 from getopt import GetoptError
 
@@ -65,7 +66,8 @@ def main():
         if options['dbname']:
             odsn += "/%s" % options['dbname']
         
-        lco_options = [ "srid=5514" ]
+        os.environ['NLS_LANG'] = 'american_america.UTF8' # fix encoding issue
+        lco_options = [ "srid=2065" ]                  ### TODO: 5514
         time = convert_vfr(ids, odsn, "OCI", options['layer'], options['overwrite'], lco_options)
         message("Time elapsed: %d sec" % time)
     
