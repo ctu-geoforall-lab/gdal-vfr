@@ -27,6 +27,10 @@ def parse_cmd(argv, flags, params, outdir):
             ftype = a
         elif o in ("-h", "--help"):
             raise getopt.GetoptError()
+        elif o in ("-o", "--overwrite"):
+            outdir['overwrite'] = True
+        elif o in ("-e", "--extended"):
+            outdir['extended'] = True
         elif o == "-f": # unused
             list_formats()
             sys.exit(0)

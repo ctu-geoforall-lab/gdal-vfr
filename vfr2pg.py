@@ -8,6 +8,7 @@ Requires GDAL/OGR library version 1.11 or later.
 Usage: vfr2py.py [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--ftype=ST_ABCD|OB_000000_ABCD] --dbname <database name>  [--schema <schema name>] [--user <user name>] [--passwd <password>] [--host <host name>]
 
        -o         Overwrite existing PostGIS tables
+       -e         Extended layer list statistics 
        --file     Path to xml.gz file
        --date     Date in format 'YYYYMMDD'
        --ftype    Type of request in format XY_ABCD, eg. 'ST_UKSH' or 'OB_000000_ABCD'
@@ -34,9 +35,10 @@ def main():
     check_ogr()
     
     # parse cmd arguments
-    options = { 'dbname' : None, 'schema' : None, 'user' : None, 'passwd' : None, 'host' : None, 'overwrite' : False }
+    options = { 'dbname' : None, 'schema' : None, 'user' : None, 'passwd' : None, 'host' : None, 
+                'overwrite' : False, 'extended' : False }
     try:
-        filename = parse_cmd(sys.argv, "ho", ["help", "overwrite",
+        filename = parse_cmd(sys.argv, "heo", ["help", "overwrite", "extended",
                                               "file=", "date=", "type=",
                                               "dbname=", "schema=", "user=", "passwd=", "host="],
                              options)
@@ -49,7 +51,7 @@ def main():
     
     if options['dbname'] is None:
         # list available layers and exit
-        list_layers(ids)
+        list_layers(ids, options['extended'])
     else:
         odsn = "PG:dbname=%s" % options['dbname']
         if options['user']:

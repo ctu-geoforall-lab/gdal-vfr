@@ -12,6 +12,7 @@ One of options must be given:
 Usage: vfr2ogr.py [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type=ST_ABCD|OB_000000_ABCD] [--format=<output format>] [--dsn=<OGR datasource>]
 
        -f         List supported output formats
+       -e         Extended layers statistics
        -o         Overwrite existing files
        --file     Path to xml.gz file
        --date     Date in format 'YYYYMMDD'
@@ -36,9 +37,9 @@ def main():
     check_ogr()
 
     # parse cmd arguments
-    options = { 'format' : None, 'dsn' : None, 'overwrite' : False }
+    options = { 'format' : None, 'dsn' : None, 'overwrite' : False, 'extended' : False }
     try:
-        filename = parse_cmd(sys.argv, "hfo", ["help", "overwrite",
+        filename = parse_cmd(sys.argv, "hfeo", ["help", "overwrite", "extended",
                                                "file=", "date=", "type=",
                                                "format=", "dsn="], options)
     except GetoptError, e:
@@ -50,7 +51,7 @@ def main():
     
     if options['format'] is None:
         # list available layers and exit
-        list_layers(ids)
+        list_layers(ids, options['extended'])
     else:
         if options['dsn'] is None:
             fatal("Output datasource not defined")

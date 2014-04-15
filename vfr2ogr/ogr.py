@@ -48,13 +48,31 @@ def list_formats():
     for i in sorted(formatsList):
         print i
 
-def list_layers(ds):
+def get_geom_count(layer):
+    defn = layer.GetLayerDefn()
+    geom_list = list()
+    for i in range(defn.GetGeomFieldCount()):
+        geom_list.append([defn.GetGeomFieldDefn(i).GetName(), 0])
+    
+    for feature in layer:
+        for i in range(len(geom_list)):
+            if feature.GetGeomFieldRef(i):
+                geom_list[i][1] += 1
+    
+    return geom_list
+
+def list_layers(ds, extended = False):
     nlayers = ds.GetLayerCount()
     for i in range(nlayers):
         layer = ds.GetLayer(i)
         featureCount = layer.GetFeatureCount()
+        if extended:
+            print '-' * 80
         print "Number of features in %-20s: %d" % (layer.GetName(), featureCount)
-
+        if extended:
+            for field, count in get_geom_count(layer):
+                print "%41s : %d" % (field, count)
+        
 # convert VFR into specified format
 def convert_vfr(ids, odsn, frmt, overwrite, options=[]):
     odrv = ogr.GetDriverByName(frmt)
