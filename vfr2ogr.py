@@ -9,19 +9,22 @@ One of options must be given:
        --file
        --date and --ftype
 
-Usage: vfr2ogr.py [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--ftype=ST_ABCD|OB_000000_ABCD] [--format=<output format>] [--dsn=<OGR datasource>]
+Usage: vfr2ogr.py [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type=ST_ABCD|OB_000000_ABCD] [--format=<output format>] [--dsn=<OGR datasource>]
 
        -f         List supported output formats
        -o         Overwrite existing files
        --file     Path to xml.gz file
        --date     Date in format 'YYYYMMDD'
-       --ftype    Type of request in format XY_ABCD, eg. 'ST_UKSH' or 'OB_000000_ABCD'
+       --type     Type of request in format XY_ABCD, eg. 'ST_UKSH' or 'OB_000000_ABCD'
        --format   Output format
        --dsn      Output OGR datasource
 """
 
-from vfr2ogr.ogr import *
-from vfr2ogr.utils import *
+import sys
+from getopt import GetoptError
+
+from vfr2ogr.ogr import check_ogr, open_file, list_layers, convert_vfr
+from vfr2ogr.utils import fatal, message
 from vfr2ogr.parse import parse_cmd
 
 # print usage
@@ -34,13 +37,14 @@ def main():
 
     # parse cmd arguments
     options = { 'format' : None, 'dsn' : None, 'overwrite' : False }
-    filename = parse_cmd(sys.argv, "hfo", ["help", "overwrite",
-                                "file=", "date=", "type=",
-                                "format=", "dsn="], options)
-    if not filename:
+    try:
+        filename = parse_cmd(sys.argv, "hfo", ["help", "overwrite",
+                                               "file=", "date=", "type=",
+                                               "format=", "dsn="], options)
+    except GetoptError, e:
         usage()
-        sys.exit(1)
-    
+        fatal(e)
+
     # open input file by GML driver
     ids = open_file(filename)
     

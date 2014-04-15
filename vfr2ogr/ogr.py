@@ -2,6 +2,8 @@ import os
 import sys
 import time
 
+from utils import fatal
+
 try:
     from osgeo import gdal, ogr
 except ImportError, e:

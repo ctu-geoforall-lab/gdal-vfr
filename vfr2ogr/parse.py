@@ -1,6 +1,7 @@
+import sys
 import getopt
 
-from utils import *
+from utils import fatal, message, check_file
 from vfr import list_formats
 
 def parse_cmd(argv, flags, params, outdir):
@@ -25,7 +26,7 @@ def parse_cmd(argv, flags, params, outdir):
         elif o == "--type":
             ftype = a
         elif o in ("-h", "--help"):
-            return None
+            raise getopt.GetoptError()
         elif o == "-f": # unused
             list_formats()
             sys.exit(0)
@@ -33,18 +34,20 @@ def parse_cmd(argv, flags, params, outdir):
             assert False, "unhandled option: %s" % o
     
     if not filename and not date:
-        fatal("--file or --date requested")
+        raise getopt.GetoptError("--file or --date required")
     if filename and date:
-        fatal("--file and --date are mutually exclusive")
+        raise getopt.GetoptError("--file and --date are mutually exclusive")
     if date and not ftype:
-        fatal("--ftype requested")
+        raise getopt.GetoptError("--ftype required")
     
     if filename:
-        # check if input VFR file exists
         filename = check_file(filename)
     else:
         url = "http://vdp.cuzk.cz/vymenny_format/soucasna/%s_%s.xml.gz" % (date, ftype)
         message("Downloading %s..." % url)
         filename = "/vsicurl/" + url
-        
+    
+    if not filename:
+        raise getopt.GetoptError("Ivalid input file")
+    
     return filename

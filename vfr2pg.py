@@ -18,8 +18,11 @@ Usage: vfr2py.py [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--f
        --host     Host name
 """
 
-from vfr2ogr.ogr import *
-from vfr2ogr.utils import *
+import sys
+from getopt import GetoptError
+
+from vfr2ogr.ogr import check_ogr, open_file, list_layers, convert_vfr
+from vfr2ogr.utils import fatal, message
 from vfr2ogr.parse import parse_cmd
 
 # print usage
@@ -32,14 +35,15 @@ def main():
     
     # parse cmd arguments
     options = { 'dbname' : None, 'schema' : None, 'user' : None, 'passwd' : None, 'host' : None, 'overwrite' : False }
-    filename = parse_cmd(sys.argv, "ho", ["help", "overwrite",
-                                          "file=", "date=", "type=",
-                                          "dbname=", "schema=", "user=", "passwd=", "host="],
-                         options)
-    if not filename:
+    try:
+        filename = parse_cmd(sys.argv, "ho", ["help", "overwrite",
+                                              "file=", "date=", "type=",
+                                              "dbname=", "schema=", "user=", "passwd=", "host="],
+                             options)
+    except GetoptError, e:
         usage()
-        sys.exit(1)
-
+        fatal(e)
+    
     # open input file by GML driver
     ids = open_file(filename)
     
