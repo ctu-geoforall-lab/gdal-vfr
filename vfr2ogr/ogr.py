@@ -110,6 +110,7 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[]):
             olayer = ods.CopyLayer(layer, layerName, options)
             if olayer is None:
                 fatal("Unable to export layer '%s'. Exiting..." % layerName)
+            ods.SyncToDisk()
             print >> sys.stderr, " %-5d features" % olayer.GetFeatureCount()
     
     end = time.time() - start
