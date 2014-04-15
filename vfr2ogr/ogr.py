@@ -80,7 +80,7 @@ def list_layers(ds, extended = False):
     return layer_list
 
 # convert VFR into specified format
-def convert_vfr(ids, odsn, frmt, overwrite, options=[]):
+def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[]):
     odrv = ogr.GetDriverByName(frmt)
     if odrv is None:
         fatal("Format '%s' is not supported" % frmt)
@@ -101,6 +101,8 @@ def convert_vfr(ids, odsn, frmt, overwrite, options=[]):
     for i in range(nlayers):
         layer = ids.GetLayer(i)
         layerName = layer.GetName()
+        if layers and layerName not in layers:
+            continue
         print >> sys.stderr, "Exporing layer %-20s ..." % layerName,
         if not overwrite and ids.GetLayerByName(layerName):
             print >> sys.stderr, " already exists (skipped)"

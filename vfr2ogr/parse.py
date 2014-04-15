@@ -44,6 +44,9 @@ def parse_cmd(argv, flags, params, outdir):
     if date and not ftype:
         raise getopt.GetoptError("--ftype required")
     
+    if outdir['layer']:
+        outdir['layer'] = outdir['layer'].split(',')
+    
     if filename:
         filename = check_file(filename)
     else:

@@ -9,7 +9,7 @@ One of options must be given:
        --file
        --date and --ftype
 
-Usage: vfr2ogr.py [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type=ST_ABCD|OB_000000_ABCD] [--format=<output format>] [--dsn=<OGR datasource>]
+Usage: vfr2ogr.py [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type=ST_ABCD|OB_000000_ABCD] [--format=<output format>] [--dsn=<OGR datasource>] [--layer=layer1,layer2,...]
 
        -f         List supported output formats
        -e         Extended layer list statistics 
@@ -19,6 +19,7 @@ Usage: vfr2ogr.py [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--
        --type     Type of request in format XY_ABCD, eg. 'ST_UKSH' or 'OB_000000_ABCD'
        --format   Output format
        --dsn      Output OGR datasource
+       --layer    Import only selected layers separated by comma (if not given all layers are processed)
 """
 
 import sys
@@ -37,11 +38,12 @@ def main():
     check_ogr()
 
     # parse cmd arguments
-    options = { 'format' : None, 'dsn' : None, 'overwrite' : False, 'extended' : False }
+    options = { 'format' : None, 'dsn' : None, 'overwrite' : False, 'extended' : False,
+                'layer' : []}
     try:
         filename = parse_cmd(sys.argv, "hfeo", ["help", "overwrite", "extended",
                                                "file=", "date=", "type=",
-                                               "format=", "dsn="], options)
+                                               "format=", "dsn=", "layer="], options)
     except GetoptError, e:
         usage()
         fatal(e)
@@ -59,7 +61,7 @@ def main():
             fatal("Output datasource not defined")
         else:
             # convert VFR ...
-            time = convert_vfr(ids, options['dsn'], options['format'], options['overwrite'])
+            time = convert_vfr(ids, options['dsn'], options['format'], options['layer'], options['overwrite'])
             message("Time elapsed: %d sec" % time)
     
     ids.Destroy()
