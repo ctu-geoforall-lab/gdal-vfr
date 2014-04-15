@@ -23,7 +23,7 @@ import sys
 from getopt import GetoptError
 
 from vfr2ogr.ogr import check_ogr, open_file, list_layers, convert_vfr
-from vfr2ogr.utils import fatal, message
+from vfr2ogr.utils import fatal, message, parse_xml_gz, compare_list
 from vfr2ogr.parse import parse_cmd
 
 # print usage
@@ -51,7 +51,9 @@ def main():
     
     if options['dbname'] is None:
         # list available layers and exit
-        list_layers(ids, options['extended'])
+        layer_list = list_layers(ids, options['extended'])
+        if options['extended']:
+            compare_list(layer_list, parse_xml_gz(filename))
     else:
         odsn = "PG:dbname=%s" % options['dbname']
         if options['user']:

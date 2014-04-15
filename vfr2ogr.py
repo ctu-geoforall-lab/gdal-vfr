@@ -12,7 +12,7 @@ One of options must be given:
 Usage: vfr2ogr.py [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type=ST_ABCD|OB_000000_ABCD] [--format=<output format>] [--dsn=<OGR datasource>]
 
        -f         List supported output formats
-       -e         Extended layers statistics
+       -e         Extended layer list statistics 
        -o         Overwrite existing files
        --file     Path to xml.gz file
        --date     Date in format 'YYYYMMDD'
@@ -25,7 +25,7 @@ import sys
 from getopt import GetoptError
 
 from vfr2ogr.ogr import check_ogr, open_file, list_layers, convert_vfr
-from vfr2ogr.utils import fatal, message
+from vfr2ogr.utils import fatal, message, parse_xml_gz, compare_list
 from vfr2ogr.parse import parse_cmd
 
 # print usage
@@ -51,7 +51,9 @@ def main():
     
     if options['format'] is None:
         # list available layers and exit
-        list_layers(ids, options['extended'])
+        layer_list = list_layers(ids, options['extended'])
+        if options['extended']:
+            compare_list(layer_list, parse_xml_gz(filename))
     else:
         if options['dsn'] is None:
             fatal("Output datasource not defined")

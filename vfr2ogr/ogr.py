@@ -63,16 +63,22 @@ def get_geom_count(layer):
 
 def list_layers(ds, extended = False):
     nlayers = ds.GetLayerCount()
+    layer_list = list()
     for i in range(nlayers):
         layer = ds.GetLayer(i)
         featureCount = layer.GetFeatureCount()
+        layerName = layer.GetName()
+        layer_list.append(layerName)
+        
         if extended:
             print '-' * 80
-        print "Number of features in %-20s: %d" % (layer.GetName(), featureCount)
+        print "Number of features in %-20s: %d" % (layerName, featureCount)
         if extended:
             for field, count in get_geom_count(layer):
                 print "%41s : %d" % (field, count)
-        
+    
+    return layer_list
+
 # convert VFR into specified format
 def convert_vfr(ids, odsn, frmt, overwrite, options=[]):
     odrv = ogr.GetDriverByName(frmt)
