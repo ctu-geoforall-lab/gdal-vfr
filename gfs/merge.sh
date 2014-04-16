@@ -13,30 +13,62 @@ merge() {
     echo "</GMLFeatureClassList>" >> $FILE
 }
 
-FILE="vfr_st_v1.gfs"
-merge "Staty" \
-    "RegionySoudrznosti" \
-    "Kraje" \
-    "Vusc" \
-    "Okresy" \
-    "Orp" \
-    "Pou" \
-    "Obce" \
-    "SpravniObvody" \
-    "Mop" \
-    "Momc" \
-    "CastiObci" \
-    "KatastralniUzemi" \
-    "Zsj"
+merge_st() {
+    FILE="vfr_st_v1.gfs"
+    merge "Staty" \
+        "RegionySoudrznosti" \
+        "Kraje" \
+        "Vusc" \
+        "Okresy" \
+        "Orp" \
+        "Pou" \
+        "Obce" \
+        "SpravniObvody" \
+        "Mop" \
+        "Momc" \
+        "CastiObci" \
+        "KatastralniUzemi" \
+        "Zsj"
+}
 
-FILE="vfr_ob_v1.gfs"
-merge "Obce" \
-    "CastiObci" \
-    "KatastralniUzemi" \
-    "Zsj" \
-    "Ulice" \
-    "Parcely" \
-    "StavebniObjekty" \
-    "AdresniMista"
+merge_ob() {
+    FILE="vfr_ob_v1.gfs"
+    merge "Obce" \
+        "CastiObci" \
+        "KatastralniUzemi" \
+        "Zsj" \
+        "Ulice" \
+        "Parcely" \
+        "StavebniObjekty" \
+        "AdresniMista"
+}
+
+merge_all() {
+    FILE="ruian_vf_v1.gfs"
+    merge "Staty" \
+        "RegionySoudrznosti" \
+        "Kraje" \
+        "Vusc" \
+        "Okresy" \
+        "Orp" \
+        "Pou" \
+        "Obce" \
+        "SpravniObvody" \
+        "Mop" \
+        "Momc" \
+        "CastiObci" \
+        "KatastralniUzemi" \
+        "Zsj" \
+        "Obce" \
+        "CastiObci" \
+        "KatastralniUzemi" \
+        "Zsj" \
+        "Ulice" \
+        "Parcely" \
+        "StavebniObjekty" \
+        "AdresniMista"
+}
+
+merge_all
 
 exit 0
