@@ -69,6 +69,8 @@ merge_all() {
         "AdresniMista"
 }
 
+merge_st
+merge_ob
 merge_all
 
 exit 0

@@ -2325,20 +2325,20 @@
     <SRSName>urn:ogc:def:crs:EPSG::5514</SRSName>
     <!-- Definiční bod typu Adresní bod -->
     <GeomPropertyDefn>
-      <Name>AdresniBod</Name> 
-      <ElementPath>Geometrie|AdresniBod</ElementPath> 
+      <Name>AdresniBod</Name>
+      <ElementPath>Geometrie|DefinicniBod|AdresniBod</ElementPath>
       <Type>Point</Type>
     </GeomPropertyDefn>
     <!-- Definiční bod typu Přístup pro záchrannou službu -->
     <GeomPropertyDefn>
-      <Name>Zachranka</Name> 
-      <ElementPath>Geometrie|Zachranka</ElementPath> 
+      <Name>Zachranka</Name>
+      <ElementPath>Geometrie|DefinicniBod|Zachranka</ElementPath>
       <Type>Point</Type>
     </GeomPropertyDefn>
     <!-- Definiční bod typu Přístup pro hasiče -->
     <GeomPropertyDefn>
-      <Name>Hasici</Name> 
-      <ElementPath>Geometrie|Hasici</ElementPath> 
+      <Name>Hasici</Name>
+      <ElementPath>Geometrie|DefinicniBod|Hasici</ElementPath>
       <Type>Point</Type>
     </GeomPropertyDefn>
     <!-- Kód adresního místa -->
