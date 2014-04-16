@@ -80,7 +80,7 @@ def list_layers(ds, extended = False):
     return layer_list
 
 # convert VFR into specified format
-def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[]):
+def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_name = None):
     odrv = ogr.GetDriverByName(frmt)
     if odrv is None:
         fatal("Format '%s' is not supported" % frmt)
@@ -104,10 +104,33 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[]):
         if layers and layerName not in layers:
             continue
         print >> sys.stderr, "Exporing layer %-20s ..." % layerName,
-        if not overwrite and ids.GetLayerByName(layerName):
+        if not overwrite and ods.GetLayerByName(layerName):
             print >> sys.stderr, " already exists (skipped)"
         else:
-            olayer = ods.CopyLayer(layer, layerName, options)
+            if not geom_name:
+                olayer = ods.CopyLayer(layer, layerName, options)
+            else:
+                olayer = ods.CreateLayer(layerName,
+                                         srs = layer.GetSpatialRef(),
+                                         geom_type=ogr.wkbMultiPolygon, options = options)
+                layer.ResetReading()
+                
+                feature = layer.GetNextFeature()
+                for i in range(feature.GetFieldCount()):
+                    olayer.CreateField(feature.GetFieldDefnRef(i))
+
+                while feature:
+                    ofeature = feature.Clone()
+                    odefn = feature.GetDefnRef()
+                    idx = feature.GetGeomFieldIndex(geom_name)
+                    for i in range(odefn.GetGeomFieldCount()):
+                        if i == idx:
+                            continue
+                        odefn.DeleteGeomFieldDefn(i)
+                    olayer.CreateFeature(ofeature)
+                    
+                    feature = layer.GetNextFeature()
+            
             if olayer is None:
                 fatal("Unable to export layer '%s'. Exiting..." % layerName)
             ods.SyncToDisk()

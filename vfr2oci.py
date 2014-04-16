@@ -9,7 +9,7 @@ One of input options must be given:
        --file
        --date and --type
 
-Usage: vfr2oci.py [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type=ST_ABCD|OB_000000_ABCD] [--layer=layer1,layer2,...]
+Usage: vfr2oci.py [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type=ST_ABCD|OB_000000_ABCD] [--layer=layer1,layer2,...] [--geom=OriginalniHranice|GeneralizovaneHranice]
                              --dbname <database name>
                             [--user <user name>] [--passwd <password>] [--host <host name>]
 
@@ -19,6 +19,7 @@ Usage: vfr2oci.py [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--
        --date     Date in format 'YYYYMMDD'
        --type     Type of request in format XY_ABCD, eg. 'ST_UKSH' or 'OB_000000_ABCD'
        --layer    Import only selected layers separated by comma (if not given all layers are processed)
+       --geom     Preferred geometry column 'OriginalniHranice' or 'GeneralizovaneHranice' (if not found or given than first column is used)
        --dbname   Output PostGIS database
        --user     User name
        --passwd   Password
@@ -43,10 +44,10 @@ def main():
     
     # parse cmd arguments
     options = { 'dbname' : None, 'user' : None, 'passwd' : None, 'host' : None, 
-                'overwrite' : False, 'extended' : False, 'layer': []}
+                'overwrite' : False, 'extended' : False, 'layer': [], 'geom' : None}
     try:
         filename = parse_cmd(sys.argv, "heo", ["help", "overwrite", "extended",
-                                              "file=", "date=", "type=", "layer=",
+                                              "file=", "date=", "type=", "layer=", "geom=",
                                               "dbname=", "user=", "passwd=", "host="],
                              options)
     except GetoptError, e:
@@ -75,8 +76,8 @@ def main():
             odsn += "/%s" % options['dbname']
         
         os.environ['NLS_LANG'] = 'american_america.UTF8' # fix encoding issue
-        lco_options = [ "srid=2065" ]                  ### TODO: 5514
-        time = convert_vfr(ids, odsn, "OCI", options['layer'], options['overwrite'], lco_options)
+        lco_options = [ "srid=2065" ]                    ### TODO: 5514
+        time = convert_vfr(ids, odsn, "OCI", options['layer'], options['overwrite'], lco_options, options['geom'])
         message("Time elapsed: %d sec" % time)
     
     ids.Destroy()
