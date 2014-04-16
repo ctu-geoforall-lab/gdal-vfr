@@ -27,6 +27,7 @@ Usage: vfr2py.py [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--t
        --host     Host name
 """
 
+import os
 import sys
 from getopt import GetoptError
 
@@ -63,7 +64,7 @@ def main():
     if options['dbname'] is None:
         # list available layers and exit
         layer_list = list_layers(ids, options['extended'])
-        if options['extended']:
+        if options['extended'] and os.path.exists(filename):
             compare_list(layer_list, parse_xml_gz(filename))
     else:
         odsn = "PG:dbname=%s" % options['dbname']

@@ -62,7 +62,7 @@ def main():
     if options['user'] is None:
         # list available layers and exit
         layer_list = list_layers(ids, options['extended'])
-        if options['extended']:
+        if options['extended'] and os.path.exists(filename):
             compare_list(layer_list, parse_xml_gz(filename))
     else:
         if not options['user'] or not options['passwd']:
