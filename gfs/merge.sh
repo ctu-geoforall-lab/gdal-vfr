@@ -14,7 +14,7 @@ merge() {
 }
 
 merge_st() {
-    FILE="ruain_vf_st_v1.gfs"
+    FILE="ruian_vf_st_v1.gfs"
     merge "Staty" \
         "RegionySoudrznosti" \
         "Kraje" \
@@ -32,7 +32,7 @@ merge_st() {
 }
 
 merge_ob() {
-    FILE="ruain_vf_ob_v1.gfs"
+    FILE="ruian_vf_ob_v1.gfs"
     merge "Obce" \
         "CastiObci" \
         "KatastralniUzemi" \
