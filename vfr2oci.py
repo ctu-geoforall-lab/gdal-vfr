@@ -46,7 +46,10 @@ def main():
                              options)
     except GetoptError, e:
         usage()
-        fatal(e)
+        if str(e):
+            fatal(e)
+        else:
+            sys.exit(0)
     
     # open input file by GML driver
     ids = open_file(filename)

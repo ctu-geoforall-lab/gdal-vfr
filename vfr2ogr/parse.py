@@ -26,7 +26,7 @@ def parse_cmd(argv, flags, params, outdir):
         elif o == "--type":
             ftype = a
         elif o in ("-h", "--help"):
-            raise getopt.GetoptError()
+            raise getopt.GetoptError("")
         elif o in ("-o", "--overwrite"):
             outdir['overwrite'] = True
         elif o in ("-e", "--extended"):
