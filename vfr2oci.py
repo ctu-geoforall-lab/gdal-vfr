@@ -5,16 +5,21 @@ Imports VFR data to Oracle Spatial database
 
 Requires GDAL/OGR library version 1.11 or later.
 
-Usage: vfr2oci.py [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type=ST_ABCD|OB_000000_ABCD] --dbname <database name>  [--schema <schema name>] [--user <user name>] [--passwd <password>] [--host <host name>]
+One of input options must be given:
+       --file
+       --date and --type
+
+Usage: vfr2oci.py [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type=ST_ABCD|OB_000000_ABCD] [--layer=layer1,layer2,...]
+                             --dbname <database name>
+                            [--user <user name>] [--passwd <password>] [--host <host name>]
 
        -o         Overwrite existing Oracle tables
        -e         Extended layer list statistics 
        --file     Path to xml.gz file
        --date     Date in format 'YYYYMMDD'
-       --type    Type of request in format XY_ABCD, eg. 'ST_UKSH' or 'OB_000000_ABCD'
+       --type     Type of request in format XY_ABCD, eg. 'ST_UKSH' or 'OB_000000_ABCD'
        --layer    Import only selected layers separated by comma (if not given all layers are processed)
        --dbname   Output PostGIS database
-       --schema   Schema name (default: public)
        --user     User name
        --passwd   Password
        --host     Host name
@@ -37,12 +42,12 @@ def main():
     check_ogr()
     
     # parse cmd arguments
-    options = { 'dbname' : None, 'schema' : None, 'user' : None, 'passwd' : None, 'host' : None, 
+    options = { 'dbname' : None, 'user' : None, 'passwd' : None, 'host' : None, 
                 'overwrite' : False, 'extended' : False, 'layer': []}
     try:
         filename = parse_cmd(sys.argv, "heo", ["help", "overwrite", "extended",
                                               "file=", "date=", "type=", "layer=",
-                                              "dbname=", "schema=", "user=", "passwd=", "host="],
+                                              "dbname=", "user=", "passwd=", "host="],
                              options)
     except GetoptError, e:
         usage()

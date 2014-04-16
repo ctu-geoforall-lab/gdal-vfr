@@ -5,7 +5,14 @@ Imports VFR data to PostGIS database
 
 Requires GDAL/OGR library version 1.11 or later.
 
-Usage: vfr2py.py [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type=ST_ABCD|OB_000000_ABCD] [--layer=layer1,layer2,...] --dbname <database name>  [--schema <schema name>] [--user <user name>] [--passwd <password>] [--host <host name>] 
+One of input options must be given:
+       --file
+       --date and --type
+
+Usage: vfr2py.py [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type=ST_ABCD|OB_000000_ABCD] [--layer=layer1,layer2,...] 
+                            --dbname <database name>
+                            [--schema <schema name>] [--user <user name>] [--passwd <password>] [--host <host name>]
+                            
 
        -o         Overwrite existing PostGIS tables
        -e         Extended layer list statistics 

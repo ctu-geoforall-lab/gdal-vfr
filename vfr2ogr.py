@@ -5,11 +5,12 @@ Converts VFR file into desired GIS format supported by OGR library.
 
 Requires GDAL/OGR library version 1.11 or later.
 
-One of options must be given:
+One of input options must be given:
        --file
-       --date and --ftype
+       --date and --type
 
-Usage: vfr2ogr.py [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type=ST_ABCD|OB_000000_ABCD] [--layer=layer1,layer2,...] [--format=<output format>] [--dsn=<OGR datasource>] 
+Usage: vfr2ogr.py [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type=ST_ABCD|OB_000000_ABCD] [--layer=layer1,layer2,...]
+                            [--format=<output format>] [--dsn=<OGR datasource>]
 
        -f         List supported output formats
        -e         Extended layer list statistics 
@@ -46,7 +47,10 @@ def main():
                                                "format=", "dsn="], options)
     except GetoptError, e:
         usage()
-        fatal(e)
+        if str(e):
+            fatal(e)
+        else:
+            sys.exit(0)
 
     # open input file by GML driver
     ids = open_file(filename)
