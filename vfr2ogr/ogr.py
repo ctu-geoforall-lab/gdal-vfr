@@ -127,6 +127,8 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
                         if i == idx:
                             continue
                         odefn.DeleteGeomFieldDefn(i)
+                    geom = feature.GetGeomFieldRef(idx)
+                    ofeature.SetGeometry(geom)
                     olayer.CreateFeature(ofeature)
                     
                     feature = layer.GetNextFeature()
