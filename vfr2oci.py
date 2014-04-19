@@ -76,7 +76,8 @@ def main():
             odsn += "/%s" % options['dbname']
         
         os.environ['NLS_LANG'] = 'american_america.UTF8' # fix encoding issue
-        lco_options = [ "srid=2065", "INDEX=OFF" ]                    ### TODO: 5514
+        lco_options = [ "srid=2065", "INDEX=OFF", "MULTI_LOAD=OFF" ]  ### TODO: 5514
+                                                                      ### TODO: fix MULTI_LOAD (currently it crashes)
         time = convert_vfr(ids, odsn, "OCI", options['layer'], options['overwrite'], lco_options, options['geom'])
         message("Time elapsed: %d sec" % time)
     
