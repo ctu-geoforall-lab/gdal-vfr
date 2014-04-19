@@ -2,7 +2,7 @@ import sys
 import getopt
 
 from utils import fatal, message, check_file
-from vfr import list_formats
+from ogr import list_formats
 
 def parse_cmd(argv, flags, params, outdir):
     try:
