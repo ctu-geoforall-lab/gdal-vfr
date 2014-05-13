@@ -1,13 +1,29 @@
 import os
 import sys
 import time
+import logging
 
-from utils import fatal
+from utils import fatal, message
 
 try:
     from osgeo import gdal, ogr
 except ImportError, e:
     sys.exit('ERROR: Import of ogr from osgeo failed. %s' % e)
+
+logger = logging.getLogger()
+logFile = 'log.%d' % os.getpid()
+logger.addHandler(logging.FileHandler(logFile, delay = True))
+
+# redirect warnings to the file
+def error_handler(err_level, err_no, err_msg):
+    if err_level > gdal.CE_Warning:
+        raise RuntimeError(err_level, err_no, err_msg)
+    else:
+        logger.warning(err_msg)
+
+def check_log():
+    if os.path.exists(logFile):
+        message("WARNINGS LOGGED IN %s" % logFile)
 
 # check GDAL/OGR library, version >= 1.11 required
 def check_ogr():
@@ -19,6 +35,8 @@ def check_ogr():
     # check if OGR comes with GML driver
     if not ogr.GetDriverByName('GML'):
         fatal('GML driver required')
+
+    gdal.PushErrorHandler(error_handler)
 
 def open_file(filename):
     drv = ogr.GetDriverByName("GML")

@@ -27,7 +27,7 @@ import os
 import sys
 from getopt import GetoptError
 
-from vfr2ogr.ogr import check_ogr, open_file, list_layers, convert_vfr
+from vfr2ogr.ogr import check_ogr, open_file, list_layers, convert_vfr, check_log
 from vfr2ogr.utils import fatal, message, parse_xml_gz, compare_list
 from vfr2ogr.parse import parse_cmd
 
@@ -74,4 +74,5 @@ def main():
     return 0
 
 if __name__ == "__main__":
+    atexit.register(check_log)
     sys.exit(main())
