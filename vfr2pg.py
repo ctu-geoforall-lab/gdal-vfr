@@ -73,7 +73,7 @@ def main():
         if options['user']:
             odsn += " user=%s" % options['user']
         if options['passwd']:
-            odsn += " passwd=%s" % options['passwd']
+            odsn += " password=%s" % options['passwd']
         if options['host']:
             odsn += " host=%s" % options['host']
         
