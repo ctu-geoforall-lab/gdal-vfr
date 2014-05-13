@@ -30,6 +30,7 @@ Usage: vfr2py.py [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--t
 
 import os
 import sys
+import atexit
 from getopt import GetoptError
 
 from vfr2ogr.ogr import check_ogr, open_file, list_layers, convert_vfr, check_log
