@@ -15,7 +15,7 @@ Usage: vfr2py.py [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--t
                             
 
        -o         Overwrite existing PostGIS tables
-       -e         Extended layer list statistics 
+       -e         Extended layer list statistics
        --file     Path to xml.gz file
        --date     Date in format 'YYYYMMDD'
        --type     Type of request in format XY_ABCD, eg. 'ST_UKSH' or 'OB_000000_ABCD'
@@ -40,6 +40,29 @@ from vfr2ogr.parse import parse_cmd
 # print usage
 def usage():
     print __doc__
+
+def check_epsg(conn_string):
+    try:
+        import psycopg2
+    except ImportError as e:
+        sys.stderr.write("Unable to add EPSG 5514: %s\n" % e)
+    
+    try:
+        conn = psycopg2.connect(conn_string)
+    except psycopg2.OperationalError as e:
+        sys.exit("Unable to connect to DB: %s" % e)
+    
+    cursor = conn.cursor()
+    cursor.execute("SELECT srid FROM spatial_ref_sys WHERE srid = 5514")
+    epsg_exists = bool(cursor.fetchall())
+    if not epsg_exists:
+        stmt = """INSERT INTO spatial_ref_sys (srid, auth_name, auth_srid, proj4text, srtext) VALUES ( 5514, 'EPSG', 5514, '+proj=krovak +lat_0=49.5 +lon_0=24.83333333333333 +alpha=30.28813972222222 +k=0.9999 +x_0=0 +y_0=0 +ellps=bessel +towgs84=589,76,480,0,0,0,0 +units=m +no_defs ', 'PROJCS["S-JTSK / Krovak East North",GEOGCS["S-JTSK",DATUM["System_Jednotne_Trigonometricke_Site_Katastralni",SPHEROID["Bessel 1841",6377397.155,299.1528128,AUTHORITY["EPSG","7004"]],TOWGS84[589,76,480,0,0,0,0],AUTHORITY["EPSG","6156"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4156"]],PROJECTION["Krovak"],PARAMETER["latitude_of_center",49.5],PARAMETER["longitude_of_center",24.83333333333333],PARAMETER["azimuth",30.28813972222222],PARAMETER["pseudo_standard_parallel_1",78.5],PARAMETER["scale_factor",0.9999],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["X",EAST],AXIS["Y",NORTH],AUTHORITY["EPSG","5514"]]')"""
+        cursor.execute(stmt)
+        conn.commit()
+        message("EPSG 5514 defined in DB")
+    
+    cursor.close()
+    conn.close()
 
 def main():
     # check requirements
@@ -77,9 +100,12 @@ def main():
         if options['host']:
             odsn += " host=%s" % options['host']
         
-        lco_options = []
+        lco_options = ["PG_USE_COPY=YES"]
         if options['schema']:
             lco_options.append('SCHEMA=%s' % schema)
+        
+        # check EPSG 5514
+        check_epsg(odsn[3:])
         
         time = convert_vfr(ids, odsn, "PostgreSQL", options['layer'], options['overwrite'], lco_options, options['geom'])
         message("Time elapsed: %d sec" % time)
