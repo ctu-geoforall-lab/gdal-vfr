@@ -46,6 +46,7 @@ def check_epsg(conn_string):
         import psycopg2
     except ImportError as e:
         sys.stderr.write("Unable to add EPSG 5514: %s\n" % e)
+        return
     
     try:
         conn = psycopg2.connect(conn_string)
