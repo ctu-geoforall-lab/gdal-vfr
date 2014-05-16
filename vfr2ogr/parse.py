@@ -8,8 +8,7 @@ def parse_cmd(argv, flags, params, outdir):
     try:
         opts, args = getopt.getopt(argv[1:], flags, params)
     except getopt.GetoptError as err:
-        print str(err) 
-        return None
+        sys.exit(str(err))
     
     filename = date = ftype = None
     for o, a in opts:
@@ -35,7 +34,7 @@ def parse_cmd(argv, flags, params, outdir):
             list_formats()
             sys.exit(0)
         else:
-            assert False, "unhandled option: %s" % o
+            sys.exit("unhandled option: %s" % o)
     
     if not filename and not date:
         raise getopt.GetoptError("--file or --date required")
