@@ -172,32 +172,38 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
                 if append:
                     olayer = ods.GetLayerByName(layerName)
 
+                createFields = False
                 if not olayer:
                     if geom_name:
                         geom_type = ogr.wkbMultiPolygon # TODO: remove hardcoded-value
                     else:
                         geom_type = ogr.wkbMultiPoint
-                    print >> sys.stderr, 'x'
+                    
                     olayer = ods.CreateLayer(layerName,
-                                             srs = layer.GetSpatialRef(),
-                                             geom_type=geom_type, options = options)
-                print >> sys.stderr, 'x'
+                                             # srs = layer.GetSpatialRef(),
+                                             geom_type = geom_type, options = options)
+                    createFields = True
+                
                 layer.ResetReading()
                 
                 feature = layer.GetNextFeature()
-                for i in range(feature.GetFieldCount()):
-                    olayer.CreateField(feature.GetFieldDefnRef(i))
-
+                if createFields:
+                    for i in range(feature.GetFieldCount()):
+                        olayer.CreateField(feature.GetFieldDefnRef(i))
+                
                 while feature:
                     ofeature = feature.Clone()
-                    odefn = feature.GetDefnRef()
-                    idx = feature.GetGeomFieldIndex(geom_name)
-                    for i in range(odefn.GetGeomFieldCount()):
-                        if i == idx:
-                            continue
-                        odefn.DeleteGeomFieldDefn(i)
-                    geom = feature.GetGeomFieldRef(idx)
-                    ofeature.SetGeometry(geom)
+                    
+                    if geom_name:
+                        odefn = feature.GetDefnRef()
+                        idx = feature.GetGeomFieldIndex(geom_name)
+                        for i in range(odefn.GetGeomFieldCount()):
+                            if i == idx:
+                                continue
+                            odefn.DeleteGeomFieldDefn(i)
+                        geom = feature.GetGeomFieldRef(idx)
+                        ofeature.SetGeometry(geom)
+                    
                     olayer.CreateFeature(ofeature)
                     
                     feature = layer.GetNextFeature()
