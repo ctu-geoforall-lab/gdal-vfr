@@ -13,8 +13,9 @@ Usage: vfr2ogr.py [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--
                             [--format=<output format>] [--dsn=<OGR datasource>]
 
        -f         List supported output formats
-       -e         Extended layer list statistics 
        -o         Overwrite existing files
+       -e         Extended layer list statistics 
+       -d         Save downloaded VFR data in currect directory (--date and --type required)
        --file     Path to xml.gz file
        --date     Date in format 'YYYYMMDD'
        --type     Type of request in format XY_ABCD, eg. 'ST_UKSH' or 'OB_000000_ABCD'
@@ -42,9 +43,9 @@ def main():
 
     # parse cmd arguments
     options = { 'format' : None, 'dsn' : None, 'overwrite' : False, 'extended' : False,
-                'layer' : []}
+                'layer' : [], 'download' : False}
     try:
-        filename = parse_cmd(sys.argv, "hfeo", ["help", "overwrite", "extended",
+        filename = parse_cmd(sys.argv, "hfeod", ["help", "overwrite", "extended",
                                                "file=", "date=", "type=", "layer=",
                                                "format=", "dsn="], options)
     except GetoptError, e:

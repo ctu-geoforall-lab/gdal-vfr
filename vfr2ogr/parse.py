@@ -30,6 +30,8 @@ def parse_cmd(argv, flags, params, outdir):
             outdir['overwrite'] = True
         elif o in ("-e", "--extended"):
             outdir['extended'] = True
+        elif o == "-d":
+            outdir['download'] = True
         elif o == "-f": # unused
             list_formats()
             sys.exit(0)
@@ -48,10 +50,18 @@ def parse_cmd(argv, flags, params, outdir):
     
     if filename:
         filename = check_file(filename)
-    else:
+    else: # --date & --type
         url = "http://vdp.cuzk.cz/vymenny_format/soucasna/%s_%s.xml.gz" % (date, ftype)
-        message("Downloading %s..." % url)
-        filename = "/vsicurl/" + url
+        if outdir['download']:
+            import urllib
+
+            message("Downloading %s into currect directory..." % url)
+            local_file = '%s_%s.xml.gz' % (date, ftype)
+            urllib.urlretrieve (url, local_file)
+            filename = local_file
+        else:
+            message("Reading %s..." % url)
+            filename = "/vsicurl/" + url
     
     if not filename:
         raise getopt.GetoptError("Ivalid input file")

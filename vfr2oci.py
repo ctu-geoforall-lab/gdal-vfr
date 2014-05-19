@@ -15,6 +15,7 @@ Usage: vfr2oci.py [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--
 
        -o         Overwrite existing Oracle tables
        -e         Extended layer list statistics 
+       -d         Save downloaded VFR data in currect directory (--date and --type required)
        --file     Path to xml.gz file
        --date     Date in format 'YYYYMMDD'
        --type     Type of request in format XY_ABCD, eg. 'ST_UKSH' or 'OB_000000_ABCD'
@@ -45,9 +46,9 @@ def main():
     
     # parse cmd arguments
     options = { 'dbname' : None, 'user' : None, 'passwd' : None, 'host' : None, 
-                'overwrite' : False, 'extended' : False, 'layer': [], 'geom' : None}
+                'overwrite' : False, 'extended' : False, 'layer': [], 'geom' : None, 'download' : False}
     try:
-        filename = parse_cmd(sys.argv, "heo", ["help", "overwrite", "extended",
+        filename = parse_cmd(sys.argv, "heod", ["help", "overwrite", "extended",
                                               "file=", "date=", "type=", "layer=", "geom=",
                                               "dbname=", "user=", "passwd=", "host="],
                              options)
