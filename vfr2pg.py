@@ -17,7 +17,7 @@ Usage: vfr2py.py [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--t
        -o         Overwrite existing PostGIS tables
        -e         Extended layer list statistics
        -d         Save downloaded VFR data in currect directory (--date and --type required)
-       --file     Path to xml.gz file
+       --file     Path to xml.gz or URL list file
        --date     Date in format 'YYYYMMDD'
        --type     Type of request in format XY_ABCD, eg. 'ST_UKSH' or 'OB_000000_ABCD'
        --layer    Import only selected layers separated by comma (if not given all layers are processed)
@@ -34,7 +34,7 @@ import sys
 import atexit
 from getopt import GetoptError
 
-from vfr2ogr.ogr import check_ogr, open_file, list_layers, convert_vfr, check_log
+from vfr2ogr.ogr import check_ogr, open_file, list_layers, convert_vfr, check_log, open_ds
 from vfr2ogr.utils import fatal, message, parse_xml_gz, compare_list
 from vfr2ogr.parse import parse_cmd
 
@@ -88,35 +88,53 @@ def main():
             fatal(e)
         else:
             sys.exit(0)
-    
-    # open input file by GML driver
-    ids = open_file(filename)
-    
-    if options['dbname'] is None:
-        # list available layers and exit
-        layer_list = list_layers(ids, options['extended'])
-        if options['extended'] and os.path.exists(filename):
-            compare_list(layer_list, parse_xml_gz(filename))
-    else:
-        odsn = "PG:dbname=%s" % options['dbname']
+
+    # build dsn string and options
+    lco_options = ["PG_USE_COPY=YES"]
+    odsn = ''
+    if options['dbname']:
+        odsn += "PG:dbname=%s" % options['dbname']
         if options['user']:
             odsn += " user=%s" % options['user']
         if options['passwd']:
             odsn += " password=%s" % options['passwd']
         if options['host']:
             odsn += " host=%s" % options['host']
-        
-        lco_options = ["PG_USE_COPY=YES"]
         if options['schema']:
             lco_options.append('SCHEMA=%s' % schema)
-        
-        # check EPSG 5514
-        check_epsg(odsn[3:])
-        
-        time = convert_vfr(ids, odsn, "PostgreSQL", options['layer'], options['overwrite'], lco_options, options['geom'])
-        message("Time elapsed: %d sec" % time)
+
+    # open input file(s) by GML driver
+    i = 0
+    epsg_checked = False
+    file_list = open_file(filename, options['download'])
+    append = len(file_list) > 1 # enable append mode on more files
     
-    ids.Destroy()
+    for fname in file_list:
+        message("Processing %d out of %d..." % (i+1, len(file_list)))
+
+        # open OGR datasource
+        ids = open_ds(fname)
+        if ids is None:
+            continue # unable to open - skip
+        
+        if not odsn:
+            # list available layers and exit
+            layer_list = list_layers(ids, options['extended'])
+            if options['extended'] and os.path.exists(filename):
+                compare_list(layer_list, parse_xml_gz(filename))
+        else:
+            # check EPSG 5514
+            if epsg_checked:
+                check_epsg(odsn[3:])
+                epsg_checked = True
+            
+            # do conversion
+            time = convert_vfr(ids, odsn, "PostgreSQL", options['layer'],
+                               options['overwrite'], lco_options, options['geom'], append)
+            message("Time elapsed: %d sec" % time)
+        
+        ids.Destroy()
+        i += 1
     
     return 0
 

@@ -1,7 +1,7 @@
 import sys
 import getopt
 
-from utils import fatal, message, check_file
+from utils import fatal, message, check_file, download_vfr
 from ogr import list_formats
 
 def parse_cmd(argv, flags, params, outdir):
@@ -53,12 +53,7 @@ def parse_cmd(argv, flags, params, outdir):
     else: # --date & --type
         url = "http://vdp.cuzk.cz/vymenny_format/soucasna/%s_%s.xml.gz" % (date, ftype)
         if outdir['download']:
-            import urllib
-
-            message("Downloading %s into currect directory..." % url)
-            local_file = '%s_%s.xml.gz' % (date, ftype)
-            urllib.urlretrieve (url, local_file)
-            filename = local_file
+            filename = download_vfr(url)
         else:
             message("Reading %s..." % url)
             filename = "/vsicurl/" + url

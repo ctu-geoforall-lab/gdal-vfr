@@ -3,7 +3,7 @@ import sys
 import time
 import logging
 
-from utils import fatal, message
+from utils import fatal, message, warning, download_vfr
 
 try:
     from osgeo import gdal, ogr
@@ -38,14 +38,44 @@ def check_ogr():
 
     gdal.PushErrorHandler(error_handler)
 
-def open_file(filename):
+def open_file(filename, download = False):
     drv = ogr.GetDriverByName("GML")
     if drv is None:
         fatal("Unable to select GML driver")
+    
+    list_ds = list()
     ds = drv.Open(filename, False)
     if ds is None:
-        fatal("Unable to open '%s'" % filename)
-        
+        # unable to open input file with GML driver, so it's probably
+        # URL list file
+        try:
+            f = open(filename)
+            i = 0
+            lines = f.read().splitlines()
+            for line in lines:
+                if line.startswith('http://'):
+                    if download:
+                        download_vfr(line)
+                        line = os.path.basename(line)
+                    else:
+                        line = '/vsicurl/' + line
+                list_ds.append(line)
+                i += 1
+            message("%d VFR files will be processed..." % len(list_ds))
+        except IOError:
+            fatal("Unable to read '%s'" % filename)
+        f.close()    
+    else:
+        list_ds.append(ds)
+    
+    return list_ds
+
+def open_ds(filename):
+    drv = ogr.GetDriverByName("GML")
+    ds = drv.Open(filename, False)
+    if ds is None:
+        warning("Unable to open '%s'. Skipping." % filename)
+    
     return ds
 
 # list formats
@@ -98,7 +128,7 @@ def list_layers(ds, extended = False):
     return layer_list
 
 # convert VFR into specified format
-def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_name = None):
+def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_name = None, append = False):
     odrv = ogr.GetDriverByName(frmt)
     if odrv is None:
         fatal("Format '%s' is not supported" % frmt)
@@ -135,12 +165,23 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
                 if 'GEOMETRY_NAME=definicnibod' not in options:
                     options.append('GEOMETRY_NAME=definicnibod')
             
-            if not geom_name:
+            if not append and not geom_name:
                 olayer = ods.CopyLayer(layer, layerName, options)
             else:
-                olayer = ods.CreateLayer(layerName,
-                                         srs = layer.GetSpatialRef(),
-                                         geom_type=ogr.wkbMultiPolygon, options = options)
+                olayer = None
+                if append:
+                    olayer = ods.GetLayerByName(layerName)
+
+                if not olayer:
+                    if geom_name:
+                        geom_type = ogr.wkbMultiPolygon # TODO: remove hardcoded-value
+                    else:
+                        geom_type = ogr.wkbMultiPoint
+                    print >> sys.stderr, 'x'
+                    olayer = ods.CreateLayer(layerName,
+                                             srs = layer.GetSpatialRef(),
+                                             geom_type=geom_type, options = options)
+                print >> sys.stderr, 'x'
                 layer.ResetReading()
                 
                 feature = layer.GetNextFeature()

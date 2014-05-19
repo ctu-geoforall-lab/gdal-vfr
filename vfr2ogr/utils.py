@@ -1,6 +1,7 @@
 import os
 import sys
 import gzip
+import urllib
 
 from xml.dom.minidom import parse, parseString
 
@@ -19,6 +20,9 @@ def check_file(filename):
 def fatal(msg):
     sys.exit('ERROR: ' + str(msg))
 
+def warning(msg):
+    sys.stderr.write('WARNING: ' + str(msg) + os.linesep)
+    
 def message(msg):
     sys.stderr.write('-' * 80 + os.linesep)
     sys.stderr.write(msg + os.linesep)
@@ -49,3 +53,10 @@ def compare_list(list1, list2):
     for item in list2:
         if item not in list1:
             print "- %s" % item
+
+def download_vfr(url):
+    message("Downloading %s into currect directory..." % url)
+    local_file = os.path.basename(url)
+    urllib.urlretrieve (url, local_file)
+    
+    return local_file
