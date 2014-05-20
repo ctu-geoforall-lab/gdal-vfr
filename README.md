@@ -6,4 +6,4 @@ VFR (Vymenny format RUIAN) support in OGR library.
 References
 ==========
 
-http://geo.fsv.cvut.cz/freegis/RUIAN_/_OGR-VFR#VFR_konverzn.C3.AD_skripty
+http://freegis.fsv.cvut.cz/RUIAN_/_OGR-VFR#VFR_konverzn.C3.AD_skripty
