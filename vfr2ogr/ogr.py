@@ -17,7 +17,9 @@ logger.addHandler(logging.FileHandler(logFile, delay = True))
 # redirect warnings to the file
 def error_handler(err_level, err_no, err_msg):
     if err_level > gdal.CE_Warning:
-        raise RuntimeError(err_level, err_no, err_msg)
+        sys.exit(err_msg)
+    elif err_level == gdal.CE_Debug:
+        sys.stderr.write(err_msg + os.linesep)
     else:
         logger.warning(err_msg)
 
@@ -71,6 +73,9 @@ def open_file(filename, download = False):
     return list_ds
 
 def open_ds(filename):
+    if isinstance(filename, ogr.DataSource):
+        return filename # already open
+    
     drv = ogr.GetDriverByName("GML")
     ds = drv.Open(filename, False)
     if ds is None:
@@ -149,12 +154,16 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
     for i in range(nlayers):
         layer = ids.GetLayer(i)
         layerName = layer.GetName()
+        
         if layers and layerName not in layers:
             continue
+        
         print >> sys.stderr, "Exporing layer %-20s ..." % layerName,
         if not overwrite and ods.GetLayerByName(layerName):
             print >> sys.stderr, " already exists (skipped)"
         else:
+            ### TODO: fix output drivers not to use default geometry
+            ### names
             if layerName.lower() == 'ulice':
                 if 'GEOMETRY_NAME=definicnibod' in options:
                     options.remove('GEOMETRY_NAME=definicnibod')
@@ -171,38 +180,45 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
                 olayer = None
                 if append:
                     olayer = ods.GetLayerByName(layerName)
-
+                
                 createFields = False
                 if not olayer:
                     if geom_name:
                         geom_type = ogr.wkbMultiPolygon # TODO: remove hardcoded-value
                     else:
-                        geom_type = ogr.wkbMultiPoint
+                        geom_type = ogr.wkbNone
                     
                     olayer = ods.CreateLayer(layerName,
-                                             # srs = layer.GetSpatialRef(),
-                                             geom_type = geom_type, options = options)
+                                             layer.GetSpatialRef(),
+                                             geom_type, options)
+                    
                     createFields = True
+                
+                if not olayer:
+                    fatal("Unable to create layer '%'" % layerName)
                 
                 layer.ResetReading()
                 
                 feature = layer.GetNextFeature()
+                # create attributes
                 if createFields:
                     for i in range(feature.GetFieldCount()):
                         olayer.CreateField(feature.GetFieldDefnRef(i))
                 
+                # copy features from source to dest layer
                 while feature:
                     ofeature = feature.Clone()
                     
+                    # parse geometry columns if requested
+                    odefn = feature.GetDefnRef()
                     if geom_name:
-                        odefn = feature.GetDefnRef()
                         idx = feature.GetGeomFieldIndex(geom_name)
                         for i in range(odefn.GetGeomFieldCount()):
                             if i == idx:
                                 continue
                             odefn.DeleteGeomFieldDefn(i)
-                        geom = feature.GetGeomFieldRef(idx)
-                        ofeature.SetGeometry(geom)
+                            geom = feature.GetGeomFieldRef(idx)
+                            ofeature.SetGeometry(geom)
                     
                     olayer.CreateFeature(ofeature)
                     
