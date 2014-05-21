@@ -34,7 +34,7 @@ import sys
 import atexit
 from getopt import GetoptError
 
-from vfr2ogr.ogr import check_ogr, open_file, list_layers, convert_vfr, check_log, open_ds
+from vfr2ogr.ogr import check_ogr, open_file, list_layers, convert_vfr, check_log, open_ds, print_summary
 from vfr2ogr.utils import fatal, message, parse_xml_gz, compare_list
 from vfr2ogr.parse import parse_cmd
 
@@ -104,13 +104,14 @@ def main():
             lco_options.append('SCHEMA=%s' % schema)
 
     # open input file(s) by GML driver
-    i = 0
+    ipass = 0
     epsg_checked = False
     file_list = open_file(filename, options['download'])
-    append = len(file_list) > 1 # enable append mode on more files
-    
+    layer_list = []
+
+    append = False # do not append on the first pass
     for fname in file_list:
-        message("Processing %d out of %d..." % (i+1, len(file_list)))
+        message("Processing %d out of %d..." % (ipass+1, len(file_list)))
 
         # open OGR datasource
         ids = open_ds(fname)
@@ -119,7 +120,7 @@ def main():
         
         if not odsn:
             # list available layers and exit
-            layer_list = list_layers(ids, options['extended'])
+            layer_list = list_layers(ids, options['extended'], sys.stdout)
             if options['extended'] and os.path.exists(filename):
                 compare_list(layer_list, parse_xml_gz(filename))
         else:
@@ -128,13 +129,20 @@ def main():
                 check_epsg(odsn[3:])
                 epsg_checked = True
             
+            if not layer_list:
+                layer_list = list_layers(ids, False, None)
+            
             # do conversion
             time = convert_vfr(ids, odsn, "PostgreSQL", options['layer'],
                                options['overwrite'], lco_options, options['geom'], append)
+            append = True # append on the next passes
             message("Time elapsed: %d sec" % time)
         
         ids.Destroy()
-        i += 1
+        ipass += 1
+    
+    if ipass > 1:
+        print_summary(odsn, "PostgreSQL", layer_list)
     
     return 0
 
