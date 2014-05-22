@@ -208,31 +208,38 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
                 if createFields:
                     for i in range(feature.GetFieldCount()):
                         olayer.CreateField(feature.GetFieldDefnRef(i))
-                
+
+                olayer.StartTransaction()
                 # copy features from source to dest layer
                 ifeat = 0
+                iFID = olayer.GetFeatureCount()
                 while feature:
                     ofeature = feature.Clone()
                     
                     # parse geometry columns if requested
-                    odefn = feature.GetDefnRef()
                     if geom_name:
+                        odefn = feature.GetDefnRef()
                         idx = feature.GetGeomFieldIndex(geom_name)
                         for i in range(odefn.GetGeomFieldCount()):
                             if i == idx:
                                 continue
                             odefn.DeleteGeomFieldDefn(i)
                             geom = feature.GetGeomFieldRef(idx)
-                            ofeature.SetGeometry(geom)
-                    
+                            ofeature.SetGeometry(geom.Clone())
+
+                    ofeature.SetFID(iFID)
                     olayer.CreateFeature(ofeature)
                     
                     feature = layer.GetNextFeature()
                     ifeat += 1
+                    iFID += 1
+
+            olayer.CommitTransaction()
             
             if olayer is None:
                 fatal("Unable to export layer '%s'. Exiting..." % layerName)
-            ods.SyncToDisk()
+            #ods.SyncToDisk()
+            
             print >> sys.stderr, " %-5d features" % ifeat
     
     end = time.time() - start
