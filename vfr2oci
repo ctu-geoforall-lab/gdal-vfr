@@ -1,0 +1,5 @@
+#!/bin/sh
+
+./vfr2oci.py $*
+
+exit 0

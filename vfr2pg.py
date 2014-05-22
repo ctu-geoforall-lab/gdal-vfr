@@ -106,9 +106,10 @@ def main():
     # open input file(s) by GML driver
     ipass = 0
     epsg_checked = False
-    file_list = open_file(filename, options['download'])
-    layer_list = []
 
+    file_list  = open_file(filename, options['download'])
+    layer_list = options['layer']
+    
     append = False # do not append on the first pass
     for fname in file_list:
         message("Processing %d out of %d..." % (ipass+1, len(file_list)))

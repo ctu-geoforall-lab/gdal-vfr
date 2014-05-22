@@ -1,0 +1,5 @@
+#!/bin/sh
+
+./vfr2pg.py $*
+
+exit 0
