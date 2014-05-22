@@ -133,6 +133,9 @@ def list_layers(ds, extended = False, fd = sys.stdout):
             for field, count in get_geom_count(layer):
                 fd.write("%41s : %d\n" % (field, count))
     
+    if fd:
+        fd.write('-' * 80 + os.linesep)
+    
     return layer_list
 
 # convert VFR into specified format
