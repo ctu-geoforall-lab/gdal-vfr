@@ -154,6 +154,7 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
 
     start = time.time()
     nlayers = ids.GetLayerCount()
+    nfeat = 0
     for i in range(nlayers):
         layer = ids.GetLayer(i)
         layerName = layer.GetName()
@@ -161,8 +162,9 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
         if layers and layerName not in layers:
             continue
         
+        olayer = ods.GetLayerByName(layerName)
         print >> sys.stderr, "Exporing layer %-20s ..." % layerName,
-        if not overwrite and ods.GetLayerByName(layerName):
+        if not overwrite and (olayer and not append):
             print >> sys.stderr, " already exists (skipped)"
         else:
             ### TODO: fix output drivers not to use default geometry
@@ -177,14 +179,10 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
                 if 'GEOMETRY_NAME=definicnibod' not in options:
                     options.append('GEOMETRY_NAME=definicnibod')
             
-            if not append and not geom_name:
+            if not olayer and not geom_name:
                 olayer = ods.CopyLayer(layer, layerName, options)
                 ifeat = olayer.GetFeatureCount()
             else:
-                olayer = None
-                if append:
-                    olayer = ods.GetLayerByName(layerName)
-                
                 createFields = False
                 if not olayer:
                     if geom_name:
@@ -241,12 +239,13 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
             #ods.SyncToDisk()
             
             print >> sys.stderr, " %-5d features" % ifeat
-    
-    end = time.time() - start
+            nfeat += ifeat
     
     ods.Destroy()
     
-    return end
+    message("Time elapsed: %d sec" % (time.time() - start))
+    
+    return nfeat
 
 def print_summary(odsn, frmt, layer_list):
     odrv = ogr.GetDriverByName(frmt)

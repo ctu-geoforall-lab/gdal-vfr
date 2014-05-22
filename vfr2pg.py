@@ -134,12 +134,10 @@ def main():
                 layer_list = list_layers(ids, False, None)
             
             # do conversion
-            time = convert_vfr(ids, odsn, "PostgreSQL", options['layer'],
-                               options['overwrite'], lco_options, options['geom'], append)
-            if not append:
+            nfeat = convert_vfr(ids, odsn, "PostgreSQL", options['layer'],
+                                options['overwrite'], lco_options, options['geom'], append)
+            if nfeat > 0:
                 append = True # append on next passes
-            
-            message("Time elapsed: %d sec" % time)
         
         ids.Destroy()
         ipass += 1
