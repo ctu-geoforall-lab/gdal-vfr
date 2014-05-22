@@ -107,7 +107,7 @@ def main():
     i = 0
     epsg_checked = False
     file_list = open_file(filename, options['download'])
-    append = len(file_list) > 1 # enable append mode on more files
+    append = False # do not append on first pass
     
     for fname in file_list:
         message("Processing %d out of %d..." % (i+1, len(file_list)))
@@ -131,6 +131,9 @@ def main():
             # do conversion
             time = convert_vfr(ids, odsn, "PostgreSQL", options['layer'],
                                options['overwrite'], lco_options, options['geom'], append)
+            if not append:
+                append = True # append on next passes
+            
             message("Time elapsed: %d sec" % time)
         
         ids.Destroy()
