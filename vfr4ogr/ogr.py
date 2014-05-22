@@ -247,7 +247,7 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
     
     return nfeat
 
-def print_summary(odsn, frmt, layer_list):
+def print_summary(odsn, frmt, layer_list, stime):
     odrv = ogr.GetDriverByName(frmt)
     if odrv is None:
         fatal("Format '%s' is not supported" % frmt)
@@ -264,6 +264,6 @@ def print_summary(odsn, frmt, layer_list):
         
         print >> sys.stderr, "Layer          %-20s ... %-5d features" % (layerName, layer.GetFeatureCount())
     
-    print '-' * 80
+    message("Time elapsed: %d sec" % (time.time() - stime))
     
     ods.Destroy()

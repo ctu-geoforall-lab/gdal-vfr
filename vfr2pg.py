@@ -32,6 +32,7 @@ Usage: vfr2py [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type
 import os
 import sys
 import atexit
+import time
 from getopt import GetoptError
 
 from vfr4ogr.ogr import check_ogr, open_file, list_layers, convert_vfr, check_log, open_ds, print_summary
@@ -111,6 +112,7 @@ def main():
     layer_list = options['layer']
     
     append = False # do not append on the first pass
+    stime = time.time()
     for fname in file_list:
         message("Processing %d out of %d..." % (ipass+1, len(file_list)))
 
@@ -143,7 +145,7 @@ def main():
         ipass += 1
     
     if ipass > 1:
-        print_summary(odsn, "PostgreSQL", layer_list)
+        print_summary(odsn, "PostgreSQL", layer_list, stime)
     
     return 0
 
