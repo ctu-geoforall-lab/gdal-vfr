@@ -114,7 +114,7 @@ def get_geom_count(layer):
     
     return geom_list
 
-def list_layers(ds, extended = False):
+def list_layers(ds, extended = False, fd = sys.stdout):
     nlayers = ds.GetLayerCount()
     layer_list = list()
     for i in range(nlayers):
@@ -123,12 +123,15 @@ def list_layers(ds, extended = False):
         layerName = layer.GetName()
         layer_list.append(layerName)
         
+        if not fd:
+            continue
+
         if extended:
-            print '-' * 80
-        print "Number of features in %-20s: %d" % (layerName, featureCount)
+            fd.write('-' * 80 + os.linesep)
+        fd.write("Number of features in %-20s: %d\n" % (layerName, featureCount))
         if extended:
             for field, count in get_geom_count(layer):
-                print "%41s : %d" % (field, count)
+                fd.write("%41s : %d\n" % (field, count))
     
     return layer_list
 
@@ -176,6 +179,7 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
             
             if not append and not geom_name:
                 olayer = ods.CopyLayer(layer, layerName, options)
+                ifeat = olayer.GetFeatureCount()
             else:
                 olayer = None
                 if append:
@@ -206,6 +210,7 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
                         olayer.CreateField(feature.GetFieldDefnRef(i))
                 
                 # copy features from source to dest layer
+                ifeat = 0
                 while feature:
                     ofeature = feature.Clone()
                     
@@ -223,14 +228,36 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
                     olayer.CreateFeature(ofeature)
                     
                     feature = layer.GetNextFeature()
+                    ifeat += 1
             
             if olayer is None:
                 fatal("Unable to export layer '%s'. Exiting..." % layerName)
             ods.SyncToDisk()
-            print >> sys.stderr, " %-5d features" % olayer.GetFeatureCount()
+            print >> sys.stderr, " %-5d features" % ifeat
     
     end = time.time() - start
     
     ods.Destroy()
     
     return end
+
+def print_summary(odsn, frmt, layer_list):
+    odrv = ogr.GetDriverByName(frmt)
+    if odrv is None:
+        fatal("Format '%s' is not supported" % frmt)
+    
+    ods = odrv.Open(odsn, False)
+    if ods is None:
+        fatal("Unable to open datasource '%s'" % odsn)
+
+    message("Summary")
+    for layerName in layer_list:
+        layer = ods.GetLayerByName(layerName)
+        if not layer:
+            continue
+        
+        print >> sys.stderr, "Layer          %-20s ... %-5d features" % (layerName, layer.GetFeatureCount())
+    
+    print '-' * 80
+    
+    ods.Destroy()
