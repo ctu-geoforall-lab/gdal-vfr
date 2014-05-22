@@ -179,7 +179,7 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
                 if 'GEOMETRY_NAME=definicnibod' not in options:
                     options.append('GEOMETRY_NAME=definicnibod')
             
-            if not olayer and not geom_name:
+            if not olayer or (not append and olayer and not geom_name ):
                 olayer = ods.CopyLayer(layer, layerName, options)
                 ifeat = olayer.GetFeatureCount()
             else:
