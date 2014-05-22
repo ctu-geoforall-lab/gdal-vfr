@@ -9,9 +9,9 @@ One of input options must be given:
        --file
        --date and --type
 
-Usage: vfr2py.py [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type=ST_ABCD|OB_000000_ABCD] [--layer=layer1,layer2,...]  [--geom=OriginalniHranice|GeneralizovaneHranice]
-                            --dbname <database name>
-                            [--schema <schema name>] [--user <user name>] [--passwd <password>] [--host <host name>]
+Usage: vfr2py [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type=ST_ABCD|OB_000000_ABCD] [--layer=layer1,layer2,...]  [--geom=OriginalniHranice|GeneralizovaneHranice]
+                         --dbname <database name>
+                         [--schema <schema name>] [--user <user name>] [--passwd <password>] [--host <host name>]
                             
 
        -o         Overwrite existing PostGIS tables
@@ -34,9 +34,9 @@ import sys
 import atexit
 from getopt import GetoptError
 
-from vfr2ogr.ogr import check_ogr, open_file, list_layers, convert_vfr, check_log, open_ds, print_summary
-from vfr2ogr.utils import fatal, message, parse_xml_gz, compare_list
-from vfr2ogr.parse import parse_cmd
+from vfr4ogr.ogr import check_ogr, open_file, list_layers, convert_vfr, check_log, open_ds, print_summary
+from vfr4ogr.utils import fatal, message, parse_xml_gz, compare_list
+from vfr4ogr.parse import parse_cmd
 
 # print usage
 def usage():

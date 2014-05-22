@@ -1,0 +1,5 @@
+#!/bin/sh
+
+./vfr2ogr.py $*
+
+exit 0
