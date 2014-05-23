@@ -32,6 +32,8 @@ def parse_cmd(argv, flags, params, outdir):
             outdir['extended'] = True
         elif o == "-d":
             outdir['download'] = True
+        elif o == "-s":
+            outdir['schema_per_file'] = True
         elif o == "-f": # unused
             list_formats()
             sys.exit(0)

@@ -68,14 +68,12 @@ def open_file(filename, download = False):
             fatal("Unable to read '%s'" % filename)
         f.close()    
     else:
-        list_ds.append(ds)
-    
+        list_ds.append(filename)
+        ds.Destroy()
+
     return list_ds
 
 def open_ds(filename):
-    if isinstance(filename, ogr.DataSource):
-        return filename # already open
-    
     drv = ogr.GetDriverByName("GML")
     ds = drv.Open(filename, False)
     if ds is None:
@@ -164,8 +162,8 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
         
         if layers and layerName not in layers:
             continue
-        
-        olayer = ods.GetLayerByName(layerName)
+                
+        olayer = ods.GetLayerByName('%s' % layerName)
         print >> sys.stderr, "Exporing layer %-20s ..." % layerName,
         if not overwrite and (olayer and not append):
             print >> sys.stderr, " already exists (skipped)"
@@ -182,8 +180,10 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
                 if 'GEOMETRY_NAME=definicnibod' not in options:
                     options.append('GEOMETRY_NAME=definicnibod')
             
-            if not olayer or (not append and olayer and not geom_name ):
+            if not olayer or (not append and olayer and not geom_name):
                 olayer = ods.CopyLayer(layer, layerName, options)
+                if olayer is None:
+                    fatal("Unable to create layer %s" % layerName)
                 ifeat = olayer.GetFeatureCount()
             else:
                 createFields = False

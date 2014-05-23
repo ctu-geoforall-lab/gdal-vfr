@@ -17,6 +17,7 @@ Usage: vfr2py [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type
        -o         Overwrite existing PostGIS tables
        -e         Extended layer list statistics
        -d         Save downloaded VFR data in currect directory (--date and --type required)
+       -s         Create new schema for each VFR file
        --file     Path to xml.gz or URL list file
        --date     Date in format 'YYYYMMDD'
        --type     Type of request in format XY_ABCD, eg. 'ST_UKSH' or 'OB_000000_ABCD'
@@ -43,17 +44,33 @@ from vfr4ogr.parse import parse_cmd
 def usage():
     print __doc__
 
-def check_epsg(conn_string):
+def open_db(conn_string):
     try:
         import psycopg2
     except ImportError as e:
-        sys.stderr.write("Unable to add EPSG 5514: %s\n" % e)
-        return
+        return None
     
     try:
         conn = psycopg2.connect(conn_string)
     except psycopg2.OperationalError as e:
         sys.exit("Unable to connect to DB: %s" % e)
+    
+    return conn
+
+def create_schema(conn, name):
+    cursor = conn.cursor()
+    try:
+        cursor.execute("CREATE SCHEMA IF NOT EXISTS %s" % name)
+        conn.commit()
+    except StandardError as e:
+        sys.exit("Unable to create schema %s: %s" % (name, e))
+    
+    cursor.close()
+
+def check_epsg(conn):
+    if not conn:
+        sys.stderr.write("Unable to add EPSG 5514: %s\n" % e)
+        return
     
     cursor = conn.cursor()
     try:
@@ -69,7 +86,6 @@ def check_epsg(conn_string):
         message("EPSG 5514 defined in DB")
     
     cursor.close()
-    conn.close()
 
 def main():
     # check requirements
@@ -77,9 +93,10 @@ def main():
     
     # parse cmd arguments
     options = { 'dbname' : None, 'schema' : None, 'user' : None, 'passwd' : None, 'host' : None, 
-                'overwrite' : False, 'extended' : False, 'layer' : [], 'geom' : None, 'download' : False}
+                'overwrite' : False, 'extended' : False, 'layer' : [], 'geom' : None, 'download' : False,
+                'schema_per_file' : False}
     try:
-        filename = parse_cmd(sys.argv, "heod", ["help", "overwrite", "extended",
+        filename = parse_cmd(sys.argv, "heods", ["help", "overwrite", "extended",
                                               "file=", "date=", "type=", "layer=", "geom=",
                                               "dbname=", "schema=", "user=", "passwd=", "host="],
                              options)
@@ -101,17 +118,22 @@ def main():
             odsn += " password=%s" % options['passwd']
         if options['host']:
             odsn += " host=%s" % options['host']
-        if options['schema']:
-            lco_options.append('SCHEMA=%s' % schema)
+        if not options['schema_per_file'] and options['schema']:
+            lco_options.append(' schema=%s' % schema)
 
-    epsg_checked = False
-
+    # open connection to DB
+    conn = open_db(odsn[3:])
+    
+    # get list of input VFR files
     file_list  = open_file(filename, options['download'])
     layer_list = options['layer']
     
+    epsg_checked = False
     append = False # do not append on the first pass
     ipass = 0
     stime = time.time()
+
+    # go thru VFR file and load them to DB
     for fname in file_list:
         message("Processing %d out of %d..." % (ipass+1, len(file_list)))
 
@@ -126,25 +148,41 @@ def main():
             if options['extended'] and os.path.exists(filename):
                 compare_list(layer_list, parse_xml_gz(filename))
         else:
-            # check EPSG 5514
+            # check EPSG 5514 (only first pass)
             if epsg_checked:
-                check_epsg(odsn[3:])
+                check_epsg(conn)
                 epsg_checked = True
             
             if not layer_list:
                 layer_list = list_layers(ids, False, None)
             
+            odsn_reset = odsn
+            if options['schema_per_file']:
+                # set schema per file
+                schema_name = os.path.basename(fname).rstrip('.xml.gz').lower()
+                if schema_name[0].isdigit():
+                    schema_name = 'vfr_' + schema_name
+                create_schema(conn, schema_name)
+                odsn += ' active_schema=%s' % schema_name
+            
             # do conversion
             nfeat = convert_vfr(ids, odsn, "PostgreSQL", options['layer'],
                                 options['overwrite'], lco_options, options['geom'], append)
+            
+            if options['schema_per_file']:
+                odsn = odsn_reset
+            
             if nfeat > 0:
                 append = True # append on next passes
         
+            
         ids.Destroy()
         ipass += 1
     
     if ipass > 1:
         print_summary(odsn, "PostgreSQL", layer_list, stime)
+    
+    conn.close()
     
     return 0
 

@@ -21,12 +21,20 @@ fi
 echo "Using vfr2${PGM}..."
 
 # first pass (empty DB)
+echo "First pass (empty DB...)"
 ../vfr2${PGM}.py --file seznam.txt $OPT
 
 # second pass (already exists)
+echo "Second pass (already exists...)"
 ../vfr2${PGM}.py --file seznam.txt $OPT
 
 # third pass (overwrite)
-../vfr2${PGM}.py --file seznam.txt $OPT
+echo "Third pass (overwrite...)"
+../vfr2${PGM}.py --file seznam.txt $OPT --o
+
+if [ "$PGM" = "pg" ] ; then
+    echo "Fourth pass (schema per file...)"
+    ../vfr2${PGM}.py --file seznam.txt $OPT -s
+fi
 
 exit 0

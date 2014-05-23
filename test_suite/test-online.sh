@@ -22,12 +22,20 @@ fi
 echo "Using vfr2${PGM}..."
 
 # first pass (empty DB)
+echo "First pass (empty DB...)"
 ../vfr2${PGM}.py --date $DATE --type OB_564729_UKSH $OPT
 
 # second pass (already exists)
+echo "Second pass (already exists...)"
 ../vfr2${PGM}.py --date $DATE --type OB_564729_UKSH $OPT
 
 # third pass (overwrite)
+echo "Third pass (overwrite...)"
 ../vfr2${PGM}.py --date $DATE --type OB_564729_UKSH $OPT
+
+if [ "$PGM" = "pg" ] ; then
+    echo "Fourth pass (schema per file...)"
+    ../vfr2${PGM}.py --date $DATE --type OB_564729_UKSH $OPT -s
+fi
 
 exit 0
