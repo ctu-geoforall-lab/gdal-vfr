@@ -1,14 +1,15 @@
 #!/bin/sh
 
+DB=vfr
 DATE="20140430"
 
 if test -z "$1" ; then
     PGM="pg"
-    OPT="--dbname vfr"
+    OPT="--dbname $DB"
 else
     if [ "$1" = "ogr" ] ; then
         PGM="ogr"
-        OPT="--format PostgreSQL --dsn PG:dbname=vfr"
+        OPT="--format PostgreSQL --dsn PG:dbname=$DB"
     else
         PGM="oci"
         OPT="--user test --passwd test"
@@ -16,7 +17,7 @@ else
 fi
 
 if [ "PGM" != "oci" ] ; then
-    dropdb vfr; createdb vfr && psql vfr -c"create extension postgis"
+    psql -d $DB -f cleandb.sql 2>/dev/null
 fi
 
 echo "Using vfr2${PGM}..."
@@ -31,7 +32,7 @@ echo "Second pass (already exists...)"
 
 # third pass (overwrite)
 echo "Third pass (overwrite...)"
-../vfr2${PGM}.py --date $DATE --type OB_564729_UKSH $OPT
+../vfr2${PGM}.py --date $DATE --type OB_564729_UKSH $OPT --o
 
 if [ "$PGM" = "pg" ] ; then
     echo "Fourth pass (schema per file...)"
