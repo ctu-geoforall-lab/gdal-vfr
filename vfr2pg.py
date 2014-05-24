@@ -118,8 +118,6 @@ def main():
             odsn += " password=%s" % options['passwd']
         if options['host']:
             odsn += " host=%s" % options['host']
-        if not options['schema_per_file'] and options['schema']:
-            lco_options.append(' schema=%s' % schema)
 
     # open connection to DB
     conn = open_db(odsn[3:])
@@ -132,7 +130,7 @@ def main():
     append = False # do not append on the first pass
     ipass = 0
     stime = time.time()
-
+    
     # go thru VFR file and load them to DB
     for fname in file_list:
         message("Processing %d out of %d..." % (ipass+1, len(file_list)))
@@ -149,7 +147,7 @@ def main():
                 compare_list(layer_list, parse_xml_gz(filename))
         else:
             # check EPSG 5514 (only first pass)
-            if epsg_checked:
+            if not epsg_checked:
                 check_epsg(conn)
                 epsg_checked = True
             
@@ -157,11 +155,15 @@ def main():
                 layer_list = list_layers(ids, False, None)
             
             odsn_reset = odsn
-            if options['schema_per_file']:
-                # set schema per file
-                schema_name = os.path.basename(fname).rstrip('.xml.gz').lower()
-                if schema_name[0].isdigit():
-                    schema_name = 'vfr_' + schema_name
+            if options['schema_per_file'] or options['schema']:
+                if options['schema_per_file']:
+                    # set schema per file
+                    schema_name = os.path.basename(fname).rstrip('.xml.gz').lower()
+                    if schema_name[0].isdigit():
+                        schema_name = 'vfr_' + schema_name
+                else:
+                    schema_name = options['schema'].lower()
+                
                 create_schema(conn, schema_name)
                 odsn += ' active_schema=%s' % schema_name
             
