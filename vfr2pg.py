@@ -9,12 +9,13 @@ One of input options must be given:
        --file
        --date and --type
 
-Usage: vfr2py [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type=ST_ABCD|OB_000000_ABCD] [--layer=layer1,layer2,...]  [--geom=OriginalniHranice|GeneralizovaneHranice]
-                         --dbname <database name>
-                         [--schema <schema name>] [--user <user name>] [--passwd <password>] [--host <host name>]
-                            
+Usage: vfr2py [-o] [-a] [-e] [-d] [-s]
+              [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type=ST_ABCD|OB_XXXXXX_ABCD] [--layer=layer1,layer2,...]  [--geom=OriginalniHranice|GeneralizovaneHranice]
+              --dbname <database name>
+              [--schema <schema name>] [--user <user name>] [--passwd <password>] [--host <host name>]
 
        -o         Overwrite existing PostGIS tables
+       -a         Append to existing PostGIS tables
        -e         Extended layer list statistics
        -d         Save downloaded VFR data in currect directory (--date and --type required)
        -s         Create new schema for each VFR file
@@ -94,9 +95,9 @@ def main():
     # parse cmd arguments
     options = { 'dbname' : None, 'schema' : None, 'user' : None, 'passwd' : None, 'host' : None, 
                 'overwrite' : False, 'extended' : False, 'layer' : [], 'geom' : None, 'download' : False,
-                'schema_per_file' : False}
+                'schema_per_file' : False, 'append' : False}
     try:
-        filename = parse_cmd(sys.argv, "heods", ["help", "overwrite", "extended",
+        filename = parse_cmd(sys.argv, "heodsa", ["help", "overwrite", "extended", "append",
                                               "file=", "date=", "type=", "layer=", "geom=",
                                               "dbname=", "schema=", "user=", "passwd=", "host="],
                              options)
@@ -127,13 +128,13 @@ def main():
     layer_list = options['layer']
     
     epsg_checked = False
-    append = False # do not append on the first pass
+    append = options['append']
     ipass = 0
     stime = time.time()
     
     # go thru VFR file and load them to DB
     for fname in file_list:
-        message("Processing %d out of %d..." % (ipass+1, len(file_list)))
+        message("Processing %s (%d out of %d)..." % (fname, ipass+1, len(file_list)))
 
         # open OGR datasource
         ids = open_ds(fname)

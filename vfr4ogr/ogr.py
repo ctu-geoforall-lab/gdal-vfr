@@ -164,9 +164,9 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
             continue
                 
         olayer = ods.GetLayerByName('%s' % layerName)
-        print >> sys.stderr, "Exporing layer %-20s ..." % layerName,
+        print >> sys.stdout, "Exporting layer %-20s ..." % layerName,
         if not overwrite and (olayer and not append):
-            print >> sys.stderr, " already exists (skipped)"
+            print >> sys.stdout, " already exists (skipped)"
         else:
             ### TODO: fix output drivers not to use default geometry
             ### names
@@ -241,7 +241,7 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
                 fatal("Unable to export layer '%s'. Exiting..." % layerName)
             #ods.SyncToDisk()
             
-            print >> sys.stderr, " %-5d features" % ifeat
+            print >> sys.stdout, " %-5d features" % ifeat
             nfeat += ifeat
     
     ods.Destroy()

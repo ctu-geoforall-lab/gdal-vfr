@@ -24,10 +24,11 @@ def warning(msg):
     sys.stderr.write('WARNING: ' + str(msg) + os.linesep)
     
 def message(msg):
-    sys.stderr.write('-' * 80 + os.linesep)
-    sys.stderr.write(msg + os.linesep)
-    sys.stderr.write('-' * 80 + os.linesep)
-
+    sys.stdout.write('-' * 80 + os.linesep)
+    sys.stdout.write(msg + os.linesep)
+    sys.stdout.write('-' * 80 + os.linesep)
+    sys.stdout.flush()
+    
 def parse_xml_gz(filename):
     message("Comparing OGR layers and input XML file (may take some time)...")
     infile = gzip.open(filename)

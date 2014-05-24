@@ -28,6 +28,8 @@ def parse_cmd(argv, flags, params, outdir):
             raise getopt.GetoptError("")
         elif o in ("-o", "--overwrite"):
             outdir['overwrite'] = True
+        elif o in ("-a", "--append"):
+            outdir['append'] = True
         elif o in ("-e", "--extended"):
             outdir['extended'] = True
         elif o == "-d":
@@ -46,6 +48,8 @@ def parse_cmd(argv, flags, params, outdir):
         raise getopt.GetoptError("--file and --date are mutually exclusive")
     if date and not ftype:
         raise getopt.GetoptError("--ftype required")
+    if outdir['overwrite'] and outdir['append']:
+        raise getopt.GetoptError("--append and --overwrite are mutually exclusive")
     
     if outdir['layer']:
         outdir['layer'] = outdir['layer'].split(',')
