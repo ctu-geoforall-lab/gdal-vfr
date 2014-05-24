@@ -31,7 +31,7 @@ def check_log():
 def check_ogr():
     # check required version
     version = gdal.__version__.split('.', 1)
-    if not (int(version[0]) >= 1 and int(version[1][:2]) >= 11):
+    if not (int(version[0]) > 1 or int(version[1][:2]) >= 11):
         fatal("GDAL/OGR 1.11 or later required (%s found)" % '.'.join(version))
     
     # check if OGR comes with GML driver
