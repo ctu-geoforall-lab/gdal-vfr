@@ -38,7 +38,7 @@ import time
 from getopt import GetoptError
 
 from vfr4ogr.ogr import check_ogr, open_file, list_layers, convert_vfr, check_log, open_ds, print_summary
-from vfr4ogr.utils import fatal, message, parse_xml_gz, compare_list
+from vfr4ogr.utils import fatal, message, parse_xml_gz, compare_list, error
 from vfr4ogr.parse import parse_cmd
 
 # print usage
@@ -169,8 +169,11 @@ def main():
                 odsn += ' active_schema=%s' % schema_name
             
             # do conversion
-            nfeat = convert_vfr(ids, odsn, "PostgreSQL", options['layer'],
-                                options['overwrite'], lco_options, options['geom'], append)
+            try:
+                nfeat = convert_vfr(ids, odsn, "PostgreSQL", options['layer'],
+                                    options['overwrite'], lco_options, options['geom'], append)
+            except RuntimeError as e:
+                error("Unable to read %s: %s" % (fname, e))
             
             if options['schema_per_file']:
                 odsn = odsn_reset

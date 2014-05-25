@@ -21,8 +21,11 @@ def fatal(msg):
     sys.exit('ERROR: ' + str(msg))
 
 def warning(msg):
-    sys.stderr.write('WARNING: ' + str(msg) + os.linesep)
-    
+    sys.stderr.write('WARNING: %s%s' % (str(msg), os.linesep))
+
+def error(msg):
+    sys.stderr.write('ERROR: %s%s' % (str(msg), os.linesep))
+
 def message(msg):
     sys.stdout.write('-' * 80 + os.linesep)
     sys.stdout.write(msg + os.linesep)

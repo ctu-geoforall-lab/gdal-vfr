@@ -17,7 +17,7 @@ logger.addHandler(logging.FileHandler(logFile, delay = True))
 # redirect warnings to the file
 def error_handler(err_level, err_no, err_msg):
     if err_level > gdal.CE_Warning:
-        sys.exit(err_msg)
+        raise RuntimeError(err_msg)
     elif err_level == gdal.CE_Debug:
         sys.stderr.write(err_msg + os.linesep)
     else:
