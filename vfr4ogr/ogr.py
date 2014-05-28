@@ -239,7 +239,7 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
             
             if olayer is None:
                 fatal("Unable to export layer '%s'. Exiting..." % layerName)
-            #ods.SyncToDisk()
+            # ods.SyncToDisk()
             
             print >> sys.stdout, " %-5d features" % ifeat
             nfeat += ifeat

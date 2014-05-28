@@ -59,6 +59,10 @@ def main():
     file_list  = open_file(filename, options['download'])
     layer_list = options['layer']
     
+    # set up driver-specific options
+    if options['format'] == 'SQLite':
+        os.environ['OGR_SQLITE_SYNCHRONOUS'] = 'OFF'
+    
     append = False # do not append on the first pass
     ipass = 0
     stime = time.time()

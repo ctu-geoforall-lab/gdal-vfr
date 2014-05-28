@@ -48,7 +48,7 @@ def parse_cmd(argv, flags, params, outdir):
         raise getopt.GetoptError("--file and --date are mutually exclusive")
     if date and not ftype:
         raise getopt.GetoptError("--ftype required")
-    if outdir['overwrite'] and outdir['append']:
+    if outdir['overwrite'] and outdir.get('append', False):
         raise getopt.GetoptError("--append and --overwrite are mutually exclusive")
     
     if outdir['layer']:
