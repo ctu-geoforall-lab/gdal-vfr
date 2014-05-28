@@ -54,7 +54,7 @@ def open_db(conn_string):
     try:
         conn = psycopg2.connect(conn_string)
     except psycopg2.OperationalError as e:
-        sys.exit("Unable to connect to DB: %s" % e)
+        sys.exit("Unable to connect to DB: %s\nTry to define --user and/or --passwd" % e)
     
     return conn
 
