@@ -166,7 +166,7 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
         olayer = ods.GetLayerByName('%s' % layerName)
         print >> sys.stdout, "Exporting layer %-20s ..." % layerName,
         if not overwrite and (olayer and not append):
-            print >> sys.stdout, " already exists (skipped)"
+            print >> sys.stdout, " already exists (use --overwrite or --append to modify existing data)"
         else:
             ### TODO: fix output drivers not to use default geometry
             ### names
