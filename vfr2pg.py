@@ -185,7 +185,7 @@ def main():
         ids.Destroy()
         ipass += 1
     
-    if ipass > 1:
+    if ipass > 1 or options.get('append', True):
         print_summary(odsn, "PostgreSQL", layer_list, stime)
     
     conn.close()
