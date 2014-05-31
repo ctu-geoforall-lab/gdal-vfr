@@ -7,7 +7,7 @@ Requires GDAL/OGR library version 1.11 or later.
 
 One of input options must be given:
        --file
-       --date and --type
+       --type
 
 Usage: vfr2oci [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type=ST_ABCD|OB_000000_ABCD] [--layer=layer1,layer2,...] [--geom=OriginalniHranice|GeneralizovaneHranice]
                           --dbname <database name>

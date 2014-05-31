@@ -1,8 +1,15 @@
 import sys
 import getopt
+import datetime
 
 from utils import fatal, message, check_file, download_vfr
 from ogr import list_formats
+
+def last_day_of_month():
+    today = datetime.date.today()
+    if today.month == 12:
+        return today.replace(day=31)
+    return (today.replace(month=today.month, day=1) - datetime.timedelta(days=1)).strftime("%Y%m%d")
 
 def parse_cmd(argv, flags, params, outdir):
     try:
@@ -42,12 +49,12 @@ def parse_cmd(argv, flags, params, outdir):
         else:
             sys.exit("unhandled option: %s" % o)
     
-    if not filename and not date:
-        raise getopt.GetoptError("--file or --date required")
-    if filename and date:
-        raise getopt.GetoptError("--file and --date are mutually exclusive")
-    if date and not ftype:
-        raise getopt.GetoptError("--ftype required")
+    if not filename and not ftype:
+        raise getopt.GetoptError("--file or --type required")
+    if filename and ftype:
+        raise getopt.GetoptError("--file and --type are mutually exclusive")
+    if ftype and not date:
+        date = last_day_of_month()
     if outdir['overwrite'] and outdir.get('append', False):
         raise getopt.GetoptError("--append and --overwrite are mutually exclusive")
     
