@@ -124,7 +124,7 @@ def main():
     conn = open_db(odsn[3:])
     
     # get list of input VFR files
-    file_list  = open_file(filename, options['download'])
+    file_list  = open_file(filename, options['download'], force_date = options['date'])
     layer_list = options['layer']
     
     epsg_checked = False

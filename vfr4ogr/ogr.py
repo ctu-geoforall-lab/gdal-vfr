@@ -40,7 +40,7 @@ def check_ogr():
 
     gdal.PushErrorHandler(error_handler)
 
-def open_file(filename, download = False):
+def open_file(filename, download = False, force_date = None):
     drv = ogr.GetDriverByName("GML")
     if drv is None:
         fatal("Unable to select GML driver")
@@ -58,7 +58,11 @@ def open_file(filename, download = False):
                 if line.startswith('20'):
                     line = 'http://vdp.cuzk.cz/vymenny_format/soucasna/' + line
                 else:
-                    line = 'http://vdp.cuzk.cz/vymenny_format/soucasna/' + last_day_of_month() + '_' + line
+                    if not force_date:
+                        date = last_day_of_month()
+                    else:
+                        date = force_date
+                    line = 'http://vdp.cuzk.cz/vymenny_format/soucasna/' + date + '_' + line
                 
                 if line.startswith('http://'):
                     if download:
