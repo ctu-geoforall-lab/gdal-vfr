@@ -1,15 +1,8 @@
 import sys
 import getopt
-import datetime
 
-from utils import fatal, message, check_file, download_vfr
+from utils import fatal, message, check_file, download_vfr, last_day_of_month
 from ogr import list_formats
-
-def last_day_of_month():
-    today = datetime.date.today()
-    if today.month == 12:
-        return today.replace(day=31)
-    return (today.replace(month=today.month, day=1) - datetime.timedelta(days=1)).strftime("%Y%m%d")
 
 def parse_cmd(argv, flags, params, outdir):
     try:

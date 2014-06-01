@@ -2,6 +2,7 @@ import os
 import sys
 import gzip
 import urllib
+import datetime
 
 from xml.dom.minidom import parse, parseString
 
@@ -64,3 +65,9 @@ def download_vfr(url):
     urllib.urlretrieve (url, local_file)
     
     return local_file
+
+def last_day_of_month():
+    today = datetime.date.today()
+    if today.month == 12:
+        return today.replace(day=31)
+    return (today.replace(month=today.month, day=1) - datetime.timedelta(days=1)).strftime("%Y%m%d")

@@ -3,7 +3,7 @@ import sys
 import time
 import logging
 
-from utils import fatal, message, warning, download_vfr
+from utils import fatal, message, warning, download_vfr, last_day_of_month
 
 try:
     from osgeo import gdal, ogr
@@ -55,12 +55,18 @@ def open_file(filename, download = False):
             i = 0
             lines = f.read().splitlines()
             for line in lines:
+                if line.startswith('20'):
+                    line = 'http://vdp.cuzk.cz/vymenny_format/soucasna/' + line
+                else:
+                    line = 'http://vdp.cuzk.cz/vymenny_format/soucasna/' + last_day_of_month() + '_' + line
+                
                 if line.startswith('http://'):
                     if download:
                         download_vfr(line)
                         line = os.path.basename(line)
                     else:
                         line = '/vsicurl/' + line
+                
                 list_ds.append(line)
                 i += 1
             message("%d VFR files will be processed..." % len(list_ds))
