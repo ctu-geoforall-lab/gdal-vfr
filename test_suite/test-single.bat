@@ -6,6 +6,8 @@ set PATH=C:\Program Files (x86)\PostgreSQL\9.3\bin;%PATH%
 IF "%1"=="ogr" (
    set PGM=%1
    set OPT=--format SQLite --dsn=%DB%.db
+
+   del "%DB%.db"
 ) ELSE (
    set PGM=pg
    set OPT=--dbname %DB% --user %USER%
@@ -17,28 +19,22 @@ IF "%1"=="ogr" (
 
 echo "Using vfr2%PGM%..."
 
-REM first pass (empty DB)
-echo "First pass (empty DB...)"
+echo "1st PASS (empty DB...)"
 call vfr2%PGM% --file OB_UKSH.xml.gz %OPT%
 
-REM second pass (already exists)
-echo "Second pass (already exists...)"
+echo "2nd PASS (already exists...)"
 call vfr2%PGM% --file OB_UKSH.xml.gz %OPT%
 
-REM third pass (overwrite)
-echo "Third pass (overwrite...)"
+echo "3rd PASS (overwrite...)"
 call vfr2%PGM% --file OB_UKSH.xml.gz %OPT% --o
 
-REM fourth pass (append)
-echo "Forth pass (append...)"
+echo "4th PASS (append...)"
 call vfr2%PGM% --file OB_UKSH.xml.gz %OPT% --a
 
-if %PGM%==pg (
-   REM fifth pass (schema per file)
-   echo "Fifth pass (schema per file...)"
-   call vfr2%PGM% --file OB_UKSH.xml.gz %OPT% -s
-)
+echo "5th PASS (geom_name...)"
+call vfr2%PGM% --file OB_UKSH.xml.gz %OPT% --o --geom OriginalniHranice
 
-if %PGM%==ogr (
-   del "%DB%.db"
+if %PGM%==pg (
+   echo "6th PASS (schema per file...)"
+   call vfr2%PGM% --file OB_UKSH.xml.gz %OPT% -s
 )

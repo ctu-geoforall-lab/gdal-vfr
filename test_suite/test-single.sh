@@ -12,6 +12,8 @@ else
     if [ "$1" = "ogr" ] ; then
         PGM=ogr
         OPT="--format SQLite --dsn ${DB}.db"
+
+        rm -f ${DB}.db
     else
         PGM=oci
         OPT="--user test --passwd test"
@@ -20,29 +22,24 @@ fi
 
 echo "Using vfr2${PGM}..."
 
-# first pass (empty DB)
-echo "First pass (empty DB...)"
+echo "1st PASS (empty DB...)"
 ../vfr2${PGM}.py --file OB_UKSH.xml.gz $OPT
 
-# second pass (already exists)
-echo "Second pass (already exists...)"
+echo "2nd PASS (already exists...)"
 ../vfr2${PGM}.py --file OB_UKSH.xml.gz $OPT
 
-# third pass (overwrite)
-echo "Third pass (overwrite...)"
+echo "3rd PASS (overwrite...)"
 ../vfr2${PGM}.py --file OB_UKSH.xml.gz $OPT --o
 
-# fourth pass (append)
-echo "Forth pass (append...)"
+echo "4th PASS (append...)"
 ../vfr2${PGM}.py --file OB_UKSH.xml.gz $OPT --a
 
-if [ "$PGM" = "pg" ] ; then
-    echo "Fifth pass (schema per file...)"
-    ../vfr2${PGM}.py --file OB_UKSH.xml.gz $OPT -s
-fi
+echo "5th PASS (geom_name...)"
+../vfr2${PGM}.py --file OB_UKSH.xml.gz $OPT --o --geom OriginalniHranice
 
-if [ "$PGM" = "ogr" ] ; then
-    rm ${DB}.db
+if [ "$PGM" = "pg" ] ; then
+    echo "6th PASS (schema per file...)"
+    ../vfr2${PGM}.py --file OB_UKSH.xml.gz $OPT -s
 fi
 
 exit 0

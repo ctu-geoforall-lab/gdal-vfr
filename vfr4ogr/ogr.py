@@ -3,7 +3,7 @@ import sys
 import time
 import logging
 
-from utils import fatal, message, warning, download_vfr, last_day_of_month
+from utils import fatal, message, warning, download_vfr, last_day_of_month, remove_option
 
 try:
     from osgeo import gdal, ogr
@@ -163,6 +163,11 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
     if ods is None:
         fatal("Unable to open/create new datasource '%s'" % odsn)
     
+    create_geom = ods.TestCapability(ogr.ODsCCreateGeomFieldAfterCreateLayer)
+    if not create_geom:
+        warning("Driver '%s' doesn't support multiple geometry columns. "
+                "Only first will be used." % odrv.GetName())
+    
     if overwrite:
         options.append("OVERWRITE=YES")
 
@@ -183,16 +188,13 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
         else:
             ### TODO: fix output drivers not to use default geometry
             ### names
-            if frmt in ('PostgreSQL', 'OCI'):
+            if frmt in ('PostgreSQL', 'OCI') and not geom_name:
                 if layerName.lower() == 'ulice':
-                    if 'GEOMETRY_NAME=definicnibod' in options:
-                        options.remove('GEOMETRY_NAME=definicnibod')
+                    remove_option(options, 'GEOMETRY_NAME')
                     options.append('GEOMETRY_NAME=definicnicara')
                 else:
-                    if 'GEOMETRY_NAME=definicnicara' in options:
-                        options.remove('GEOMETRY_NAME=definicnicara')
-                    if 'GEOMETRY_NAME=definicnibod' not in options:
-                        options.append('GEOMETRY_NAME=definicnibod')
+                    remove_option(options, 'GEOMETRY_NAME')
+                    options.append('GEOMETRY_NAME=definicnibod')
             
             # delete layer if exists and append is not True
             if olayer and not append:
@@ -204,7 +206,7 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
                         break
             
             # if not olayer or (not append and olayer and not geom_name):
-            if False: # disabled (preserve fid)
+            if False: # disabled (do not preserve fid...)
                 olayer = ods.CopyLayer(layer, layerName, options)
                 if olayer is None:
                     fatal("Unable to create layer %s" % layerName)
@@ -212,11 +214,29 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
             else:
                 createFields = False
                 if not olayer:
-                    if geom_name:
-                        geom_type = ogr.wkbMultiPolygon # TODO: remove hardcoded-value
+
+                    # determine geometry type
+                    if geom_name or not create_geom:
+                        feat_defn = layer.GetLayerDefn()
+                        if geom_name:
+                            idx = feat_defn.GetGeomFieldIndex(geom_name)
+                        else:
+                            idx = 0
+                        
+                        if idx > -1:
+                            geom_type = feat_defn.GetGeomFieldDefn(idx).GetType()
+                        else:
+                            # warning("Layer '%s': geometry '%s' not available" % (layerName, geom_name))
+                            geom_type = layer.GetGeomType()
+                            idx = 0
+
+                        if frmt in ('PostgreSQL', 'OCI'):
+                            remove_option(options, 'GEOMETRY_NAME')
+                            options.append('GEOMETRY_NAME=%s' % feat_defn.GetGeomFieldDefn(idx).GetName().lower())
                     else:
                         geom_type = ogr.wkbNone
                     
+                    # create new layer
                     olayer = ods.CreateLayer(layerName,
                                              layer.GetSpatialRef(),
                                              geom_type, options)
@@ -231,18 +251,23 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
                     feat_defn = layer.GetLayerDefn()
                     for i in range(feat_defn.GetFieldCount()):
                         olayer.CreateField(feat_defn.GetFieldDefn(i))
-                    # copy also geometry columns
-                    if olayer.TestCapability(ogr.OLCCreateGeomField):
+                    # create also geometry attributes
+                    if not geom_name and \
+                            olayer.TestCapability(ogr.OLCCreateGeomField):
                         for i in range(feat_defn.GetGeomFieldCount()):
+                            geom_defn = feat_defn.GetGeomFieldDefn(i) 
+                            if geom_name and geom_defn.GetName() != geom_name:
+                                continue
                             olayer.CreateGeomField(feat_defn.GetGeomFieldDefn(i))
-
+                
                 if olayer.TestCapability(ogr.OLCTransactions):
                     olayer.StartTransaction()
                 
                 # copy features from source to dest layer
                 ifeat = 0
                 iFID = olayer.GetFeatureCount() + 1
-                
+                geom_idx = -1
+
                 layer.ResetReading()
                 feature = layer.GetNextFeature()
                 while feature:
@@ -250,15 +275,22 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
                     
                     # parse geometry columns if requested
                     if geom_name:
-                        odefn = feature.GetDefnRef()
-                        idx = feature.GetGeomFieldIndex(geom_name)
+                        if geom_idx < 0:
+                            odefn = feature.GetDefnRef()
+                            geom_idx = feature.GetGeomFieldIndex(geom_name)
+                        
+                        # set requested geometry
+                        if geom_idx > -1:
+                            geom = feature.GetGeomFieldRef(geom_idx)
+                            if geom:
+                                ofeature.SetGeometry(geom.Clone())
+                        
+                        # delete remaining geometry columns
                         for i in range(odefn.GetGeomFieldCount()):
-                            if i == idx:
+                            if i == geom_idx:
                                 continue
                             odefn.DeleteGeomFieldDefn(i)
-                            geom = feature.GetGeomFieldRef(idx)
-                            ofeature.SetGeometry(geom.Clone())
-
+                    
                     ofeature.SetFID(iFID)
                     olayer.CreateFeature(ofeature)
                     
