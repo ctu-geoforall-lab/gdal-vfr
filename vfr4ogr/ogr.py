@@ -230,8 +230,9 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
                     if olayer.TestCapability(ogr.OLCCreateGeomField):
                         for i in range(feat_defn.GetGeomFieldCount()):
                             olayer.CreateGeomField(feat_defn.GetGeomFieldDefn(i))
-                
-                olayer.StartTransaction()
+
+                if olayer.TestCapability(ogr.OLCTransactions):
+                    olayer.StartTransaction()
                 
                 # copy features from source to dest layer
                 ifeat = 0
@@ -260,7 +261,8 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
                     ifeat += 1
                     iFID += 1
 
-            olayer.CommitTransaction()
+                if olayer.TestCapability(ogr.OLCTransactions):
+                    olayer.CommitTransaction()
             
             if olayer is None:
                 fatal("Unable to export layer '%s'. Exiting..." % layerName)
