@@ -9,11 +9,12 @@ One of input options must be given:
        --file
        --type
 
-Usage: vfr2ogr [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type=ST_ABCD|OB_000000_ABCD] [--layer=layer1,layer2,...]
+Usage: vfr2ogr [-f] [-o] [-a] [-e] [-d] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type=ST_ABCD|OB_000000_ABCD] [--layer=layer1,layer2,...]
                          [--format=<output format>] [--dsn=<OGR datasource>]
 
        -f         List supported output formats
        -o         Overwrite existing files
+       -a         Append to existing files
        -e         Extended layer list statistics 
        -d         Save downloaded VFR data in currect directory (--date and --type required)
        --file     Path to xml.gz or URL list file
