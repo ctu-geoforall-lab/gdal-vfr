@@ -1,8 +1,6 @@
 @echo off
 
 set DB=vfr
-set USER=postgres
-set CONN=--username %USER%
 
 IF "%1"=="ogr" (
    set PGM=%1
@@ -10,10 +8,12 @@ IF "%1"=="ogr" (
 ) ELSE (
    set PGM=pg
    set OPT=--dbname %DB% --user %USER%
-)
+   set USER=postgres
+   set CONN=--username %USER%
 
-set PATH=C:\Program Files (x86)\PostgreSQL\9.3\bin;%PATH%
-psql -d %DB% -f cleandb.sql %CONN% 2>nul
+   set PATH=C:\Program Files (x86)\PostgreSQL\9.3\bin;%PATH%
+   psql -d %DB% -f cleandb.sql %CONN% 2>nul
+)
 
 echo "Using vfr2%PGM%..."
 
@@ -37,4 +37,8 @@ if %PGM%==pg (
    REM fifth pass (schema per file)
    echo "Fifth pass (schema per file...)"
    call vfr2%PGM% --type OB_564729_UKSH %OPT% -s
+)
+
+if %PGM%==ogr (
+   del "%DB%.db"
 )

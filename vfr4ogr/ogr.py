@@ -183,15 +183,16 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
         else:
             ### TODO: fix output drivers not to use default geometry
             ### names
-            if layerName.lower() == 'ulice':
-                if 'GEOMETRY_NAME=definicnibod' in options:
-                    options.remove('GEOMETRY_NAME=definicnibod')
-                options.append('GEOMETRY_NAME=definicnicara')
-            else:
-                if 'GEOMETRY_NAME=definicnicara' in options:
-                    options.remove('GEOMETRY_NAME=definicnicara')
-                if 'GEOMETRY_NAME=definicnibod' not in options:
-                    options.append('GEOMETRY_NAME=definicnibod')
+            if frmt in ('PostgreSQL', 'OCI'):
+                if layerName.lower() == 'ulice':
+                    if 'GEOMETRY_NAME=definicnibod' in options:
+                        options.remove('GEOMETRY_NAME=definicnibod')
+                    options.append('GEOMETRY_NAME=definicnicara')
+                else:
+                    if 'GEOMETRY_NAME=definicnicara' in options:
+                        options.remove('GEOMETRY_NAME=definicnicara')
+                    if 'GEOMETRY_NAME=definicnibod' not in options:
+                        options.append('GEOMETRY_NAME=definicnibod')
             
             # delete layer if exists and append is not True
             if olayer and not append:

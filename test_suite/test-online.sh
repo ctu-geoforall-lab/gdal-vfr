@@ -3,14 +3,14 @@
 DB=vfr
 
 if test -z "$1" ; then
-    PGM="pg"
+    PGM=pg
     OPT="--dbname $DB"
 else
     if [ "$1" = "ogr" ] ; then
-        PGM="ogr"
-        OPT="--format PostgreSQL --dsn PG:dbname=$DB"
+        PGM=ogr
+        OPT="--format SQLite --dsn ${DB}.db"
     else
-        PGM="oci"
+        PGM=oci
         OPT="--user test --passwd test"
     fi
 fi
@@ -40,6 +40,10 @@ echo "Forth pass (append...)"
 if [ "$PGM" = "pg" ] ; then
     echo "Fourth pass (schema per file...)"
     ../vfr2${PGM}.py --type OB_564729_UKSH $OPT --schema vfr_xxxxxxx_ob_564729_uksh
+fi
+
+if [ "$PGM" = "ogr" ] ; then
+    rm ${DB}.db
 fi
 
 exit 0
