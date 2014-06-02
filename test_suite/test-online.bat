@@ -25,7 +25,7 @@ echo "Third pass (overwrite...)"
 call vfr2%PGM% --type OB_564729_UKSH %OPT% --o
 
 echo "Forth pass (append...)"
-call vfr2%PGM% --type OB_554979_UKSH $OPT --a
+call vfr2%PGM% --type OB_554979_UKSH %OPT% --a
 
 echo "Fifth pass (schema per file...)"
 call vfr2%PGM% --type OB_564729_UKSH %OPT% -s
