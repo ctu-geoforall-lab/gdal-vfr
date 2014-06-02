@@ -17,7 +17,7 @@ Usage: vfr2py [-o] [-a] [-e] [-d] [-s]
        -o         Overwrite existing PostGIS tables
        -a         Append to existing PostGIS tables
        -e         Extended layer list statistics
-       -d         Save downloaded VFR data in currect directory (--date and --type required)
+       -d         Save downloaded VFR data in currect directory (--type required)
        -s         Create new schema for each VFR file
        --file     Path to xml.gz or URL list file
        --date     Date in format 'YYYYMMDD'

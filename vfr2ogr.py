@@ -16,7 +16,7 @@ Usage: vfr2ogr [-f] [-o] [-a] [-e] [-d] [--file=/path/to/vfr/filename] [--date=Y
        -o         Overwrite existing files
        -a         Append to existing files
        -e         Extended layer list statistics 
-       -d         Save downloaded VFR data in currect directory (--date and --type required)
+       -d         Save downloaded VFR data in currect directory (--type required)
        --file     Path to xml.gz or URL list file
        --date     Date in format 'YYYYMMDD'
        --type     Type of request in format XY_ABCD, eg. 'ST_UKSH' or 'OB_000000_ABCD'

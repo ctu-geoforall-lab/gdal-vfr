@@ -15,7 +15,7 @@ Usage: vfr2oci [-f] [-o] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--typ
 
        -o         Overwrite existing Oracle tables
        -e         Extended layer list statistics 
-       -d         Save downloaded VFR data in currect directory (--date and --type required)
+       -d         Save downloaded VFR data in currect directory (--type required)
        --file     Path to xml.gz file
        --date     Date in format 'YYYYMMDD'
        --type     Type of request in format XY_ABCD, eg. 'ST_UKSH' or 'OB_000000_ABCD'
