@@ -1,3 +1,3 @@
-http://vdp.cuzk.cz/vymenny_format/soucasna/20140430_OB_500011_UKSH.xml.gz
-http://vdp.cuzk.cz/vymenny_format/soucasna/20140430_OB_500020_UKSH.xml.gz
-http://vdp.cuzk.cz/vymenny_format/soucasna/20140430_OB_500046_UKSH.xml.gz
+OB_500011_UKSH.xml.gz
+OB_500020_UKSH.xml.gz
+OB_500046_UKSH.xml.gz

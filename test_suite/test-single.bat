@@ -24,5 +24,8 @@ REM third pass (overwrite)
 echo "Third pass (overwrite...)"
 call vfr2%PGM% --file OB_UKSH.xml.gz %OPT% --o
 
-echo "Fourth pass (schema per file...)"
+echo "Forth pass (append...)"
+call vfr2%PGM% --file OB_UKSH.xml.gz $OPT --a
+
+echo "Fifth pass (schema per file...)"
 call vfr2%PGM% --file OB_UKSH.xml.gz %OPT% -s

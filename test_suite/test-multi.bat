@@ -25,5 +25,8 @@ REM third pass (overwrite)
 echo "Third pass (overwrite...)"
 call vfr2%PGM% --file seznam.txt %OPT% --o
 
-echo "Fourth pass (schema per file...)"
+echo "Forth pass (append...)"
+call vfr2%PGM% --type OB_554979_UKSH $OPT --a
+
+echo "Fifth pass (schema per file...)"
 call vfr2%PGM% --file seznam.txt %OPT% -s
