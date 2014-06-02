@@ -6,6 +6,8 @@ DB=vfr
 if test -z "$1" ; then
     PGM=pg
     OPT="--dbname $DB"
+
+    psql -d $DB -f cleandb.sql 2>/dev/null
 else
     if [ "$1" = "ogr" ] ; then
         PGM=ogr
@@ -14,10 +16,6 @@ else
         PGM=oci
         OPT="--user test --passwd test"
     fi
-fi
-
-if [ "PGM" != "oci" ] ; then
-    psql -d $DB -f cleandb.sql 2>/dev/null
 fi
 
 echo "Using vfr2${PGM}..."
