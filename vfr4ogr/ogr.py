@@ -169,8 +169,8 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
     start = time.time()
     nlayers = ids.GetLayerCount()
     nfeat = 0
-    for i in range(nlayers):
-        layer = ids.GetLayer(i)
+    for iLayer in range(nlayers):
+        layer = ids.GetLayer(iLayer)
         layerName = layer.GetName()
         
         if layers and layerName not in layers:
@@ -193,7 +193,13 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
                 if 'GEOMETRY_NAME=definicnibod' not in options:
                     options.append('GEOMETRY_NAME=definicnibod')
             
-            if not olayer or (not append and olayer and not geom_name):
+            # delete layer if exists and append is not True
+            if olayer and not append:
+                ods.DeleteLayer(iLayer)
+                olayer = None
+            
+            # if not olayer or (not append and olayer and not geom_name):
+            if False: # disabled (preserve fid)
                 olayer = ods.CopyLayer(layer, layerName, options)
                 if olayer is None:
                     fatal("Unable to create layer %s" % layerName)
@@ -222,11 +228,11 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
                 if createFields:
                     for i in range(feature.GetFieldCount()):
                         olayer.CreateField(feature.GetFieldDefnRef(i))
-
+                
                 olayer.StartTransaction()
                 # copy features from source to dest layer
                 ifeat = 0
-                iFID = olayer.GetFeatureCount()
+                iFID = olayer.GetFeatureCount() + 1
                 while feature:
                     ofeature = feature.Clone()
                     

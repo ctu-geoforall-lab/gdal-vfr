@@ -109,7 +109,8 @@ def main():
             sys.exit(0)
 
     # build dsn string and options
-    lco_options = ["PG_USE_COPY=YES"]
+    ### lco_options = ["PG_USE_COPY=YES"]
+    lco_options = []
     odsn = ''
     if options['dbname']:
         odsn += "PG:dbname=%s" % options['dbname']
