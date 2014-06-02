@@ -164,7 +164,7 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
         fatal("Unable to open/create new datasource '%s'" % odsn)
     
     create_geom = ods.TestCapability(ogr.ODsCCreateGeomFieldAfterCreateLayer)
-    if not create_geom:
+    if not geom_name and not create_geom:
         warning("Driver '%s' doesn't support multiple geometry columns. "
                 "Only first will be used." % odrv.GetName())
     
