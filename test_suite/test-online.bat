@@ -1,17 +1,17 @@
 @echo off
 
 set DB=vfr
+set PATH=C:\Program Files (x86)\PostgreSQL\9.3\bin;%PATH%
 
 IF "%1"=="ogr" (
    set PGM=%1
-   set OPT=--format PostgreSQL --dsn="PG:dbname=%DB% user=%USER%"
+   set OPT=--format SQLite --dsn=%DB%.db
 ) ELSE (
    set PGM=pg
    set OPT=--dbname %DB% --user %USER%
    set USER=postgres
    set CONN=--username %USER%
 
-   set PATH=C:\Program Files (x86)\PostgreSQL\9.3\bin;%PATH%
    psql -d %DB% -f cleandb.sql %CONN% 2>nul
 )
 
@@ -36,7 +36,7 @@ call vfr2%PGM% --type OB_554979_UKSH %OPT% --a
 if %PGM%==pg (
    REM fifth pass (schema per file)
    echo "Fifth pass (schema per file...)"
-   call vfr2%PGM% --type OB_564729_UKSH %OPT% -s
+   call vfr2%PGM% --type OB_564729_UKSH %OPT% --schema vfr_xxxxxxx_ob_564729_uksh
 )
 
 if %PGM%==ogr (

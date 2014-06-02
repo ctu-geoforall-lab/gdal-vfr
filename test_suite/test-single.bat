@@ -1,6 +1,7 @@
 @echo off
 
 set DB=vfr
+set PATH=C:\Program Files (x86)\PostgreSQL\9.3\bin;%PATH%
 
 IF "%1"=="ogr" (
    set PGM=%1
@@ -10,8 +11,7 @@ IF "%1"=="ogr" (
    set OPT=--dbname %DB% --user %USER%
    set USER=postgres
    set CONN=--username %USER%
-
-   set PATH=C:\Program Files (x86)\PostgreSQL\9.3\bin;%PATH%
+   
    psql -d %DB% -f cleandb.sql %CONN% 2>nul
 )
 
