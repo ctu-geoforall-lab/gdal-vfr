@@ -71,6 +71,9 @@ def open_file(filename, download = False, force_date = None):
                     else:
                         line = '/vsicurl/' + line
                 
+                if not line.endswith('.xml.gz'):
+                    line += '.xml.gz'
+                
                 list_ds.append(line)
                 i += 1
             message("%d VFR files will be processed..." % len(list_ds))

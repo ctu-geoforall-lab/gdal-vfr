@@ -95,7 +95,7 @@ def main():
     # parse cmd arguments
     options = { 'dbname' : None, 'schema' : None, 'user' : None, 'passwd' : None, 'host' : None, 
                 'overwrite' : False, 'extended' : False, 'layer' : [], 'geom' : None, 'download' : False,
-                'schema_per_file' : False, 'append' : False}
+                'schema_per_file' : False, 'append' : False, 'date' : None}
     try:
         filename = parse_cmd(sys.argv, "heodsa", ["help", "overwrite", "extended", "append",
                                               "file=", "date=", "type=", "layer=", "geom=",
@@ -139,6 +139,7 @@ def main():
         # open OGR datasource
         ids = open_ds(fname)
         if ids is None:
+            ipass += 1
             continue # unable to open - skip
         
         if not odsn:
