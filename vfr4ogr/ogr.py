@@ -195,8 +195,12 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
             
             # delete layer if exists and append is not True
             if olayer and not append:
-                ods.DeleteLayer(iLayer)
-                olayer = None
+                nlayersOut = ods.GetLayerCount()
+                for iLayerOut in range(nlayersOut): # do it better
+                    if ids.GetLayer(iLayerOut).GetName() == layerName:
+                        ods.DeleteLayer(iLayerOut)
+                        olayer = None
+                        break
             
             # if not olayer or (not append and olayer and not geom_name):
             if False: # disabled (preserve fid)

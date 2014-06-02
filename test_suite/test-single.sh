@@ -34,10 +34,11 @@ echo "Second pass (already exists...)"
 echo "Third pass (overwrite...)"
 ../vfr2${PGM}.py --file OB_UKSH.xml.gz $OPT --o
 
-if [ "$PGM" = "pg" ] ; then
-    echo "Forth pass (append...)"
-    ../vfr2${PGM}.py --file OB_UKSH.xml.gz $OPT --a
+# fourth pass (append)
+echo "Forth pass (append...)"
+../vfr2${PGM}.py --file OB_UKSH.xml.gz $OPT --a
 
+if [ "$PGM" = "pg" ] ; then
     echo "Fifth pass (schema per file...)"
     ../vfr2${PGM}.py --file OB_UKSH.xml.gz $OPT -s
 fi

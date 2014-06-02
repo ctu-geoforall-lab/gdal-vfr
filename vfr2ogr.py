@@ -31,7 +31,7 @@ import time
 from getopt import GetoptError
 
 from vfr4ogr.ogr import check_ogr, open_file, list_layers, convert_vfr, check_log, open_ds, print_summary
-from vfr4ogr.utils import fatal, message, parse_xml_gz, compare_list
+from vfr4ogr.utils import fatal, message, parse_xml_gz, compare_list, error
 from vfr4ogr.parse import parse_cmd
 
 # print usage
@@ -44,10 +44,10 @@ def main():
 
     # parse cmd arguments
     options = { 'format' : None, 'dsn' : None, 'overwrite' : False, 'extended' : False,
-                'layer' : [], 'download' : False}
+                'layer' : [], 'geom' : None, 'download' : False, 'append' : False, 'date' : None}
     try:
-        filename = parse_cmd(sys.argv, "hfeod", ["help", "overwrite", "extended",
-                                               "file=", "date=", "type=", "layer=",
+        filename = parse_cmd(sys.argv, "hfeod", ["help", "overwrite", "extended", "append",
+                                               "file=", "date=", "type=", "layer=", "geom=",
                                                "format=", "dsn="], options)
     except GetoptError, e:
         usage()
@@ -56,22 +56,23 @@ def main():
         else:
             sys.exit(0)
     
-    file_list  = open_file(filename, options['download'])
+    file_list  = open_file(filename, options['download'], force_date = options['date'])
     layer_list = options['layer']
     
     # set up driver-specific options
     if options['format'] == 'SQLite':
         os.environ['OGR_SQLITE_SYNCHRONOUS'] = 'OFF'
     
-    append = False # do not append on the first pass
+    append = options['append']
     ipass = 0
     stime = time.time()
     for fname in file_list:
-        message("Processing %d out of %d..." % (ipass+1, len(file_list)))
+        message("Processing %s (%d out of %d)..." % (fname, ipass+1, len(file_list)))
 
         # open OGR datasource
         ids = open_ds(fname)
         if ids is None:
+            ipass += 1
             continue # unable to open - skip
         
         if options['format'] is None:
@@ -87,7 +88,11 @@ def main():
                 layer_list = list_layers(ids, False, None)
             
             # convert VFR ...
-            nfeat = convert_vfr(ids, options['dsn'], options['format'], options['layer'], options['overwrite'])
+            try:
+                nfeat = convert_vfr(ids, options['dsn'], options['format'], options['layer'],
+                                    options['overwrite'], [], options['geom'], append)
+            except RuntimeError as e:
+                error("Unable to read %s: %s" % (fname, e))
             
             if nfeat > 0:
                 append = True # append on next passes
@@ -95,9 +100,8 @@ def main():
         ids.Destroy()
         ipass += 1
     
-    if ipass > 1:
-        print options
-        print_summary(options['dsn'], "PostgreSQL", layer_list, stime)
+    if ipass > 1 or options.get('append', True):
+        print_summary(options['dsn'], options['format'], layer_list, stime)
     
     return 0
 

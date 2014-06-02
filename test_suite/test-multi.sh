@@ -34,10 +34,11 @@ echo "Second pass (already exists...)"
 echo "Third pass (overwrite...)"
 ../vfr2${PGM}.py --file seznam.txt $OPT --o
 
+# fourth pass (append)
+echo "Forth pass (append...)"
+../vfr2${PGM}.py --type OB_554979_UKSH $OPT --a
+
 if [ "$PGM" = "pg" ] ; then
-    echo "Forth pass (append...)"
-    ../vfr2${PGM}.py --type OB_554979_UKSH $OPT --a
-    
     echo "Fourth pass (schema per file...)"
     ../vfr2${PGM}.py --file seznam.txt $OPT -s --o
 fi
