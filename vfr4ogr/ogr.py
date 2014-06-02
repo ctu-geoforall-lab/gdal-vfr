@@ -220,19 +220,25 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
                 
                 if not olayer:
                     fatal("Unable to create layer '%'" % layerName)
-                
-                layer.ResetReading()
-                
-                feature = layer.GetNextFeature()
+                                
                 # create attributes
                 if createFields:
-                    for i in range(feature.GetFieldCount()):
-                        olayer.CreateField(feature.GetFieldDefnRef(i))
+                    feat_defn = layer.GetLayerDefn()
+                    for i in range(feat_defn.GetFieldCount()):
+                        olayer.CreateField(feat_defn.GetFieldDefn(i))
+                    # copy also geometry columns
+                    if olayer.TestCapability(ogr.OLCCreateGeomField):
+                        for i in range(feat_defn.GetGeomFieldCount()):
+                            olayer.CreateGeomField(feat_defn.GetGeomFieldDefn(i))
                 
                 olayer.StartTransaction()
+                
                 # copy features from source to dest layer
                 ifeat = 0
                 iFID = olayer.GetFeatureCount() + 1
+                
+                layer.ResetReading()
+                feature = layer.GetNextFeature()
                 while feature:
                     ofeature = feature.Clone()
                     

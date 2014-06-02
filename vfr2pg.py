@@ -61,8 +61,12 @@ def open_db(conn_string):
 def create_schema(conn, name):
     cursor = conn.cursor()
     try:
-        cursor.execute("CREATE SCHEMA IF NOT EXISTS %s" % name)
-        conn.commit()
+        cursor.execute("SELECT schema_name FROM information_schema.schemata "
+                        "WHERE schema_name = '%s'" % name)
+        if not bool(cursor.fetchall()):
+            # cursor.execute("CREATE SCHEMA IF NOT EXISTS %s" % name)
+            cursor.execute("CREATE SCHEMA %s" % name)
+            conn.commit()
     except StandardError as e:
         sys.exit("Unable to create schema %s: %s" % (name, e))
     
@@ -187,7 +191,8 @@ def main():
         ids.Destroy()
         ipass += 1
     
-    if ipass > 1 or options.get('append', True):
+    if (ipass > 1 and options.get('schema_per_file', False) is False) \
+            or options.get('append', True):
         print_summary(odsn, "PostgreSQL", layer_list, stime)
     
     conn.close()
