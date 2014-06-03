@@ -306,11 +306,11 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
             
             if olayer is None:
                 fatal("Unable to export layer '%s'. Exiting..." % layerName)
-            # ods.SyncToDisk()
             
             print >> sys.stdout, " %-5d features" % ifeat
             nfeat += ifeat
     
+    ### ods.SyncToDisk()
     ods.Destroy()
     
     message("Time elapsed: %d sec" % (time.time() - start))
@@ -332,7 +332,7 @@ def print_summary(odsn, frmt, layer_list, stime):
         if not layer:
             continue
         
-        print >> sys.stderr, "Layer          %-20s ... %-5d features" % (layerName, layer.GetFeatureCount())
+        print >> sys.stdout, "Layer          %-20s ... %-5d features" % (layerName, layer.GetFeatureCount())
     
     message("Time elapsed: %d sec" % (time.time() - stime))
     
