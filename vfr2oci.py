@@ -31,10 +31,11 @@ Usage: vfr2oci [-f] [-e] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--typ
 import os
 import sys
 import atexit
+import time
 from getopt import GetoptError
 
-from vfr4ogr.ogr import check_ogr, open_file, list_layers, convert_vfr, check_log
-from vfr4ogr.utils import fatal, message, parse_xml_gz, compare_list
+from vfr4ogr.ogr import check_ogr, open_file, list_layers, convert_vfr, check_log, open_ds, print_summary
+from vfr4ogr.utils import fatal, message, parse_xml_gz, compare_list, error
 from vfr4ogr.parse import parse_cmd
 
 # print usage
@@ -47,7 +48,8 @@ def main():
     
     # parse cmd arguments
     options = { 'dbname' : None, 'user' : None, 'passwd' : None, 'host' : None, 
-                'overwrite' : False, 'extended' : False, 'layer': [], 'geom' : None, 'download' : False}
+                'overwrite' : False, 'extended' : False, 'layer': [], 'geom' : None, 'download' : False,
+                'date' : None}
     try:
         filename = parse_cmd(sys.argv, "heod", ["help", "overwrite", "extended",
                                               "file=", "date=", "type=", "layer=", "geom=",
@@ -59,32 +61,57 @@ def main():
             fatal(e)
         else:
             sys.exit(0)
-    
-    # open input file by GML driver
-    ids = open_file(filename)
-    
-    if options['user'] is None:
-        # list available layers and exit
-        layer_list = list_layers(ids, options['extended'])
-        if options['extended'] and os.path.exists(filename):
-            compare_list(layer_list, parse_xml_gz(filename))
-    else:
-        if not options['user'] or not options['passwd']:
-            fatal("--user and --passwd required")
-            
+
+    odsn = ''
+    if options['user'] and options['passwd']:
         odsn = "OCI:%s/%s" % (options['user'], options['passwd'])
         if options['host']:
             odsn += "@%s" % options['host']
         if options['dbname']:
             odsn += "/%s" % options['dbname']
         
-        os.environ['NLS_LANG'] = 'american_america.UTF8' # fix encoding issue
-        lco_options = [ "srid=2065", "INDEX=OFF", "MULTI_LOAD=OFF" ]  ### TODO: 5514
-                                                                      ### TODO: fix MULTI_LOAD (currently it crashes)
-        time = convert_vfr(ids, odsn, "OCI", options['layer'], options['overwrite'], lco_options, options['geom'])
-        message("Time elapsed: %d sec" % time)
+    os.environ['NLS_LANG'] = 'american_america.UTF8' # fix encoding issue
+    lco_options = [ "srid=2065", "INDEX=OFF", "MULTI_LOAD=OFF" ]  ### TODO: 5514
+                                                                  ### TODO: fix MULTI_LOAD (currently it crashes)
+
+    # get list of input VFR files
+    file_list  = open_file(filename, options['download'], force_date = options['date'])
+    layer_list = options['layer']
     
-    ids.Destroy()
+    ipass = 0
+    stime = time.time()
+    
+    # go thru VFR file and load them to DB
+    for fname in file_list:
+        message("Processing %s (%d out of %d)..." % (fname, ipass+1, len(file_list)))
+
+        # open OGR datasource
+        ids = open_ds(fname)
+        if ids is None:
+            ipass += 1
+            continue # unable to open - skip
+        
+        if not odsn:
+            # list available layers and exit
+            layer_list = list_layers(ids, options['extended'], sys.stdout)
+            if options['extended'] and os.path.exists(filename):
+                compare_list(layer_list, parse_xml_gz(filename))
+        else:
+            if not layer_list:
+                layer_list = list_layers(ids, False, None)
+            
+            # do conversion
+            try:
+                nfeat = convert_vfr(ids, odsn, "OCI", options['layer'],
+                                    options['overwrite'], lco_options, options['geom'])
+            except RuntimeError as e:
+                error("Unable to read %s: %s" % (fname, e))
+        
+        ids.Destroy()
+        ipass += 1
+    
+    if ipass > 1:
+        print_summary(odsn, "OCI", layer_list, stime)
     
     return 0
 
