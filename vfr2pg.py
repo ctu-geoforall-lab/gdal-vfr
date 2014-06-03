@@ -9,26 +9,27 @@ One of input options must be given:
        --file
        --type
 
-Usage: vfr2py [-o] [-a] [-e] [-d] [-s]
-              [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type=ST_ABCD|OB_XXXXXX_ABCD] [--layer=layer1,layer2,...]  [--geom=OriginalniHranice|GeneralizovaneHranice]
-              --dbname <database name>
-              [--schema <schema name>] [--user <user name>] [--passwd <password>] [--host <host name>]
+Usage: vfr2py [-e] [-d] [-s] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type=ST_ABCD|OB_XXXXXX_ABCD] [--layer=layer1,layer2,...] [--geom=OriginalniHranice|GeneralizovaneHranice]
+                              --dbname <database name>
+                             [--schema <schema name>] [--user <user name>] [--passwd <password>] [--host <host name>]
+                             [--overwrite] [--append]
 
-       -o         Overwrite existing PostGIS tables
-       -a         Append to existing PostGIS tables
-       -e         Extended layer list statistics
-       -d         Save downloaded VFR data in currect directory (--type required)
-       -s         Create new schema for each VFR file
-       --file     Path to xml.gz or URL list file
-       --date     Date in format 'YYYYMMDD'
-       --type     Type of request in format XY_ABCD, eg. 'ST_UKSH' or 'OB_000000_ABCD'
-       --layer    Import only selected layers separated by comma (if not given all layers are processed)
-       --geom     Preferred geometry column 'OriginalniHranice' or 'GeneralizovaneHranice' (if not found or given than first column is used)
-       --dbname   Output PostGIS database
-       --schema   Schema name (default: public)
-       --user     User name
-       --passwd   Password
-       --host     Host name
+       -e          Extended layer list statistics
+       -d          Save downloaded VFR data in currect directory (--type required)
+       -s          Create new schema for each VFR file
+       --file      Path to xml.gz or URL list file
+       --date      Date in format 'YYYYMMDD'
+       --type      Type of request in format XY_ABCD, eg. 'ST_UKSH' or 'OB_000000_ABCD'
+       --layer     Import only selected layers separated by comma (if not given all layers are processed)
+       --geom      Preferred geometry 'OriginalniHranice' or 'GeneralizovaneHranice' (if not found or not given than first geometry is used)
+       --dbname    Output PostGIS database
+       --schema    Schema name (default: public)
+       --user      User name
+       --passwd    Password
+       --host      Host name
+       --overwrite Overwrite existing PostGIS tables
+       --append    Append to existing PostGIS tables
+
 """
 
 import os

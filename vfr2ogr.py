@@ -9,20 +9,22 @@ One of input options must be given:
        --file
        --type
 
-Usage: vfr2ogr [-f] [-o] [-a] [-e] [-d] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type=ST_ABCD|OB_000000_ABCD] [--layer=layer1,layer2,...]
-                         [--format=<output format>] [--dsn=<OGR datasource>]
+Usage: vfr2ogr [-f] [-e] [-d] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type=ST_ABCD|OB_000000_ABCD] [--layer=layer1,layer2,...]
+                              [--format=<output format>] [--dsn=<OGR datasource>]
+                              [--overwrite] [--append]
 
-       -f         List supported output formats
-       -o         Overwrite existing files
-       -a         Append to existing files
-       -e         Extended layer list statistics 
-       -d         Save downloaded VFR data in currect directory (--type required)
-       --file     Path to xml.gz or URL list file
-       --date     Date in format 'YYYYMMDD'
-       --type     Type of request in format XY_ABCD, eg. 'ST_UKSH' or 'OB_000000_ABCD'
-       --layer    Import only selected layers separated by comma (if not given all layers are processed)
-       --format   Output format
-       --dsn      Output OGR datasource
+       -f          List supported output formats
+       -e          Extended layer list statistics 
+       -d          Save downloaded VFR data in currect directory (--type required)
+       --file      Path to xml.gz or URL list file
+       --date      Date in format 'YYYYMMDD'
+       --type      Type of request in format XY_ABCD, eg. 'ST_UKSH' or 'OB_000000_ABCD'
+       --layer     Import only selected layers separated by comma (if not given all layers are processed)
+       --format    Output format
+       --dsn       Output OGR datasource
+       --overwrite Overwrite existing files
+       --append    Append to existing files
+
 """
 
 import os
