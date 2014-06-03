@@ -1,7 +1,7 @@
 import sys
 import getopt
 
-from utils import fatal, message, check_file, download_vfr, last_day_of_month
+from utils import fatal, message, check_file, download_vfr, last_day_of_month, yesterday
 from ogr import list_formats
 
 def parse_cmd(argv, flags, params, optdir):
@@ -13,12 +13,7 @@ def parse_cmd(argv, flags, params, optdir):
     filename = date = ftype = None
     for o, a in opts:
         so = o[2:]
-        if so in optdir:
-            if a:
-                optdir[so] = a
-            else:
-                optdir[so] = True
-        elif o == "--file":
+        if o == "--file":
             filename = a
         elif o == "--date":
             optdir['date'] = date = a
@@ -39,6 +34,11 @@ def parse_cmd(argv, flags, params, optdir):
         elif o == "-f": # unused
             list_formats()
             sys.exit(0)
+        elif so in optdir:
+            if a:
+                optdir[so] = a
+            else:
+                optdir[so] = True
         else:
             sys.exit("unhandled option: %s" % o)
     
@@ -47,7 +47,10 @@ def parse_cmd(argv, flags, params, optdir):
     if filename and ftype:
         raise getopt.GetoptError("--file and --type are mutually exclusive")
     if ftype and not date:
-        date = last_day_of_month()
+        if ftype.startswith('ST_Z'):
+            date = yesterday()
+        else:
+            date = last_day_of_month()
     if optdir['overwrite'] and optdir.get('append', False):
         raise getopt.GetoptError("--append and --overwrite are mutually exclusive")
     

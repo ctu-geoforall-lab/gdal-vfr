@@ -72,6 +72,10 @@ def last_day_of_month():
         return today.replace(day=31)
     return (today.replace(month=today.month, day=1) - datetime.timedelta(days=1)).strftime("%Y%m%d")
 
+def yesterday():
+    today = datetime.date.today()
+    return (today -  datetime.timedelta(days=1)).strftime("%Y%m%d")
+
 def remove_option(options, name):
     i = 0
     for opt in options:

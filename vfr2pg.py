@@ -116,6 +116,7 @@ def main():
     ### lco_options = ["PG_USE_COPY=YES"]
     lco_options = []
     odsn = ''
+    conn = None
     if options['dbname']:
         odsn += "PG:dbname=%s" % options['dbname']
         if options['user']:
@@ -125,8 +126,8 @@ def main():
         if options['host']:
             odsn += " host=%s" % options['host']
 
-    # open connection to DB
-    conn = open_db(odsn[3:])
+        # open connection to DB
+        conn = open_db(odsn[3:])
     
     # get list of input VFR files
     file_list  = open_file(filename, options['download'], force_date = options['date'])
@@ -195,7 +196,8 @@ def main():
             or options.get('append', True):
         print_summary(odsn, "PostgreSQL", layer_list, stime)
     
-    conn.close()
+    if conn:
+        conn.close()
     
     return 0
 

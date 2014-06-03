@@ -3,7 +3,7 @@ import sys
 import time
 import logging
 
-from utils import fatal, message, warning, download_vfr, last_day_of_month, remove_option
+from utils import fatal, message, warning, download_vfr, last_day_of_month, yesterday, remove_option
 
 try:
     from osgeo import gdal, ogr
@@ -59,7 +59,10 @@ def open_file(filename, download = False, force_date = None):
                     line = 'http://vdp.cuzk.cz/vymenny_format/soucasna/' + line
                 else:
                     if not force_date:
-                        date = last_day_of_month()
+                        if line.startswith('ST_Z'):
+                            date = yesterday()
+                        else:
+                            date = last_day_of_month()
                     else:
                         date = force_date
                     line = 'http://vdp.cuzk.cz/vymenny_format/soucasna/' + date + '_' + line
