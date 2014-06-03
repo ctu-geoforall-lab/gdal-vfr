@@ -80,7 +80,7 @@ def check_epsg(conn):
     cursor = conn.cursor()
     try:
         cursor.execute("SELECT srid FROM spatial_ref_sys WHERE srid = 5514")
-    except psycopg2.ProgrammingError as e:
+    except StandardError as e:
         sys.exit("PostGIS doesn't seems to be activated. %s" % e)
         
     epsg_exists = bool(cursor.fetchall())
