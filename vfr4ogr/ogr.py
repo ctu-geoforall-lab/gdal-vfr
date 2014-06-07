@@ -185,9 +185,9 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
             continue
                 
         olayer = ods.GetLayerByName('%s' % layerName)
-        print >> sys.stdout, "Exporting layer %-20s ..." % layerName,
+        sys.stdout.write("Exporting layer %-20s ..." % layerName)
         if not overwrite and (olayer and not append):
-            print >> sys.stdout, " already exists (use --overwrite or --append to modify existing data)"
+            sys.stdout.write(" already exists (use --overwrite or --append to modify existing data)\n")
         else:
             ### TODO: fix output drivers not to use default geometry
             ### names
@@ -307,7 +307,7 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
             if olayer is None:
                 fatal("Unable to export layer '%s'. Exiting..." % layerName)
             
-            print >> sys.stdout, " %-5d features" % ifeat
+            sys.stdout.write(" %-8d features\n" % ifeat)
             nfeat += ifeat
     
     ### ods.SyncToDisk()
@@ -332,7 +332,7 @@ def print_summary(odsn, frmt, layer_list, stime):
         if not layer:
             continue
         
-        print >> sys.stdout, "Layer          %-20s ... %-5d features" % (layerName, layer.GetFeatureCount())
+        sys.stdout.write("Layer          %-20s ... %-5d features\n" % (layerName, layer.GetFeatureCount()))
     
     message("Time elapsed: %d sec" % (time.time() - stime))
     
