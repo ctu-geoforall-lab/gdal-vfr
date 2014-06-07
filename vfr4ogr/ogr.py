@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import logging
+import datetime
 
 from utils import fatal, message, warning, download_vfr, last_day_of_month, yesterday, remove_option
 
@@ -333,7 +334,9 @@ def print_summary(odsn, frmt, layer_list, stime):
             continue
         
         sys.stdout.write("Layer          %-20s ... %-5d features\n" % (layerName, layer.GetFeatureCount()))
-    
-    message("Time elapsed: %d sec" % (time.time() - stime))
+
+    nsec = time.time() - stime    
+    etime = str(datetime.timedelta(seconds=nsec))
+    message("Time elapsed: %s" % str(etime))
     
     ods.Destroy()
