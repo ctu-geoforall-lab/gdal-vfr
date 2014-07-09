@@ -153,6 +153,59 @@ def list_layers(ds, extended = False, fd = sys.stdout):
     
     return layer_list
 
+def delete_layer(ids, ods, layerName):
+    nlayersOut = ods.GetLayerCount()
+    for iLayerOut in range(nlayersOut): # do it better
+        if ids.GetLayer(iLayerOut).GetName() == layerName:
+            ods.DeleteLayer(iLayerOut)
+            olayer = None
+            break
+
+def create_layer(ods, ilayer, layerName, geom_name, create_geom, options):
+    # determine geometry type
+    if geom_name or not create_geom:
+        feat_defn = layer.GetLayerDefn()
+        if geom_name:
+            idx = feat_defn.GetGeomFieldIndex(geom_name)
+        else:
+            idx = 0
+            
+        if idx > -1:
+            geom_type = feat_defn.GetGeomFieldDefn(idx).GetType()
+        else:
+            # warning("Layer '%s': geometry '%s' not available" % (layerName, geom_name))
+            geom_type = layer.GetGeomType()
+            idx = 0
+
+        if frmt in ('PostgreSQL', 'OCI'):
+            remove_option(options, 'GEOMETRY_NAME')
+            options.append('GEOMETRY_NAME=%s' % feat_defn.GetGeomFieldDefn(idx).GetName().lower())
+    else:
+        geom_type = ogr.wkbNone
+    
+    # create new layer
+    olayer = ods.CreateLayer(layerName, ilayer.GetSpatialRef(),
+                             geom_type, options)
+    
+    if not olayer:
+        fatal("Unable to create layer '%'" % layerName)
+           
+    # create attributes                     
+    feat_defn = ilayer.GetLayerDefn()
+    for i in range(feat_defn.GetFieldCount()):
+        olayer.CreateField(feat_defn.GetFieldDefn(i))
+
+    # create also geometry attributes
+    if not geom_name and \
+            olayer.TestCapability(ogr.OLCCreateGeomField):
+        for i in range(feat_defn.GetGeomFieldCount()):
+            geom_defn = feat_defn.GetGeomFieldDefn(i) 
+            if geom_name and geom_defn.GetName() != geom_name:
+                continue
+            olayer.CreateGeomField(feat_defn.GetGeomFieldDefn(i))
+    
+    return olayer
+
 # convert VFR into specified format
 def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_name = None, append = False):
     odrv = ogr.GetDriverByName(frmt)
@@ -202,12 +255,7 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
             
             # delete layer if exists and append is not True
             if olayer and not append:
-                nlayersOut = ods.GetLayerCount()
-                for iLayerOut in range(nlayersOut): # do it better
-                    if ids.GetLayer(iLayerOut).GetName() == layerName:
-                        ods.DeleteLayer(iLayerOut)
-                        olayer = None
-                        break
+                delete_layer(ids, ods, layerName)
             
             # if not olayer or (not append and olayer and not geom_name):
             if False: # disabled (do not preserve fid...)
@@ -216,53 +264,9 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
                     fatal("Unable to create layer %s" % layerName)
                 ifeat = olayer.GetFeatureCount()
             else:
-                createFields = False
-                if not olayer:
-
-                    # determine geometry type
-                    if geom_name or not create_geom:
-                        feat_defn = layer.GetLayerDefn()
-                        if geom_name:
-                            idx = feat_defn.GetGeomFieldIndex(geom_name)
-                        else:
-                            idx = 0
-                        
-                        if idx > -1:
-                            geom_type = feat_defn.GetGeomFieldDefn(idx).GetType()
-                        else:
-                            # warning("Layer '%s': geometry '%s' not available" % (layerName, geom_name))
-                            geom_type = layer.GetGeomType()
-                            idx = 0
-
-                        if frmt in ('PostgreSQL', 'OCI'):
-                            remove_option(options, 'GEOMETRY_NAME')
-                            options.append('GEOMETRY_NAME=%s' % feat_defn.GetGeomFieldDefn(idx).GetName().lower())
-                    else:
-                        geom_type = ogr.wkbNone
-                    
-                    # create new layer
-                    olayer = ods.CreateLayer(layerName,
-                                             layer.GetSpatialRef(),
-                                             geom_type, options)
-                    
-                    createFields = True
-                
-                if not olayer:
-                    fatal("Unable to create layer '%'" % layerName)
-                                
-                # create attributes
-                if createFields:
-                    feat_defn = layer.GetLayerDefn()
-                    for i in range(feat_defn.GetFieldCount()):
-                        olayer.CreateField(feat_defn.GetFieldDefn(i))
-                    # create also geometry attributes
-                    if not geom_name and \
-                            olayer.TestCapability(ogr.OLCCreateGeomField):
-                        for i in range(feat_defn.GetGeomFieldCount()):
-                            geom_defn = feat_defn.GetGeomFieldDefn(i) 
-                            if geom_name and geom_defn.GetName() != geom_name:
-                                continue
-                            olayer.CreateGeomField(feat_defn.GetGeomFieldDefn(i))
+                if not append:
+                    olayer = create_layer(ods, layer,
+                                          layerName, geom_name, create_geom, options)
                 
                 if olayer.TestCapability(ogr.OLCTransactions):
                     olayer.StartTransaction()
