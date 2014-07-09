@@ -158,8 +158,9 @@ def delete_layer(ids, ods, layerName):
     for iLayerOut in range(nlayersOut): # do it better
         if ids.GetLayer(iLayerOut).GetName() == layerName:
             ods.DeleteLayer(iLayerOut)
-            olayer = None
-            break
+            return True
+    
+    return False
 
 def create_layer(ods, ilayer, layerName, geom_name, create_geom, options):
     # determine geometry type
@@ -255,7 +256,8 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
             
             # delete layer if exists and append is not True
             if olayer and not append:
-                delete_layer(ids, ods, layerName)
+                if delete_layer(ids, ods, layerName):
+                    olayer = None
             
             # if not olayer or (not append and olayer and not geom_name):
             if False: # disabled (do not preserve fid...)
@@ -264,7 +266,7 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
                     fatal("Unable to create layer %s" % layerName)
                 ifeat = olayer.GetFeatureCount()
             else:
-                if not append:
+                if not olayer:
                     olayer = create_layer(ods, layer,
                                           layerName, geom_name, create_geom, options)
                 
