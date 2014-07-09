@@ -93,6 +93,27 @@ def check_epsg(conn):
     
     cursor.close()
 
+def create_indices(conn, layer_list):
+    if not conn:
+        sys.stderr.write("Unable to connect DB\n")
+        return
+
+    column = "gml_id"
+    
+    cursor = conn.cursor()
+    for layer in layer_list:
+        table = layer.lower()
+        cursor.execute('BEGIN')
+        try:
+            cursor.execute("CREATE INDEX %s_%s_idx ON %s (%s)" % \
+                               (table, column, table, column))
+            cursor.execute('COMMIT')
+        except StandardError as e:
+            sys.stderr.write("Unable to create index %s_%s: %s\n" % (table, column, e))
+            cursor.execute('ROLLBACK')
+
+    cursor.close()
+    
 def main():
     # check requirements
     check_ogr()
@@ -163,6 +184,7 @@ def main():
             if not layer_list:
                 layer_list = list_layers(ids, False, None)
             
+            # build datasource string
             odsn_reset = odsn
             if options['schema_per_file'] or options['schema']:
                 if options['schema_per_file']:
@@ -176,7 +198,7 @@ def main():
                 create_schema(conn, schema_name)
                 odsn += ' active_schema=%s' % schema_name
             
-            # do conversion
+            # do the conversion
             try:
                 nfeat = convert_vfr(ids, odsn, "PostgreSQL", options['layer'],
                                     options['overwrite'], lco_options, options['geom'], append)
@@ -192,7 +214,11 @@ def main():
             
         ids.Destroy()
         ipass += 1
+   
+    # create indices
+    create_indices(conn, layer_list)
     
+    # print summary
     if (ipass > 1 and options.get('schema_per_file', False) is False) \
             or options.get('append', True):
         print_summary(odsn, "PostgreSQL", layer_list, stime)
