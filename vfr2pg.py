@@ -93,24 +93,39 @@ def check_epsg(conn):
     
     cursor.close()
 
-def create_indices(conn, layer_list):
+def create_indices(conn, schema_list, layer_list):
     if not conn:
         sys.stderr.write("Unable to connect DB\n")
         return
-
+    
+    if not schema_list:
+        schema_list = ['public']
+    
     column = "gml_id"
     
     cursor = conn.cursor()
-    for layer in layer_list:
-        table = layer.lower()
-        cursor.execute('BEGIN')
-        try:
-            cursor.execute("CREATE INDEX %s_%s_idx ON %s (%s)" % \
-                               (table, column, table, column))
-            cursor.execute('COMMIT')
-        except StandardError as e:
-            sys.stderr.write("Unable to create index %s_%s: %s\n" % (table, column, e))
-            cursor.execute('ROLLBACK')
+    for schema in schema_list:
+        for layer in layer_list:
+            if '.' in layer:
+                schema, table = map(lambda x: x.lower(), layer.split('.', 1))
+            else:
+                table = layer.lower()
+            
+            indexname = "%s_%s_idx" % (table, column)
+            cursor.execute("SELECT COUNT(*) FROM pg_indexes WHERE "
+                           "tablename = '%s' and schemaname = '%s' and "
+                           "indexname = '%s'" % (table, schema, indexname))
+            if cursor.fetchall()[0][0] > 0:
+                continue # indices for specified table already exists
+        
+            cursor.execute('BEGIN')
+            try:
+                cursor.execute("CREATE INDEX %s ON %s.%s (%s)" % \
+                                   (indexname, schema, table, column))
+                cursor.execute('COMMIT')
+            except StandardError as e:
+                sys.stderr.write("Unable to create index %s_%s: %s\n" % (table, column, e))
+                cursor.execute('ROLLBACK')
 
     cursor.close()
     
@@ -154,6 +169,7 @@ def main():
     # get list of input VFR files
     file_list  = open_file(filename, options['download'], force_date = options['date'])
     layer_list = options['layer']
+    schema_list = []
     
     epsg_checked = False
     append = options['append']
@@ -197,8 +213,11 @@ def main():
                 
                 create_schema(conn, schema_name)
                 odsn += ' active_schema=%s' % schema_name
+                if schema_name not in schema_list:
+                    schema_list.append(schema_name)
             
             # do the conversion
+            mode = Mode.write
             if fname.split('_')[-1][0] == 'Z':
                 mode = Mode.change
             elif append:
@@ -219,9 +238,10 @@ def main():
             
         ids.Destroy()
         ipass += 1
-   
+    
     # create indices
-    create_indices(conn, layer_list)
+    if conn:
+        create_indices(conn, schema_list, layer_list)
     
     # print summary
     if (ipass > 1 and options.get('schema_per_file', False) is False) \

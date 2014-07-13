@@ -213,19 +213,19 @@ def create_layer(ods, ilayer, layerName, geom_name, create_geom, options):
     return olayer
 
 # check changes
-def check_changes():
+def check_changes(ilayer, olayer):
     ilayer.ResetReading()
     ifeature = ilayer.GetNextFeature()
     while ifeature:
-        ifeature = layer.GetNextFeature()
         fcode = ifeature.GetField("gml_id")
         olayer.SetAttributeFilter("gml_id = '%s'" % fcode)
 
         found = []
-        for feature in layer:
+        for feature in olayer:
             found.append(feature)
         
         print "%s -> %s" % (fcode, found)
+        ifeature = ilayer.GetNextFeature()
         
 # convert VFR into specified format
 def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_name = None,
@@ -292,8 +292,9 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
                                           layerName, geom_name, create_geom, options)
 
                 if mode == Mode.change:
-                    check_changes()
-                
+                    check_changes(layer, olayer)
+                    return 0
+
                 if olayer.TestCapability(ogr.OLCTransactions):
                     olayer.StartTransaction()
                 
