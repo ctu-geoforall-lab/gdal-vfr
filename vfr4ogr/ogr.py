@@ -15,6 +15,11 @@ logger = logging.getLogger()
 logFile = 'log.%d' % os.getpid()
 logger.addHandler(logging.FileHandler(logFile, delay = True))
 
+class Mode:
+    write  = 0
+    append = 1
+    change = 2
+
 # redirect warnings to the file
 def error_handler(err_level, err_no, err_msg):
     if err_level > gdal.CE_Warning:
@@ -207,8 +212,24 @@ def create_layer(ods, ilayer, layerName, geom_name, create_geom, options):
     
     return olayer
 
+# check changes
+def check_changes():
+    ilayer.ResetReading()
+    ifeature = ilayer.GetNextFeature()
+    while ifeature:
+        ifeature = layer.GetNextFeature()
+        fcode = ifeature.GetField("gml_id")
+        olayer.SetAttributeFilter("gml_id = '%s'" % fcode)
+
+        found = []
+        for feature in layer:
+            found.append(feature)
+        
+        print "%s -> %s" % (fcode, found)
+        
 # convert VFR into specified format
-def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_name = None, append = False):
+def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_name = None,
+                mode = Mode.write):
     odrv = ogr.GetDriverByName(frmt)
     if odrv is None:
         fatal("Format '%s' is not supported" % frmt)
@@ -241,7 +262,7 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
                 
         olayer = ods.GetLayerByName('%s' % layerName)
         sys.stdout.write("Exporting layer %-20s ..." % layerName)
-        if not overwrite and (olayer and not append):
+        if not overwrite and (olayer and mode != Mode.append):
             sys.stdout.write(" already exists (use --overwrite or --append to modify existing data)\n")
         else:
             ### TODO: fix output drivers not to use default geometry
@@ -255,7 +276,7 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
                     options.append('GEOMETRY_NAME=definicnibod')
             
             # delete layer if exists and append is not True
-            if olayer and not append:
+            if olayer and mode != Mode.append:
                 if delete_layer(ids, ods, layerName):
                     olayer = None
             
@@ -269,6 +290,9 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
                 if not olayer:
                     olayer = create_layer(ods, layer,
                                           layerName, geom_name, create_geom, options)
+
+                if mode == Mode.change:
+                    check_changes()
                 
                 if olayer.TestCapability(ogr.OLCTransactions):
                     olayer.StartTransaction()

@@ -38,7 +38,7 @@ import atexit
 import time
 from getopt import GetoptError
 
-from vfr4ogr.ogr import check_ogr, open_file, list_layers, convert_vfr, check_log, open_ds, print_summary
+from vfr4ogr.ogr import check_ogr, open_file, list_layers, convert_vfr, check_log, open_ds, print_summary, Mode
 from vfr4ogr.utils import fatal, message, parse_xml_gz, compare_list, error
 from vfr4ogr.parse import parse_cmd
 
@@ -199,9 +199,14 @@ def main():
                 odsn += ' active_schema=%s' % schema_name
             
             # do the conversion
+            if fname.split('_')[-1][0] == 'Z':
+                mode = Mode.change
+            elif append:
+                mode = Mode.append
             try:
                 nfeat = convert_vfr(ids, odsn, "PostgreSQL", options['layer'],
-                                    options['overwrite'], lco_options, options['geom'], append)
+                                    options['overwrite'], lco_options, options['geom'],
+                                    mode)
             except RuntimeError as e:
                 error("Unable to read %s: %s" % (fname, e))
             
