@@ -222,6 +222,7 @@ def main():
                 mode = Mode.change
             elif append:
                 mode = Mode.append
+            
             try:
                 nfeat = convert_vfr(ids, odsn, "PostgreSQL", options['layer'],
                                     options['overwrite'], lco_options, options['geom'],
