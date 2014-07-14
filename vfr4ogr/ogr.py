@@ -15,10 +15,17 @@ logger = logging.getLogger()
 logFile = 'log.%d' % os.getpid()
 logger.addHandler(logging.FileHandler(logFile, delay = True))
 
+# file mode
 class Mode:
     write  = 0
     append = 1
     change = 2
+
+# feature action (changes only)
+class Action:
+    write  = 0
+    update = 1
+    delete = 2
 
 # redirect warnings to the file
 def error_handler(err_level, err_no, err_msg):
@@ -46,6 +53,7 @@ def check_ogr():
 
     gdal.PushErrorHandler(error_handler)
 
+# open VFR file for reading
 def open_file(filename, download = False, force_date = None):
     drv = ogr.GetDriverByName("GML")
     if drv is None:
@@ -95,6 +103,7 @@ def open_file(filename, download = False, force_date = None):
 
     return list_ds
 
+# open OGR data-source for reading
 def open_ds(filename):
     drv = ogr.GetDriverByName("GML")
     ds = drv.Open(filename, False)
@@ -103,7 +112,7 @@ def open_ds(filename):
     
     return ds
 
-# list formats
+# list supported OGR formats
 def list_formats():
     cnt = ogr.GetDriverCount()
     
@@ -121,6 +130,7 @@ def list_formats():
     for i in sorted(formatsList):
         print i
 
+# get list of geometry column for specified layer
 def get_geom_count(layer):
     defn = layer.GetLayerDefn()
     geom_list = list()
@@ -134,6 +144,7 @@ def get_geom_count(layer):
     
     return geom_list
 
+# list OGR layers of input VFR file
 def list_layers(ds, extended = False, fd = sys.stdout):
     nlayers = ds.GetLayerCount()
     layer_list = list()
@@ -158,6 +169,7 @@ def list_layers(ds, extended = False, fd = sys.stdout):
     
     return layer_list
 
+# delete specified layer from output data-source
 def delete_layer(ids, ods, layerName):
     nlayersOut = ods.GetLayerCount()
     for iLayerOut in range(nlayersOut): # do it better
@@ -167,6 +179,7 @@ def delete_layer(ids, ods, layerName):
     
     return False
 
+# create new layer in output data-source
 def create_layer(ods, ilayer, layerName, geom_name, create_geom, options):
     # determine geometry type
     if geom_name or not create_geom:
@@ -213,21 +226,50 @@ def create_layer(ods, ilayer, layerName, geom_name, create_geom, options):
     return olayer
 
 # check changes
-def check_changes(ilayer, olayer):
+# TODO: process deleted features
+def process_changes(ilayer, olayer, column='gml_id'):
+    changes_list = {}
+    
     ilayer.ResetReading()
     ifeature = ilayer.GetNextFeature()
     while ifeature:
-        fcode = ifeature.GetField("gml_id")
-        olayer.SetAttributeFilter("gml_id = '%s'" % fcode)
-
+        fcode = ifeature.GetField(column)
+        olayer.SetAttributeFilter("%s = '%s'" % (column, fcode))
+        
         found = []
         for feature in olayer:
             found.append(feature)
         
-        print "%s -> %s" % (fcode, found)
-        ifeature = ilayer.GetNextFeature()
+        ### print "%s -> %s" % (fcode, found)
+        if len(found) > 1:
+            warning("Layer %s: more features '%s=%s' found, skipping..." % \
+                        (olayer.GetName(), column, fcode))
+            continue
         
-# convert VFR into specified format
+        changes_list[ifeature.GetFID()] = Action.update if len(found) > 0 else Action.write
+        
+        ifeature = ilayer.GetNextFeature()
+    
+    return changes_list
+
+# modify output feature - remove remaining geometry columns
+def modify_ofeature(feature, geom_idx, ofeature):
+    # set requested geometry
+    if geom_idx > -1:
+        geom = feature.GetGeomFieldRef(geom_idx)
+        if geom:
+            ofeature.SetGeometry(geom.Clone())
+                        
+    # delete remaining geometry columns
+    odefn = feature.GetDefnRef()
+    for i in range(odefn.GetGeomFieldCount()):
+        if i == geom_idx:
+            continue
+        odefn.DeleteGeomFieldDefn(i)
+
+    return geom_idx
+
+# write VFR features to output data-source
 def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_name = None,
                 mode = Mode.write):
     odrv = ogr.GetDriverByName(frmt)
@@ -264,83 +306,97 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
         sys.stdout.write("Exporting layer %-20s ..." % layerName)
         if not overwrite and (olayer and mode == Mode.write):
             sys.stdout.write(" already exists (use --overwrite or --append to modify existing data)\n")
-        else:
-            ### TODO: fix output drivers not to use default geometry
-            ### names
-            if frmt in ('PostgreSQL', 'OCI') and not geom_name:
-                if layerName.lower() == 'ulice':
-                    remove_option(options, 'GEOMETRY_NAME')
-                    options.append('GEOMETRY_NAME=definicnicara')
-                else:
-                    remove_option(options, 'GEOMETRY_NAME')
-                    options.append('GEOMETRY_NAME=definicnibod')
-            
-            # delete layer if exists and append is not True
-            if olayer and mode != Mode.append:
-                if delete_layer(ids, ods, layerName):
-                    olayer = None
-            
-            # if not olayer or (not append and olayer and not geom_name):
-            if False: # disabled (do not preserve fid...)
-                olayer = ods.CopyLayer(layer, layerName, options)
-                if olayer is None:
-                    fatal("Unable to create layer %s" % layerName)
-                ifeat = olayer.GetFeatureCount()
+            continue
+
+        ### TODO: fix output drivers not to use default geometry
+        ### names
+        if frmt in ('PostgreSQL', 'OCI') and not geom_name:
+            if layerName.lower() == 'ulice':
+                remove_option(options, 'GEOMETRY_NAME')
+                options.append('GEOMETRY_NAME=definicnicara')
             else:
-                if not olayer:
-                    olayer = create_layer(ods, layer,
-                                          layerName, geom_name, create_geom, options)
+                remove_option(options, 'GEOMETRY_NAME')
+                options.append('GEOMETRY_NAME=definicnibod')
+            
+        # delete layer if exists and append is not True
+        if olayer and mode == Mode.write:
+            if delete_layer(ids, ods, layerName):
+                olayer = None
+            
+        # if not olayer or (not append and olayer and not geom_name):
+        ### olayer = ods.CopyLayer(layer, layerName, options)
+        ### if olayer is None:
+        ### fatal("Unable to create layer %s" % layerName)
+        ### ifeat = olayer.GetFeatureCount()
 
-                if mode == Mode.change:
-                    check_changes(layer, olayer)
-                    return 0
+        # create new layer if not exists
+        if not olayer:
+            olayer = create_layer(ods, layer,
+                                  layerName, geom_name, create_geom, options)
 
-                if olayer.TestCapability(ogr.OLCTransactions):
-                    olayer.StartTransaction()
+        if olayer is None:
+            fatal("Unable to export layer '%s'. Exiting..." % layerName)
+        
+        # pre-process changes
+        if mode == Mode.change:
+            change_list = process_changes(layer, olayer)
+        
+        if olayer.TestCapability(ogr.OLCTransactions):
+            olayer.StartTransaction()
                 
-                # copy features from source to dest layer
-                ifeat = 0
-                iFID = olayer.GetFeatureCount() + 1
-                geom_idx = -1
-
-                layer.ResetReading()
-                feature = layer.GetNextFeature()
-                while feature:
-                    ofeature = feature.Clone()
-                    
-                    # parse geometry columns if requested
-                    if geom_name:
-                        if geom_idx < 0:
-                            odefn = feature.GetDefnRef()
-                            geom_idx = feature.GetGeomFieldIndex(geom_name)
-                        
-                        # set requested geometry
-                        if geom_idx > -1:
-                            geom = feature.GetGeomFieldRef(geom_idx)
-                            if geom:
-                                ofeature.SetGeometry(geom.Clone())
-                        
-                        # delete remaining geometry columns
-                        for i in range(odefn.GetGeomFieldCount()):
-                            if i == geom_idx:
-                                continue
-                            odefn.DeleteGeomFieldDefn(i)
-                    
-                    ofeature.SetFID(iFID)
-                    olayer.CreateFeature(ofeature)
-                    
-                    feature = layer.GetNextFeature()
-                    ifeat += 1
-                    iFID += 1
-
-                if olayer.TestCapability(ogr.OLCTransactions):
-                    olayer.CommitTransaction()
+        ifeat = 0
+        iFID = olayer.GetFeatureCount() + 1
+        geom_idx = -1
+        
+        # copy features from source to destination layer
+        layer.ResetReading()
+        feature = layer.GetNextFeature()
+        while feature:
+            # check for changes first
+            if mode == Mode.change:
+                iFID = feature.GetFID()
+                action = change_list.get(iFID, None)
+                # feature marked to be changed
+                if action in (Action.delete, Action.update):
+                    olayer.DeleteFeature(iFID)
+                if action == Action.delete:
+                    # do nothing else and continue
+                    continue 
             
-            if olayer is None:
-                fatal("Unable to export layer '%s'. Exiting..." % layerName)
+            # clone feature
+            ofeature = feature.Clone()
+        
+            # modify geometry columns if requested
+            if mode == Mode.write and geom_name:
+                if geom_idx < 0:
+                    geom_idx = feature.GetGeomFieldIndex(geom_name)
+                modify_feature(feature, geom_idx, ofeature)
             
-            sys.stdout.write(" %-8d features\n" % ifeat)
-            nfeat += ifeat
+            # set feature id
+            ofeature.SetFID(iFID)
+            # add new feature to output layer
+            olayer.CreateFeature(ofeature)
+                    
+            feature = layer.GetNextFeature()
+            ifeat += 1
+            iFID += 1
+
+        if olayer.TestCapability(ogr.OLCTransactions):
+            olayer.CommitTransaction()
+            
+        sys.stdout.write(" %-8d features" % ifeat)
+        if mode == Mode.change:
+            n_updated = n_deleted = 0
+            for action in change_list.itervalues():
+                if action == Action.update:
+                    n_updated += 1
+                elif action == Action.delete:
+                    n_deleted += 1
+            sys.stdout.write(" (%d updated, %d deleted)" % \
+                                 (n_updated, n_deleted))
+        sys.stdout.write("\n")
+        
+        nfeat += ifeat
     
     ### ods.SyncToDisk()
     ods.Destroy()
@@ -349,6 +405,7 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
     
     return nfeat
 
+# print summary for multiple file input
 def print_summary(odsn, frmt, layer_list, stime):
     odrv = ogr.GetDriverByName(frmt)
     if odrv is None:
