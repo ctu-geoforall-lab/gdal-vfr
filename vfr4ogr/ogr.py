@@ -23,7 +23,7 @@ class Mode:
 
 # feature action (changes only)
 class Action:
-    write  = 0
+    add    = 0
     update = 1
     delete = 2
 
@@ -227,6 +227,7 @@ def create_layer(ods, ilayer, layerName, geom_name, create_geom, options):
 
 # check changes
 # TODO: process deleted features
+# TODO: use numeric data as key
 def process_changes(ilayer, olayer, column='gml_id'):
     changes_list = {}
     
@@ -240,15 +241,17 @@ def process_changes(ilayer, olayer, column='gml_id'):
         for feature in olayer:
             found.append(feature)
         
-        ### print "%s -> %s" % (fcode, found)
-        if len(found) > 1:
-            warning("Layer %s: more features '%s=%s' found, skipping..." % \
-                        (olayer.GetName(), column, fcode))
-            continue
-        
-        changes_list[ifeature.GetFID()] = Action.update if len(found) > 0 else Action.write
+        n_feat = len(found)
+        if n_feat > 1:
+            warning("Layer '%s': %d features '%s=%s' found, skipping..." % \
+                        (olayer.GetName(), len(found), column, fcode))
+        else:
+            changes_list[ifeature.GetFID()] = Action.update if n_feat > 0 else Action.add
         
         ifeature = ilayer.GetNextFeature()
+    
+    # unset attribute filter
+    olayer.SetAttributeFilter(None)
     
     return changes_list
 
@@ -341,12 +344,13 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
         if mode == Mode.change:
             change_list = process_changes(layer, olayer)
         
+        ifeat = 0
+        fid_before = fid = olayer.GetFeatureCount()
+        geom_idx = -1
+
+        # start transaction in output layer
         if olayer.TestCapability(ogr.OLCTransactions):
             olayer.StartTransaction()
-                
-        ifeat = 0
-        iFID = olayer.GetFeatureCount() + 1
-        geom_idx = -1
         
         # copy features from source to destination layer
         layer.ResetReading()
@@ -354,14 +358,24 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
         while feature:
             # check for changes first
             if mode == Mode.change:
-                iFID = feature.GetFID()
-                action = change_list.get(iFID, None)
-                # feature marked to be changed
+                c_fid = feature.GetFID()
+                action = change_list.get(c_fid, None)
+                
+                # feature marked to be changed (delete first)
                 if action in (Action.delete, Action.update):
-                    olayer.DeleteFeature(iFID)
+                    olayer.DeleteFeature(c_fid)
+                
+                if action == Action.add:
+                    fid_before += 1
+                    fid = fid_before
+                else:
+                    fid = c_fid
+                
                 if action == Action.delete:
                     # do nothing else and continue
                     continue 
+            else:
+                fid += 1
             
             # clone feature
             ofeature = feature.Clone()
@@ -373,27 +387,29 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
                 modify_feature(feature, geom_idx, ofeature)
             
             # set feature id
-            ofeature.SetFID(iFID)
+            ofeature.SetFID(fid)
             # add new feature to output layer
             olayer.CreateFeature(ofeature)
                     
             feature = layer.GetNextFeature()
             ifeat += 1
-            iFID += 1
-
+        
+        # commit transaction in output layer
         if olayer.TestCapability(ogr.OLCTransactions):
             olayer.CommitTransaction()
             
-        sys.stdout.write(" %-8d features" % ifeat)
+        sys.stdout.write(" %10d features" % ifeat)
         if mode == Mode.change:
-            n_updated = n_deleted = 0
+            n_added = n_updated = n_deleted = 0
             for action in change_list.itervalues():
                 if action == Action.update:
                     n_updated += 1
                 elif action == Action.delete:
                     n_deleted += 1
-            sys.stdout.write(" (%d updated, %d deleted)" % \
-                                 (n_updated, n_deleted))
+                else: # Action.add
+                    n_added += 1
+            sys.stdout.write(" (%5d added, %5d updated, %5d deleted)" % \
+                                 (n_added, n_updated, n_deleted))
         sys.stdout.write("\n")
         
         nfeat += ifeat
