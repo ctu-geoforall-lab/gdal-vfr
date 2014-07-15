@@ -1927,7 +1927,7 @@
   </GMLFeatureClass>
   <!-- Zaniklé prvky -->
   <GMLFeatureClass>
-    <Name>ZaniklyPrvek</Name>
+    <Name>ZaniklePrvky</Name>
     <ElementPath>Data|ZaniklePrvky|ZaniklyPrvek</ElementPath>
     <!-- Typ prvku -->
     <PropertyDefn>
