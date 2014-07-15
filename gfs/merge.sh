@@ -62,7 +62,8 @@ merge_all() {
         "Ulice" \
         "Parcely" \
         "StavebniObjekty" \
-        "AdresniMista"
+        "AdresniMista" \
+        "ZaniklePrvky"
 }
 
 merge_st
