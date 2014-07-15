@@ -1,6 +1,6 @@
 <GMLFeatureClassList>
+  <!-- Seznam států -->
   <GMLFeatureClass>
-    <!-- Seznam států -->
     <Name>Staty</Name>
     <ElementPath>Data|Staty|Stat</ElementPath>
     <SRSName>urn:ogc:def:crs:EPSG::5514</SRSName>

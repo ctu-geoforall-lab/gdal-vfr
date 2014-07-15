@@ -59,10 +59,6 @@ merge_all() {
         "CastiObci" \
         "KatastralniUzemi" \
         "Zsj" \
-        "Obce" \
-        "CastiObci" \
-        "KatastralniUzemi" \
-        "Zsj" \
         "Ulice" \
         "Parcely" \
         "StavebniObjekty" \
