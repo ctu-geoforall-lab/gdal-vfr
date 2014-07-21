@@ -38,7 +38,8 @@ import atexit
 import time
 from getopt import GetoptError
 
-from vfr4ogr.ogr import check_ogr, open_file, list_layers, convert_vfr, check_log, open_ds, print_summary, Mode
+from vfr4ogr.ogr import check_ogr, open_file, list_layers, convert_vfr, check_log, open_ds, print_summary
+from vfr4ogr.vfr import Mode
 from vfr4ogr.utils import fatal, message, parse_xml_gz, compare_list, error
 from vfr4ogr.parse import parse_cmd
 
@@ -106,6 +107,10 @@ def create_indices(conn, schema_list, layer_list):
     cursor = conn.cursor()
     for schema in schema_list:
         for layer in layer_list:
+            if layer == 'ZaniklePrvky':
+                # skip deleted features
+                continue
+            
             if '.' in layer:
                 schema, table = map(lambda x: x.lower(), layer.split('.', 1))
             else:

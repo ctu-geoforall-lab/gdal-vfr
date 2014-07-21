@@ -4,7 +4,9 @@ import time
 import logging
 import datetime
 
-from utils import fatal, message, warning, download_vfr, last_day_of_month, yesterday, remove_option
+from utils import fatal, error, message, warning, download_vfr, last_day_of_month, \
+    yesterday, remove_option
+from vfr import convert_vfr
 
 try:
     from osgeo import gdal, ogr
@@ -225,202 +227,6 @@ def create_layer(ods, ilayer, layerName, geom_name, create_geom, options):
     
     return olayer
 
-# check changes
-# TODO: process deleted features
-# TODO: use numeric data as key
-def process_changes(ilayer, olayer, column='gml_id'):
-    changes_list = {}
-    
-    ilayer.ResetReading()
-    ifeature = ilayer.GetNextFeature()
-    while ifeature:
-        fcode = ifeature.GetField(column)
-        olayer.SetAttributeFilter("%s = '%s'" % (column, fcode))
-        
-        found = []
-        for feature in olayer:
-            found.append(feature)
-        
-        n_feat = len(found)
-        if n_feat > 1:
-            warning("Layer '%s': %d features '%s=%s' found, skipping..." % \
-                        (olayer.GetName(), len(found), column, fcode))
-        else:
-            changes_list[ifeature.GetFID()] = Action.update if n_feat > 0 else Action.add
-        
-        ifeature = ilayer.GetNextFeature()
-    
-    # unset attribute filter
-    olayer.SetAttributeFilter(None)
-    
-    return changes_list
-
-# modify output feature - remove remaining geometry columns
-def modify_ofeature(feature, geom_idx, ofeature):
-    # set requested geometry
-    if geom_idx > -1:
-        geom = feature.GetGeomFieldRef(geom_idx)
-        if geom:
-            ofeature.SetGeometry(geom.Clone())
-                        
-    # delete remaining geometry columns
-    odefn = feature.GetDefnRef()
-    for i in range(odefn.GetGeomFieldCount()):
-        if i == geom_idx:
-            continue
-        odefn.DeleteGeomFieldDefn(i)
-
-    return geom_idx
-
-# write VFR features to output data-source
-def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_name = None,
-                mode = Mode.write):
-    odrv = ogr.GetDriverByName(frmt)
-    if odrv is None:
-        fatal("Format '%s' is not supported" % frmt)
-    
-    # try to open datasource
-    ods = odrv.Open(odsn, True)
-    if ods is None:
-        # if fails, try to create new datasource
-        ods = odrv.CreateDataSource(odsn)
-    if ods is None:
-        fatal("Unable to open/create new datasource '%s'" % odsn)
-    
-    create_geom = ods.TestCapability(ogr.ODsCCreateGeomFieldAfterCreateLayer)
-    if not geom_name and not create_geom:
-        warning("Driver '%s' doesn't support multiple geometry columns. "
-                "Only first will be used." % odrv.GetName())
-    
-    if overwrite:
-        options.append("OVERWRITE=YES")
-
-    start = time.time()
-    nlayers = ids.GetLayerCount()
-    nfeat = 0
-    for iLayer in range(nlayers):
-        layer = ids.GetLayer(iLayer)
-        layerName = layer.GetName()
-        
-        if layers and layerName not in layers:
-            continue
-                
-        olayer = ods.GetLayerByName('%s' % layerName)
-        sys.stdout.write("Exporting layer %-20s ..." % layerName)
-        if not overwrite and (olayer and mode == Mode.write):
-            sys.stdout.write(" already exists (use --overwrite or --append to modify existing data)\n")
-            continue
-
-        ### TODO: fix output drivers not to use default geometry
-        ### names
-        if frmt in ('PostgreSQL', 'OCI') and not geom_name:
-            if layerName.lower() == 'ulice':
-                remove_option(options, 'GEOMETRY_NAME')
-                options.append('GEOMETRY_NAME=definicnicara')
-            else:
-                remove_option(options, 'GEOMETRY_NAME')
-                options.append('GEOMETRY_NAME=definicnibod')
-            
-        # delete layer if exists and append is not True
-        if olayer and mode == Mode.write:
-            if delete_layer(ids, ods, layerName):
-                olayer = None
-            
-        # if not olayer or (not append and olayer and not geom_name):
-        ### olayer = ods.CopyLayer(layer, layerName, options)
-        ### if olayer is None:
-        ### fatal("Unable to create layer %s" % layerName)
-        ### ifeat = olayer.GetFeatureCount()
-
-        # create new layer if not exists
-        if not olayer:
-            olayer = create_layer(ods, layer,
-                                  layerName, geom_name, create_geom, options)
-
-        if olayer is None:
-            fatal("Unable to export layer '%s'. Exiting..." % layerName)
-        
-        # pre-process changes
-        if mode == Mode.change:
-            change_list = process_changes(layer, olayer)
-        
-        ifeat = 0
-        fid_before = fid = olayer.GetFeatureCount()
-        geom_idx = -1
-
-        # start transaction in output layer
-        if olayer.TestCapability(ogr.OLCTransactions):
-            olayer.StartTransaction()
-        
-        # copy features from source to destination layer
-        layer.ResetReading()
-        feature = layer.GetNextFeature()
-        while feature:
-            # check for changes first
-            if mode == Mode.change:
-                c_fid = feature.GetFID()
-                action = change_list.get(c_fid, None)
-                
-                # feature marked to be changed (delete first)
-                if action in (Action.delete, Action.update):
-                    olayer.DeleteFeature(c_fid)
-                
-                if action == Action.add:
-                    fid_before += 1
-                    fid = fid_before
-                else:
-                    fid = c_fid
-                
-                if action == Action.delete:
-                    # do nothing else and continue
-                    continue 
-            else:
-                fid += 1
-            
-            # clone feature
-            ofeature = feature.Clone()
-        
-            # modify geometry columns if requested
-            if mode == Mode.write and geom_name:
-                if geom_idx < 0:
-                    geom_idx = feature.GetGeomFieldIndex(geom_name)
-                modify_feature(feature, geom_idx, ofeature)
-            
-            # set feature id
-            ofeature.SetFID(fid)
-            # add new feature to output layer
-            olayer.CreateFeature(ofeature)
-                    
-            feature = layer.GetNextFeature()
-            ifeat += 1
-        
-        # commit transaction in output layer
-        if olayer.TestCapability(ogr.OLCTransactions):
-            olayer.CommitTransaction()
-            
-        sys.stdout.write(" %10d features" % ifeat)
-        if mode == Mode.change:
-            n_added = n_updated = n_deleted = 0
-            for action in change_list.itervalues():
-                if action == Action.update:
-                    n_updated += 1
-                elif action == Action.delete:
-                    n_deleted += 1
-                else: # Action.add
-                    n_added += 1
-            sys.stdout.write(" (%5d added, %5d updated, %5d deleted)" % \
-                                 (n_added, n_updated, n_deleted))
-        sys.stdout.write("\n")
-        
-        nfeat += ifeat
-    
-    ### ods.SyncToDisk()
-    ods.Destroy()
-    
-    message("Time elapsed: %d sec" % (time.time() - start))
-    
-    return nfeat
-
 # print summary for multiple file input
 def print_summary(odsn, frmt, layer_list, stime):
     odrv = ogr.GetDriverByName(frmt)
@@ -432,12 +238,12 @@ def print_summary(odsn, frmt, layer_list, stime):
         fatal("Unable to open datasource '%s'" % odsn)
 
     message("Summary")
-    for layerName in layer_list:
-        layer = ods.GetLayerByName(layerName)
+    for layer_name in layer_list:
+        layer = ods.GetLayerByName(layer_name)
         if not layer:
             continue
         
-        sys.stdout.write("Layer          %-20s ... %-5d features\n" % (layerName, layer.GetFeatureCount()))
+        sys.stdout.write("Layer          %-20s ... %-5d features\n" % (layer_name, layer.GetFeatureCount()))
 
     nsec = time.time() - stime    
     etime = str(datetime.timedelta(seconds=nsec))
