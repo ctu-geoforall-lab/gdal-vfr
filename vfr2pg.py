@@ -43,10 +43,11 @@ from vfr4ogr.vfr import Mode
 from vfr4ogr.utils import fatal, message, parse_xml_gz, compare_list, error
 from vfr4ogr.parse import parse_cmd
 
-# print usage
+# print program usage
 def usage():
     print __doc__
 
+# open connection to output DB
 def open_db(conn_string):
     try:
         import psycopg2
@@ -60,6 +61,7 @@ def open_db(conn_string):
     
     return conn
 
+# create output schema if not exists
 def create_schema(conn, name):
     cursor = conn.cursor()
     try:
@@ -74,6 +76,7 @@ def create_schema(conn, name):
     
     cursor.close()
 
+# insert EPSG 5514 definition into output DB if not defined
 def check_epsg(conn):
     if not conn:
         sys.stderr.write("Unable to add EPSG 5514: %s\n" % e)
@@ -94,6 +97,7 @@ def check_epsg(conn):
     
     cursor.close()
 
+# create indices for output tables (gml_id)
 def create_indices(conn, schema_list, layer_list):
     if not conn:
         sys.stderr.write("Unable to connect DB\n")
@@ -138,7 +142,7 @@ def main():
     # check requirements
     check_ogr()
     
-    # parse cmd arguments
+    # parse cmdline arguments
     options = { 'dbname' : None, 'schema' : None, 'user' : None, 'passwd' : None, 'host' : None, 
                 'overwrite' : False, 'extended' : False, 'layer' : [], 'geom' : None, 'download' : False,
                 'schema_per_file' : False, 'append' : False, 'date' : None}
@@ -155,7 +159,6 @@ def main():
             sys.exit(0)
 
     # build dsn string and options
-    ### lco_options = ["PG_USE_COPY=YES"]
     lco_options = []
     odsn = ''
     conn = None
@@ -167,12 +170,13 @@ def main():
             odsn += " password=%s" % options['passwd']
         if options['host']:
             odsn += " host=%s" % options['host']
-
+        
         # open connection to DB
         conn = open_db(odsn[3:])
     
-    # get list of input VFR files
+    # get list of input VFR file(s)
     file_list  = open_file(filename, options['download'], force_date = options['date'])
+    # get list of layers
     layer_list = options['layer']
     schema_list = []
     
@@ -181,31 +185,32 @@ def main():
     ipass = 0
     stime = time.time()
     
-    # go thru VFR file and load them to DB
+    # process VFR file(s) and load them to DB
     for fname in file_list:
         message("Processing %s (%d out of %d)..." % (fname, ipass+1, len(file_list)))
-
-        # open OGR datasource
+        
+        # open VFR file as OGR datasource
         ids = open_ds(fname)
         if ids is None:
             ipass += 1
             continue # unable to open - skip
         
         if not odsn:
-            # list available layers and exit
+            # no output datasource given -> list available layers and exit
             layer_list = list_layers(ids, options['extended'], sys.stdout)
             if options['extended'] and os.path.exists(filename):
                 compare_list(layer_list, parse_xml_gz(filename))
         else:
-            # check EPSG 5514 (only first pass)
+            # check if EPSG 5514 exists in output DB (only first pass)
             if not epsg_checked:
                 check_epsg(conn)
                 epsg_checked = True
             
             if not layer_list:
+                # get list of layers if not specified
                 layer_list = list_layers(ids, False, None)
             
-            # build datasource string
+            # build datasource string per file
             odsn_reset = odsn
             if options['schema_per_file'] or options['schema']:
                 if options['schema_per_file']:
@@ -216,18 +221,20 @@ def main():
                 else:
                     schema_name = options['schema'].lower()
                 
+                # create schema in output DB if needed
                 create_schema(conn, schema_name)
                 odsn += ' active_schema=%s' % schema_name
                 if schema_name not in schema_list:
                     schema_list.append(schema_name)
             
-            # do the conversion
+            # check mode - process changes or append
             mode = Mode.write
             if fname.split('_')[-1][0] == 'Z':
                 mode = Mode.change
             elif append:
                 mode = Mode.append
             
+            # do the conversion
             try:
                 nfeat = convert_vfr(ids, odsn, "PostgreSQL", options['layer'],
                                     options['overwrite'], lco_options, options['geom'],
@@ -235,25 +242,27 @@ def main():
             except RuntimeError as e:
                 error("Unable to read %s: %s" % (fname, e))
             
+            # reset datasource string per file
             if options['schema_per_file']:
                 odsn = odsn_reset
             
             if nfeat > 0:
                 append = True # append on next passes
         
-            
+        # close input VFR datasource
         ids.Destroy()
         ipass += 1
     
-    # create indices
+    # create indices for output tables
     if conn:
         create_indices(conn, schema_list, layer_list)
     
-    # print summary
+    # print final summary
     if (ipass > 1 and options.get('schema_per_file', False) is False) \
             or options.get('append', True):
         print_summary(odsn, "PostgreSQL", layer_list, stime)
     
+    # close DB connection
     if conn:
         conn.close()
     
