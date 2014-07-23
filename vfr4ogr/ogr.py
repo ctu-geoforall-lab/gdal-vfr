@@ -17,18 +17,6 @@ logger = logging.getLogger()
 logFile = 'log.%d' % os.getpid()
 logger.addHandler(logging.FileHandler(logFile, delay = True))
 
-# file mode
-class Mode:
-    write  = 0
-    append = 1
-    change = 2
-
-# feature action (changes only)
-class Action:
-    add    = 0
-    update = 1
-    delete = 2
-
 # redirect warnings to the file
 def error_handler(err_level, err_no, err_msg):
     if err_level > gdal.CE_Warning:

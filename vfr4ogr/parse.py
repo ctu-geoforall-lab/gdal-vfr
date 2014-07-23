@@ -64,7 +64,7 @@ def parse_cmd(argv, flags, params, optdir):
         if optdir['download']:
             filename = download_vfr(url)
         else:
-            message("Reading %s..." % url)
+            ### message("Reading %s..." % url)
             filename = "/vsicurl/" + url
     
     if not filename:

@@ -6,8 +6,8 @@ try:
 except ImportError, e:
     sys.exit('ERROR: Import of ogr from osgeo failed. %s' % e)
 
-from utils import message, remove_option
-from vfr_changes import delete_features, process_changes
+from utils import message, remove_option, Mode, Action
+from vfr_changes import process_changes, process_deleted_features
 
 # modify output feature - remove remaining geometry columns
 def modify_ofeature(feature, geom_idx, ofeature):
@@ -49,13 +49,14 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
     if overwrite:
         options.append("OVERWRITE=YES")
 
-    # process deleted features first
-    dlist = None
+    # process features marked for deletion first
+    dlist = None # statistics
     if mode == Mode.change:
-        dlayer = ods.GetLayerByName('ZaniklePrvky')
+        dlayer = ids.GetLayerByName('ZaniklePrvky')
         if dlayer:
-            dlist = delete_features(dlayer, ods)
+            dlist = process_deleted_features(dlayer, ods)
     
+    # process layers
     start = time.time()
     nlayers = ids.GetLayerCount()
     nfeat = 0
@@ -66,9 +67,9 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
         if layers and layer_name not in layers:
             # process only selected layers
             continue
-                
+        
         if layer_name == 'ZaniklePrvky':
-            # process deleted features
+            # skip deleted features (already done)
             continue
         
         olayer = ods.GetLayerByName('%s' % layer_name)
@@ -86,34 +87,29 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
             else:
                 remove_option(options, 'GEOMETRY_NAME')
                 options.append('GEOMETRY_NAME=definicnibod')
-            
+        
         # delete layer if exists and append is not True
         if olayer and mode == Mode.write:
             if delete_layer(ids, ods, layer_name):
                 olayer = None
-            
-        # if not olayer or (not append and olayer and not geom_name):
-        ### olayer = ods.CopyLayer(layer, layer_name, options)
-        ### if olayer is None:
-        ### fatal("Unable to create layer %s" % layer_name)
-        ### ifeat = olayer.GetFeatureCount()
-
-        # create new layer if not exists
+        
+        # create new output layer if not exists
         if not olayer:
             olayer = create_layer(ods, layer,
                                   layer_name, geom_name, create_geom, options)
-
         if olayer is None:
             fatal("Unable to export layer '%s'. Exiting..." % layer_name)
         
         # pre-process changes
         if mode == Mode.change:
             change_list = process_changes(layer, olayer)
+            if dlist and layer_name in dlist: # add features to be deleted
+                change_list.update(dlist[layer_name])
         
         ifeat = 0
-        fid_before = fid = olayer.GetFeatureCount()
+        fid_last = fid = olayer.GetFeatureCount()
         geom_idx = -1
-
+        
         # start transaction in output layer
         if olayer.TestCapability(ogr.OLCTransactions):
             olayer.StartTransaction()
@@ -122,23 +118,24 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
         layer.ResetReading()
         feature = layer.GetNextFeature()
         while feature:
-            # check for changes first
+            # check for changes first (delete/update/add)
             if mode == Mode.change:
                 c_fid = feature.GetFID()
-                action = change_list.get(c_fid, None)
+                action, o_fid = change_list.get(c_fid, None)
                 
                 # feature marked to be changed (delete first)
                 if action in (Action.delete, Action.update):
-                    olayer.DeleteFeature(c_fid)
+                    olayer.DeleteFeature(o_fid)
                 
+                # determine fid for new feature
                 if action == Action.add:
-                    fid_before += 1
-                    fid = fid_before
+                    fid_last += 1
+                    fid = fid_last
                 else:
-                    fid = c_fid
+                    fid = o_fid
                 
                 if action == Action.delete:
-                    # do nothing else and continue
+                    # do nothing and continue
                     continue 
             else:
                 fid += 1
@@ -153,7 +150,8 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
                 modify_feature(feature, geom_idx, ofeature)
             
             # set feature id
-            ofeature.SetFID(fid)
+            if fid > 0:
+                ofeature.SetFID(fid)
             # add new feature to output layer
             olayer.CreateFeature(ofeature)
                     
@@ -164,15 +162,17 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
         if olayer.TestCapability(ogr.OLCTransactions):
             olayer.CommitTransaction()
             
+        # print statistics per layer
         sys.stdout.write(" %10d features" % ifeat)
         if mode == Mode.change:
             n_added = n_updated = n_deleted = 0
-            for action in change_list.itervalues():
+            for action, unused in change_list.itervalues():
                 if action == Action.update:
                     n_updated += 1
-                else: # Action.add
+                elif action == Action.add:
                     n_added += 1
-                n_deleted = dlist.get(layer_name, 0)
+                else: # Action.delete:
+                    n_deleted += 1
             sys.stdout.write(" (%5d added, %5d updated, %5d deleted)" % \
                                  (n_added, n_updated, n_deleted))
         sys.stdout.write("\n")
@@ -180,8 +180,11 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
         nfeat += ifeat
     
     ### ods.SyncToDisk()
-    ods.Destroy()
     
+    # close output datasource
+    ods.Destroy()
+
+    # final statistics (time elapsed)
     message("Time elapsed: %d sec" % (time.time() - start))
     
     return nfeat

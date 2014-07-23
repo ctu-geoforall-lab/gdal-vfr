@@ -1,5 +1,10 @@
-# check changes
-# TODO: process deleted features
+from utils import Action
+
+# process list of features (per layer) to be modified (update/add)
+#
+# returns directory where keys are fids from input (VFR) layer and
+# items are tuples (action, fid of existing feature if found)
+#
 # TODO: use numeric data as key
 def process_changes(ilayer, olayer, column='gml_id'):
     changes_list = {}
@@ -8,18 +13,20 @@ def process_changes(ilayer, olayer, column='gml_id'):
     ifeature = ilayer.GetNextFeature()
     while ifeature:
         fcode = ifeature.GetField(column)
-        olayer.SetAttributeFilter("%s = '%s'" % (column, fcode))
         
+        # check if feature already exists in output layer
         found = []
+        olayer.SetAttributeFilter("%s = '%s'" % (column, fcode))
         for feature in olayer:
-            found.append(feature)
+            found.append(feature.GetFID())
         
         n_feat = len(found)
         if n_feat > 1:
+            # TODO: how to handle correctly?
             warning("Layer '%s': %d features '%s=%s' found, skipping..." % \
-                        (olayer.GetName(), len(found), column, fcode))
+                        (olayer.GetName(), n_feat, column, fcode))
         else:
-            changes_list[ifeature.GetFID()] = Action.update if n_feat > 0 else Action.add
+            changes_list[ifeature.GetFID()] = (Action.update, found[0]) if n_feat > 0 else (Action.add, -1)
         
         ifeature = ilayer.GetNextFeature()
     
@@ -28,8 +35,8 @@ def process_changes(ilayer, olayer, column='gml_id'):
     
     return changes_list
 
-# delete features
-def delete_features(layer, ods):
+# process deleted features (process OGR layer 'ZaniklePrvky')
+def process_deleted_features(layer, ods):
     lcode2lname = {
         'ST' : 'Staty',
         'RS' : 'RegionySoudrznosti',
@@ -53,13 +60,13 @@ def delete_features(layer, ods):
     column = 'gml_id'
     dlist = {}
     for layer_name in lcode2lname.itervalues():
-        dlist[layer_name.lower()] = 0
+        dlist[layer_name] = {}
     
     layer.ResetReading()
     feature = layer.GetNextFeature()
     layer_previous = None
     while feature:
-        # determine layer
+        # determine layer and attribute filter for given feature
         lcode = feature.GetField("TypPrvkuKod")
         layer_name = lcode2lname.get(lcode, None)
         if not layer_name:
@@ -72,27 +79,24 @@ def delete_features(layer, ods):
                 error("Layer '%s' not found" % layer_name)
                 continue
         
-        # find features to be deleted
+        # find features to be deleted (collect their FIDs)
+        n_feat = 0
         dlayer.SetAttributeFilter("%s = '%s'" % (column, fcode))
-        dfeature_list = []
         for dfeature in dlayer:
-            dfeature_list.append(dfeature.GetFID())
-            dlist[layer_name.lower()] += 1
+            fid = dfeature.GetFID()
+            dlist[layer_name][fid] = (Action.delete, fid)
+            n_feat += 1
+        dlayer.SetAttributeFilter(None)
         
-        if len(dfeature_list) == 0:
+        # check for consistency (one feature should be found)
+        if n_feat == 0:
             warning("No feature in layer '%s' ('%s') found. Nothing to delete." % \
                         (layer_name, fcode))
-        elif len(dfeature_list) > 1:
+        elif n_feat > 1:
             warning("More feature in layer '%s' with '%s' found" % (layer_name, fcode))
-        dlayer.SetAttributeFilter(None)
-
-        # delete features
-        for dfeature in dfeature_list:
-            dlayer.DeleteFeature(dfeature)
         
         layer_previous = layer_name
         feature = layer.GetNextFeature()
-
+    
     # return statistics
-    print dlist
     return dlist
