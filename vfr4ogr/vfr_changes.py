@@ -1,4 +1,4 @@
-from utils import Action
+from utils import Action, warning
 
 # process list of features (per layer) to be modified (update/add)
 #
@@ -13,7 +13,6 @@ def process_changes(ilayer, olayer, column='gml_id'):
     ifeature = ilayer.GetNextFeature()
     while ifeature:
         fcode = ifeature.GetField(column)
-        
         # check if feature already exists in output layer
         found = []
         olayer.SetAttributeFilter("%s = '%s'" % (column, fcode))

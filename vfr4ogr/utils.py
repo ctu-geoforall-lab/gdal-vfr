@@ -3,8 +3,13 @@ import sys
 import gzip
 import urllib
 import datetime
+import logging
 
 from xml.dom.minidom import parse, parseString
+
+logger = logging.getLogger()
+logFile = 'log.%d' % os.getpid()
+logger.addHandler(logging.FileHandler(logFile, delay = True))
 
 # file mode
 class Mode:
@@ -17,6 +22,11 @@ class Action:
     add    = 0
     update = 1
     delete = 2
+
+# check if log file exists and print message about that
+def check_log():
+    if os.path.exists(logFile):
+        message("WARNINGS LOGGED IN %s" % logFile)
 
 # check input VFR file exists
 def check_file(filename):
@@ -36,7 +46,8 @@ def fatal(msg):
 
 # print warning message
 def warning(msg):
-    sys.stderr.write('WARNING: %s%s' % (str(msg), os.linesep))
+    # sys.stderr.write('WARNING: %s%s' % (str(msg), os.linesep))
+    logger.warning(msg)
 
 # print error message
 def error(msg):

@@ -1,21 +1,16 @@
 import os
 import sys
 import time
-import logging
 import datetime
 
 from utils import fatal, error, message, warning, download_vfr, last_day_of_month, \
-    yesterday, remove_option
+    yesterday, remove_option, logger
 from vfr import convert_vfr
 
 try:
     from osgeo import gdal, ogr
 except ImportError, e:
     sys.exit('ERROR: Import of ogr from osgeo failed. %s' % e)
-
-logger = logging.getLogger()
-logFile = 'log.%d' % os.getpid()
-logger.addHandler(logging.FileHandler(logFile, delay = True))
 
 # redirect warnings to the file
 def error_handler(err_level, err_no, err_msg):
@@ -25,10 +20,6 @@ def error_handler(err_level, err_no, err_msg):
         sys.stderr.write(err_msg + os.linesep)
     else:
         logger.warning(err_msg)
-
-def check_log():
-    if os.path.exists(logFile):
-        message("WARNINGS LOGGED IN %s" % logFile)
 
 # check GDAL/OGR library, version >= 1.11 required
 def check_ogr():
