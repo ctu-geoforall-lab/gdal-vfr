@@ -175,7 +175,7 @@ def main():
         conn = open_db(odsn[3:])
     
     # get list of input VFR file(s)
-    file_list  = open_file(filename, options['download'], force_date = options['date'])
+    file_list = open_file(filename, options['download'], force_date = options['date'])
     # get list of layers
     layer_list = options['layer']
     schema_list = []

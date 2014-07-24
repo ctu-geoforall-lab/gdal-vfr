@@ -41,6 +41,11 @@ def open_file(filename, download = False, force_date = None):
         fatal("Unable to select GML driver")
     
     list_ds = list()
+    ds = None
+    if os.linesep in filename:
+        # already list of files (date range)
+        return filename.split(os.linesep)
+    
     ds = drv.Open(filename, False)
     if ds is None:
         # unable to open input file with GML driver, so it's probably
@@ -222,7 +227,7 @@ def print_summary(odsn, frmt, layer_list, stime):
         if not layer:
             continue
         
-        sys.stdout.write("Layer          %-20s ... %-5d features\n" % (layer_name, layer.GetFeatureCount()))
+        sys.stdout.write("Layer          %-20s ... %10d features\n" % (layer_name, layer.GetFeatureCount()))
 
     nsec = time.time() - stime    
     etime = str(datetime.timedelta(seconds=nsec))

@@ -136,7 +136,9 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
                 
                 if action == Action.delete:
                     # do nothing and continue
-                    continue 
+                    feature = layer.GetNextFeature()
+                    ifeat += 1
+                    continue
             else:
                 fid += 1
             

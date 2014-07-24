@@ -1,7 +1,8 @@
+import os
 import sys
 import getopt
 
-from utils import fatal, message, check_file, download_vfr, last_day_of_month, yesterday
+from utils import fatal, message, check_file, download_vfr, last_day_of_month, yesterday, get_date_interval
 from ogr import list_formats
 
 def parse_cmd(argv, flags, params, optdir):
@@ -42,15 +43,23 @@ def parse_cmd(argv, flags, params, optdir):
         else:
             sys.exit("unhandled option: %s" % o)
     
+    # check required options
     if not filename and not ftype:
         raise getopt.GetoptError("--file or --type required")
     if filename and ftype:
         raise getopt.GetoptError("--file and --type are mutually exclusive")
     if ftype and not date:
         if ftype.startswith('ST_Z'):
-            date = yesterday()
+            date = [yesterday()]
         else:
-            date = last_day_of_month()
+            date = [last_day_of_month()]
+    date_range = [date]
+    if ftype and date and ':' in date:
+        if ftype.startswith('ST_Z'):
+            date_range = get_date_interval(date)
+        else:
+            raise getopt.GetoptError("Date interval is valid only for '--type ST_ZXXX'")
+
     if optdir['overwrite'] and optdir.get('append', False):
         raise getopt.GetoptError("--append and --overwrite are mutually exclusive")
     
@@ -58,16 +67,18 @@ def parse_cmd(argv, flags, params, optdir):
         optdir['layer'] = optdir['layer'].split(',')
     
     if filename:
+        # is file a valid VFR file
         filename = check_file(filename)
     else: # --date & --type
-        url = "http://vdp.cuzk.cz/vymenny_format/soucasna/%s_%s.xml.gz" % (date, ftype)
-        if optdir['download']:
-            filename = download_vfr(url)
-        else:
-            ### message("Reading %s..." % url)
-            filename = "/vsicurl/" + url
-    
+        flist = []
+        for d in date_range:
+            url = "http://vdp.cuzk.cz/vymenny_format/soucasna/%s_%s.xml.gz" % (d, ftype)
+            if optdir['download']:
+                flist.append(download_vfr(url))
+            else:
+                flist.append("/vsicurl/" + url)
+        filename = os.linesep.join(flist)
     if not filename:
-        raise getopt.GetoptError("Ivalid input file")
-    
+        raise getopt.GetoptError("Invalid input file")
+
     return filename

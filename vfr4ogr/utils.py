@@ -97,16 +97,22 @@ def download_vfr(url):
     return local_file
 
 # get last day of current month
-def last_day_of_month():
+def last_day_of_month(string = True):
     today = datetime.date.today()
     if today.month == 12:
-        return today.replace(day=31)
-    return (today.replace(month=today.month, day=1) - datetime.timedelta(days=1)).strftime("%Y%m%d")
+        day = today.replace(day=31)
+    day = (today.replace(month=today.month, day=1) - datetime.timedelta(days=1))
+    if string:
+        return day.strftime("%Y%m%d")
+    return day
 
 # get formated yesterday 
-def yesterday():
+def yesterday(string = True):
     today = datetime.date.today()
-    return (today -  datetime.timedelta(days=1)).strftime("%Y%m%d")
+    day = today - datetime.timedelta(days=1)
+    if string:
+        return day.strftime("%Y%m%d")
+    return day
 
 # remove specified option from list
 def remove_option(options, name):
@@ -116,3 +122,28 @@ def remove_option(options, name):
             del options[i]
             return 
         i += 1
+
+# get date internal
+def get_date_interval(date):
+    dlist = []
+    if ':' not in date:
+        return [date]
+    
+    if date.startswith(':'):
+        sdate = last_day_of_month(string=False) + datetime.timedelta(days=1)
+        edate = datetime.datetime.strptime(date[1:], "%Y%m%d").date()
+    elif date.endswith(':'):
+        sdate = datetime.datetime.strptime(date[:-1], "%Y%m%d").date()
+        edate = yesterday(string=False)
+    else:
+        s, e = date.split(':', 1)
+        sdate = datetime.datetime.strptime(s, "%Y%m%d").date()
+        edate = datetime.datetime.strptime(e, "%Y%m%d").date()
+    
+    d = sdate
+    delta = datetime.timedelta(days=1)
+    while d <= edate:
+        dlist.append(d.strftime("%Y%m%d"))
+        d += delta
+    
+    return dlist
