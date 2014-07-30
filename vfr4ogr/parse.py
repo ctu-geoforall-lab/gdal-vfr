@@ -53,7 +53,7 @@ def parse_cmd(argv, flags, params, optdir):
             date = [yesterday()]
         else:
             date = [last_day_of_month()]
-    date_range = [date]
+    date_range = list(date)
     if ftype and date and ':' in date:
         if ftype.startswith('ST_Z'):
             date_range = get_date_interval(date)
