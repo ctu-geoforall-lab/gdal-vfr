@@ -155,62 +155,6 @@ def list_layers(ds, extended = False, fd = sys.stdout):
     
     return layer_list
 
-# delete specified layer from output data-source
-def delete_layer(ids, ods, layerName):
-    nlayersOut = ods.GetLayerCount()
-    for iLayerOut in range(nlayersOut): # do it better
-        if ids.GetLayer(iLayerOut).GetName() == layerName:
-            ods.DeleteLayer(iLayerOut)
-            return True
-    
-    return False
-
-# create new layer in output data-source
-def create_layer(ods, ilayer, layerName, geom_name, create_geom, options):
-    # determine geometry type
-    if geom_name or not create_geom:
-        feat_defn = layer.GetLayerDefn()
-        if geom_name:
-            idx = feat_defn.GetGeomFieldIndex(geom_name)
-        else:
-            idx = 0
-            
-        if idx > -1:
-            geom_type = feat_defn.GetGeomFieldDefn(idx).GetType()
-        else:
-            # warning("Layer '%s': geometry '%s' not available" % (layerName, geom_name))
-            geom_type = layer.GetGeomType()
-            idx = 0
-
-        if frmt in ('PostgreSQL', 'OCI'):
-            remove_option(options, 'GEOMETRY_NAME')
-            options.append('GEOMETRY_NAME=%s' % feat_defn.GetGeomFieldDefn(idx).GetName().lower())
-    else:
-        geom_type = ogr.wkbNone
-    
-    # create new layer
-    olayer = ods.CreateLayer(layerName, ilayer.GetSpatialRef(),
-                             geom_type, options)
-    
-    if not olayer:
-        fatal("Unable to create layer '%'" % layerName)
-           
-    # create attributes                     
-    feat_defn = ilayer.GetLayerDefn()
-    for i in range(feat_defn.GetFieldCount()):
-        olayer.CreateField(feat_defn.GetFieldDefn(i))
-
-    # create also geometry attributes
-    if not geom_name and \
-            olayer.TestCapability(ogr.OLCCreateGeomField):
-        for i in range(feat_defn.GetGeomFieldCount()):
-            geom_defn = feat_defn.GetGeomFieldDefn(i) 
-            if geom_name and geom_defn.GetName() != geom_name:
-                continue
-            olayer.CreateGeomField(feat_defn.GetGeomFieldDefn(i))
-    
-    return olayer
-
 # print summary for multiple file input
 def print_summary(odsn, frmt, layer_list, stime):
     odrv = ogr.GetDriverByName(frmt)
