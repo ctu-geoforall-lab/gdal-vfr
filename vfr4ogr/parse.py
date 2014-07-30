@@ -48,19 +48,20 @@ def parse_cmd(argv, flags, params, optdir):
         raise getopt.GetoptError("--file or --type required")
     if filename and ftype:
         raise getopt.GetoptError("--file and --type are mutually exclusive")
+
     if ftype and not date:
         if ftype.startswith('ST_Z'):
-            date = [yesterday()]
+            date_list = [yesterday()]
         else:
-            date = [last_day_of_month()]
-    if date:
-        date_range = [date]
-    if ftype and date and ':' in date:
-        if ftype.startswith('ST_Z'):
-            date_range = get_date_interval(date)
-        else:
-            raise getopt.GetoptError("Date interval is valid only for '--type ST_ZXXX'")
-
+            date_list = [last_day_of_month()]
+    elif ftype and date and ':' in date:
+            if ftype.startswith('ST_Z'):
+                date_list = get_date_interval(date)
+            else:
+                raise getopt.GetoptError("Date interval is valid only for '--type ST_ZXXX'")
+    else:
+        date_list = [date]
+    
     if optdir['overwrite'] and optdir.get('append', False):
         raise getopt.GetoptError("--append and --overwrite are mutually exclusive")
     
@@ -72,7 +73,7 @@ def parse_cmd(argv, flags, params, optdir):
         filename = check_file(filename)
     else: # --date & --type
         flist = []
-        for d in date_range:
+        for d in date_list:
             url = "http://vdp.cuzk.cz/vymenny_format/soucasna/%s_%s.xml.gz" % (d, ftype)
             if optdir['download']:
                 flist.append(download_vfr(url))
