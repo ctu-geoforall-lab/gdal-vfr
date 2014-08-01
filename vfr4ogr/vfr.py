@@ -31,7 +31,7 @@ def modify_feature(feature, geom_idx, ofeature):
 def delete_layer(ids, ods, layerName):
     nlayersOut = ods.GetLayerCount()
     for iLayerOut in range(nlayersOut): # do it better
-        if ids.GetLayer(iLayerOut).GetName() == layerName:
+        if ods.GetLayer(iLayerOut).GetName() == layerName:
             ods.DeleteLayer(iLayerOut)
             return True
     
@@ -120,6 +120,9 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
     for iLayer in range(nlayers):
         layer = ids.GetLayer(iLayer)
         layer_name = layer.GetName()
+        ### force lower case for output layers, some drivers are doing
+        ### that automatically anyway
+        layer_name_lower = layer_name.lower()
         
         if layers and layer_name not in layers:
             # process only selected layers
@@ -129,7 +132,7 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
             # skip deleted features (already done)
             continue
         
-        olayer = ods.GetLayerByName('%s' % layer_name)
+        olayer = ods.GetLayerByName('%s' % layer_name_lower)
         sys.stdout.write("Processing layer %-20s ..." % layer_name)
         if not overwrite and (olayer and mode == Mode.write):
             sys.stdout.write(" already exists (use --overwrite or --append to modify existing data)\n")
@@ -138,7 +141,7 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
         ### TODO: fix output drivers not to use default geometry
         ### names
         if frmt in ('PostgreSQL', 'OCI') and not geom_name:
-            if layer_name.lower() == 'ulice':
+            if layer_name_lower == 'ulice':
                 remove_option(options, 'GEOMETRY_NAME')
                 options.append('GEOMETRY_NAME=definicnicara')
             else:
@@ -147,13 +150,13 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
         
         # delete layer if exists and append is not True
         if olayer and mode == Mode.write:
-            if delete_layer(ids, ods, layer_name):
+            if delete_layer(ids, ods, layer_name_lower):
                 olayer = None
         
         # create new output layer if not exists
         if not olayer:
             olayer = create_layer(ods, layer,
-                                  layer_name, geom_name, create_geom, options)
+                                  layer_name_lower, geom_name, create_geom, options)
         if olayer is None:
             fatal("Unable to export layer '%s'. Exiting..." % layer_name)
         
