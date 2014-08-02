@@ -177,7 +177,11 @@ def main():
     # get list of input VFR file(s)
     file_list = open_file(filename, options['download'], force_date = options['date'])
     # get list of layers
-    layer_list = options['layer']
+    if options['layer']:
+        layer_list = options['layer'].split(',')
+    else:
+        layer_list = []
+    layer_list_all = []
     schema_list = []
     
     epsg_checked = False
@@ -206,9 +210,10 @@ def main():
                 check_epsg(conn)
                 epsg_checked = True
             
-            if not layer_list:
-                # get list of layers if not specified
-                layer_list = list_layers(ids, False, None)
+            # get list of layers
+            for l in list_layers(ids, False, None):
+                if l not in layer_list_all:
+                    layer_list_all.append(l)
             
             # build datasource string per file
             odsn_reset = odsn
@@ -255,12 +260,12 @@ def main():
     
     # create indices for output tables
     if conn:
-        create_indices(conn, schema_list, layer_list)
+        create_indices(conn, schema_list, layer_list_all)
     
     # print final summary
     if (ipass > 1 and options.get('schema_per_file', False) is False) \
             or options.get('append', True):
-        print_summary(odsn, "PostgreSQL", layer_list, stime)
+        print_summary(odsn, "PostgreSQL", layer_list_all, stime)
     
     # close DB connection
     if conn:

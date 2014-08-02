@@ -138,7 +138,6 @@ def list_layers(ds, extended = False, fd = sys.stdout):
     layer_list = list()
     for i in range(nlayers):
         layer = ds.GetLayer(i)
-        featureCount = layer.GetFeatureCount()
         layerName = layer.GetName()
         layer_list.append(layerName)
         
@@ -147,6 +146,7 @@ def list_layers(ds, extended = False, fd = sys.stdout):
 
         if extended:
             fd.write('-' * 80 + os.linesep)
+        featureCount = layer.GetFeatureCount()
         fd.write("Number of features in %-20s: %d\n" % (layerName, featureCount))
         if extended:
             for field, count in get_geom_count(layer):
