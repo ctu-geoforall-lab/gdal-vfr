@@ -177,11 +177,11 @@ def main():
     # get list of input VFR file(s)
     file_list = open_file(filename, options['download'], force_date = options['date'])
     # get list of layers
-    if options['layer']:
-        layer_list = options['layer'].split(',')
+    layer_list = options['layer']
+    if layer_list:
+        layer_list_all = layer_list
     else:
-        layer_list = []
-    layer_list_all = []
+        layer_list_all = []
     schema_list = []
     
     epsg_checked = False
@@ -211,9 +211,10 @@ def main():
                 epsg_checked = True
             
             # get list of layers
-            for l in list_layers(ids, False, None):
-                if l not in layer_list_all:
-                    layer_list_all.append(l)
+            if not options['layer']:
+                for l in list_layers(ids, False, None):
+                    if l not in layer_list_all:
+                        layer_list_all.append(l)
             
             # build datasource string per file
             odsn_reset = odsn
