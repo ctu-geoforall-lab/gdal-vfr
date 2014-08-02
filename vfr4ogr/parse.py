@@ -35,6 +35,8 @@ def parse_cmd(argv, flags, params, optdir):
         elif o == "-f": # unused
             list_formats()
             sys.exit(0)
+        elif o == "--format":
+            optdir['format'] = a.replace('_', ' ')
         elif so in optdir:
             if a:
                 optdir[so] = a

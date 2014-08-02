@@ -26,7 +26,7 @@ class Action:
 # check if log file exists and print message about that
 def check_log():
     if os.path.exists(logFile):
-        message("COMMAND FAILED! Check out '%s' for errors and warnings" % logFile)
+        message("NOTICE: CHECK OUT '%s' FOR WARNINGS!" % logFile)
 
 # check input VFR file exists
 def check_file(filename):
