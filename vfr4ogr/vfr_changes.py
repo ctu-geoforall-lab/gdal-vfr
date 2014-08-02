@@ -1,4 +1,4 @@
-from utils import Action, warning
+from utils import Action, warning, error
 
 # process list of features (per layer) to be modified (update/add)
 #
