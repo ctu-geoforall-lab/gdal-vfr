@@ -55,6 +55,8 @@ def open_file(filename, download = False, force_date = None):
             i = 0
             lines = f.read().splitlines()
             for line in lines:
+                if len(line) < 1 or line.startswith('#'):
+                    continue # skip empty or commented lines 
                 if line.startswith('20'):
                     line = 'http://vdp.cuzk.cz/vymenny_format/soucasna/' + line
                 else:
@@ -163,7 +165,8 @@ def print_summary(odsn, frmt, layer_list, stime):
     
     ods = odrv.Open(odsn, False)
     if ods is None:
-        fatal("Unable to open datasource '%s'" % odsn)
+        return
+    # fatal("Unable to open datasource '%s'" % odsn)
 
     message("Summary")
     for layer_name in layer_list:
