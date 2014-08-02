@@ -59,13 +59,16 @@ def main():
             fatal(e)
         else:
             sys.exit(0)
-    
+   
+    lco_options = []
     file_list  = open_file(filename, options['download'], force_date = options['date'])
     layer_list = options['layer']
     
     # set up driver-specific options
     if options['format'] == 'SQLite':
         os.environ['OGR_SQLITE_SYNCHRONOUS'] = 'OFF'
+    elif options['format'] == 'Esri Shapefile':
+        lco_options.append('ENCODING=UTF8')
     
     append = options['append']
     ipass = 0
@@ -94,7 +97,7 @@ def main():
             # convert VFR ...
             try:
                 nfeat = convert_vfr(ids, options['dsn'], options['format'], options['layer'],
-                                    options['overwrite'], [], options['geom'], append)
+                                    options['overwrite'], lco_options, options['geom'], append)
             except RuntimeError as e:
                 error("Unable to read %s: %s" % (fname, e))
             

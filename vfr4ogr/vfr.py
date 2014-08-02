@@ -16,13 +16,15 @@ def modify_feature(feature, geom_idx, ofeature):
         geom = feature.GetGeomFieldRef(geom_idx)
         if geom:
             ofeature.SetGeometry(geom.Clone())
-                        
+        else:
+            warning("Feature %d has no geometry (geometry column: %d)" % \
+                    (feature.GetFID(), geom_idx))
     # delete remaining geometry columns
-    odefn = feature.GetDefnRef()
-    for i in range(odefn.GetGeomFieldCount()):
-        if i == geom_idx:
-            continue
-        odefn.DeleteGeomFieldDefn(i)
+    # odefn = ofeature.GetDefnRef()
+    # for i in range(odefn.GetGeomFieldCount()):
+    #     if i == geom_idx:
+    #         continue
+    #     odefn.DeleteGeomFieldDefn(i)
 
     return geom_idx
 
