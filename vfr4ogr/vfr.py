@@ -19,13 +19,6 @@ def modify_feature(feature, geom_idx, ofeature):
         else:
             warning("Feature %d has no geometry (geometry column: %d)" % \
                     (feature.GetFID(), geom_idx))
-    # delete remaining geometry columns
-    # odefn = ofeature.GetDefnRef()
-    # for i in range(odefn.GetGeomFieldCount()):
-    #     if i == geom_idx:
-    #         continue
-    #     odefn.DeleteGeomFieldDefn(i)
-
     return geom_idx
 
 
@@ -211,6 +204,14 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
             if mode == Mode.write and geom_name:
                 if geom_idx < 0:
                     geom_idx = feature.GetGeomFieldIndex(geom_name)
+                    
+                    # delete remaining geometry columns
+                    odefn = ofeature.GetDefnRef()
+                    for i in range(odefn.GetGeomFieldCount()):
+                        if i == geom_idx:
+                            continue
+                        odefn.DeleteGeomFieldDefn(i)
+
                 modify_feature(feature, geom_idx, ofeature)
             
             # set feature id
