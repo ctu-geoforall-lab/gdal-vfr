@@ -42,102 +42,12 @@ from vfr4ogr.ogr import check_ogr, open_file, list_layers, convert_vfr, open_ds,
 from vfr4ogr.vfr import Mode
 from vfr4ogr.utils import fatal, message, parse_xml_gz, compare_list, error, check_log
 from vfr4ogr.parse import parse_cmd
+from vfr4ogr.pgutils import open_db, create_schema, check_epsg, create_indices
 
 # print program usage
 def usage():
     print __doc__
 
-# open connection to output DB
-def open_db(conn_string):
-    try:
-        import psycopg2
-    except ImportError as e:
-        return None
-    
-    try:
-        conn = psycopg2.connect(conn_string)
-    except psycopg2.OperationalError as e:
-        sys.exit("Unable to connect to DB: %s\nTry to define --user and/or --passwd" % e)
-    
-    return conn
-
-# create output schema if not exists
-def create_schema(conn, name):
-    cursor = conn.cursor()
-    try:
-        cursor.execute("SELECT schema_name FROM information_schema.schemata "
-                        "WHERE schema_name = '%s'" % name)
-        if not bool(cursor.fetchall()):
-            # cursor.execute("CREATE SCHEMA IF NOT EXISTS %s" % name)
-            cursor.execute("CREATE SCHEMA %s" % name)
-            conn.commit()
-    except StandardError as e:
-        sys.exit("Unable to create schema %s: %s" % (name, e))
-    
-    cursor.close()
-
-# insert EPSG 5514 definition into output DB if not defined
-def check_epsg(conn):
-    if not conn:
-        sys.stderr.write("Unable to add EPSG 5514: %s\n" % e)
-        return
-    
-    cursor = conn.cursor()
-    try:
-        cursor.execute("SELECT srid FROM spatial_ref_sys WHERE srid = 5514")
-    except StandardError as e:
-        sys.exit("PostGIS doesn't seems to be activated. %s" % e)
-        
-    epsg_exists = bool(cursor.fetchall())
-    if not epsg_exists:
-        stmt = """INSERT INTO spatial_ref_sys (srid, auth_name, auth_srid, proj4text, srtext) VALUES ( 5514, 'EPSG', 5514, '+proj=krovak +lat_0=49.5 +lon_0=24.83333333333333 +alpha=30.28813972222222 +k=0.9999 +x_0=0 +y_0=0 +ellps=bessel +towgs84=570.8,85.7,462.8,4.998,1.587,5.261,3.56 +units=m +no_defs ', 'PROJCS["S-JTSK / Krovak East North",GEOGCS["S-JTSK",DATUM["System_Jednotne_Trigonometricke_Site_Katastralni",SPHEROID["Bessel 1841",6377397.155,299.1528128,AUTHORITY["EPSG","7004"]],TOWGS84[570.8,85.7,462.8,4.998,1.587,5.261,3.56],AUTHORITY["EPSG","6156"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4156"]],PROJECTION["Krovak"],PARAMETER["latitude_of_center",49.5],PARAMETER["longitude_of_center",24.83333333333333],PARAMETER["azimuth",30.28813972222222],PARAMETER["pseudo_standard_parallel_1",78.5],PARAMETER["scale_factor",0.9999],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["X",EAST],AXIS["Y",NORTH],AUTHORITY["EPSG","5514"]]')"""
-        cursor.execute(stmt)
-        conn.commit()
-        message("EPSG 5514 defined in DB")
-    
-    cursor.close()
-
-# create indices for output tables (gml_id)
-def create_indices(conn, schema_list, layer_list):
-    if not conn:
-        sys.stderr.write("Unable to connect DB\n")
-        return
-    
-    if not schema_list:
-        schema_list = ['public']
-    
-    column = "gml_id"
-    
-    cursor = conn.cursor()
-    for schema in schema_list:
-        for layer in layer_list:
-            if layer == 'ZaniklePrvky':
-                # skip deleted features
-                continue
-            
-            if '.' in layer:
-                schema, table = map(lambda x: x.lower(), layer.split('.', 1))
-            else:
-                table = layer.lower()
-            
-            indexname = "%s_%s_idx" % (table, column)
-            cursor.execute("SELECT COUNT(*) FROM pg_indexes WHERE "
-                           "tablename = '%s' and schemaname = '%s' and "
-                           "indexname = '%s'" % (table, schema, indexname))
-            if cursor.fetchall()[0][0] > 0:
-                continue # indices for specified table already exists
-        
-            cursor.execute('BEGIN')
-            try:
-                cursor.execute("CREATE INDEX %s ON %s.%s (%s)" % \
-                                   (indexname, schema, table, column))
-                cursor.execute('COMMIT')
-            except StandardError as e:
-                sys.stderr.write("Unable to create index %s_%s: %s\n" % (table, column, e))
-                cursor.execute('ROLLBACK')
-
-    cursor.close()
-    
 def main():
     # check requirements
     check_ogr()
@@ -244,7 +154,7 @@ def main():
             try:
                 nfeat = convert_vfr(ids, odsn, "PostgreSQL", options['layer'],
                                     options['overwrite'], lco_options, options['geom'],
-                                    mode)
+                                    mode, {'pgconn': conn})
             except RuntimeError as e:
                 error("Unable to read %s: %s" % (fname, e))
             

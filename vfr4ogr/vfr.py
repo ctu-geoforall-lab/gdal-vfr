@@ -80,7 +80,7 @@ def create_layer(ods, ilayer, layerName, geom_name, create_geom, options):
 
 # write VFR features to output data-source
 def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_name = None,
-                mode = Mode.write):
+                mode = Mode.write, userdata={}):
     odrv = ogr.GetDriverByName(frmt)
     if odrv is None:
         fatal("Format '%s' is not supported" % frmt)
@@ -243,8 +243,10 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
         sys.stdout.write("\n")
         
         nfeat += ifeat
-    
-    ### ods.SyncToDisk()
+
+    # update sequence for PG
+    if 'pgconn' in userdata:
+        pass
     
     # close output datasource
     ods.Destroy()
