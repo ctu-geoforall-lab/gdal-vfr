@@ -90,3 +90,18 @@ def create_indices(conn, schema_list, layer_list):
                 cursor.execute('ROLLBACK')
 
     cursor.close()
+
+# update fid sequence
+def update_fid_seq(conn, table, fid, column = 'ogc_fid'):
+    if not conn:
+        sys.stderr.write("Unable to update FID sequence for table '%s'\n" % table)
+        return
+    
+    cursor = conn.cursor()
+    try:
+        cursor.execute("SELECT setval('%s_%s_seq', %d)" % (table, column, fid))
+    except StandardError as e:
+        sys.stderr.write("Unable to update FID sequence for table '%s': %s\n" % (table, e))
+    
+    cursor.close()
+
