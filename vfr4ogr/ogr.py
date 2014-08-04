@@ -59,7 +59,7 @@ def open_file(filename, download = False, force_date = None):
                     continue # skip empty or commented lines 
                 if line.startswith('20'):
                     line = 'http://vdp.cuzk.cz/vymenny_format/soucasna/' + line
-                else:
+                elif not line.startswith('http://'):
                     if not force_date:
                         if line.startswith('ST_Z'):
                             date = yesterday()
@@ -69,15 +69,13 @@ def open_file(filename, download = False, force_date = None):
                         date = force_date
                     line = 'http://vdp.cuzk.cz/vymenny_format/soucasna/' + date + '_' + line
                 
-                if line.startswith('http://'):
-                    if download:
-                        download_vfr(line)
-                        line = os.path.basename(line)
-                    else:
-                        line = '/vsicurl/' + line
-                
                 if not line.endswith('.xml.gz'):
                     line += '.xml.gz'
+                
+                if download:
+                    line = download_vfr(line)
+                else:
+                    line = '/vsicurl/' + line
                 
                 list_ds.append(line)
                 i += 1
