@@ -1,5 +1,7 @@
 import sys
 
+from utils import message
+
 # open connection to output DB
 def open_db(conn_string):
     try:
