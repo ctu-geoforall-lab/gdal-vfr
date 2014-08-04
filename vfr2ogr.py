@@ -15,7 +15,8 @@ Usage: vfr2ogr [-f] [-e] [-d] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [
 
        -f          List supported output formats
        -e          Extended layer list statistics 
-       -d          Save downloaded VFR data in currect directory (--type required)
+       -d          Download VFR data in currect directory (--type required)
+       -g          Skip features without geometry
        --file      Path to xml.gz or URL list file
        --date      Date in format 'YYYYMMDD'
        --type      Type of request in format XY_ABCD, eg. 'ST_UKSH' or 'OB_000000_ABCD'
@@ -48,11 +49,12 @@ def main():
 
     # parse cmd arguments
     options = { 'format' : None, 'dsn' : None, 'overwrite' : False, 'extended' : False,
-                'layer' : [], 'geom' : None, 'download' : False, 'append' : False, 'date' : None}
+                'layer' : [], 'geom' : None, 'download' : False, 'append' : False, 'date' : None,
+                'nogeomskip': False}
     try:
-        filename = parse_cmd(sys.argv, "hfeod", ["help", "overwrite", "extended", "append",
-                                               "file=", "date=", "type=", "layer=", "geom=",
-                                               "format=", "dsn="], options)
+        filename = parse_cmd(sys.argv, "haofedg", ["help", "overwrite", "extended", "append",
+                                                   "file=", "date=", "type=", "layer=", "geom=",
+                                                   "format=", "dsn="], options)
     except GetoptError, e:
         usage()
         if str(e):
@@ -94,10 +96,18 @@ def main():
             if not layer_list:
                 layer_list = list_layers(ids, False, None)
             
-            # convert VFR ...
+            # check mode - process changes or append
+            mode = Mode.write
+            if fname.split('_')[-1][0] == 'Z':
+                mode = Mode.change
+            elif append:
+                mode = Mode.append
+
+            # do the conversion
             try:
-                nfeat = convert_vfr(ids, options['dsn'], options['format'], options['layer'],
-                                    options['overwrite'], lco_options, options['geom'], append)
+                nfeat = convert_vfr(ids=ids, odsn=options['dsn'], frmt=options['format'],
+                                    layers=options['layer'], overwrite=options['overwrite'],
+                                    options=lco_options, geom_name=options['geom'], mode=mode)
             except RuntimeError as e:
                 error("Unable to read %s: %s" % (fname, e))
             

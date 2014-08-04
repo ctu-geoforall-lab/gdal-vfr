@@ -15,7 +15,8 @@ Usage: vfr2oci [-f] [-e] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--typ
                          [--overwrite] 
 
        -e          Extended layer list statistics 
-       -d          Save downloaded VFR data in currect directory (--type required)
+       -d          Download VFR data in currect directory (--type required)
+       -g          Skip features without geometry
        --file      Path to xml.gz file
        --date      Date in format 'YYYYMMDD'
        --type      Type of request in format XY_ABCD, eg. 'ST_UKSH' or 'OB_000000_ABCD'
@@ -49,11 +50,11 @@ def main():
     # parse cmd arguments
     options = { 'dbname' : None, 'user' : None, 'passwd' : None, 'host' : None, 
                 'overwrite' : False, 'extended' : False, 'layer': [], 'geom' : None, 'download' : False,
-                'date' : None}
+                'date' : None, 'nogeomskip': False}
     try:
-        filename = parse_cmd(sys.argv, "heod", ["help", "overwrite", "extended",
-                                              "file=", "date=", "type=", "layer=", "geom=",
-                                              "dbname=", "user=", "passwd=", "host="],
+        filename = parse_cmd(sys.argv, "haoedg", ["help", "overwrite", "extended",
+                                                  "file=", "date=", "type=", "layer=", "geom=",
+                                                  "dbname=", "user=", "passwd=", "host="],
                              options)
     except GetoptError, e:
         usage()
@@ -102,8 +103,9 @@ def main():
             
             # do conversion
             try:
-                nfeat = convert_vfr(ids, odsn, "OCI", options['layer'],
-                                    options['overwrite'], lco_options, options['geom'])
+                nfeat = convert_vfr(ids=ids, odsn=odsn, frmt="OCI", layers=options['layer'],
+                                    overwrite=options['overwrite'], options=lco_options,
+                                    geom_name=options['geom'])
             except RuntimeError as e:
                 error("Unable to read %s: %s" % (fname, e))
         

@@ -80,7 +80,7 @@ def create_layer(ods, ilayer, layerName, geom_name, create_geom, options):
 
 # write VFR features to output data-source
 def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_name = None,
-                mode = Mode.write, userdata={}):
+                mode = Mode.write, nogeomskip = False, userdata={}):
     odrv = ogr.GetDriverByName(frmt)
     if odrv is None:
         fatal("Format '%s' is not supported" % frmt)
@@ -164,6 +164,7 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
         ifeat = 0
         fid_last = fid = olayer.GetFeatureCount()
         geom_idx = -1
+        n_nogeom = 0
         
         # start transaction in output layer
         if olayer.TestCapability(ogr.OLCTransactions):
@@ -214,6 +215,12 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
 
                 modify_feature(feature, geom_idx, ofeature)
             
+            if nogeomskip and ofeature.GetGeometryRef() is None:
+                # skip feature without geometry
+                n_nogeom += 1
+                feature = layer.GetNextFeature()
+                continue
+
             # set feature id
             if fid > 0:
                 ofeature.SetFID(fid)
@@ -240,6 +247,9 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
                     n_deleted += 1
             sys.stdout.write(" (%5d added, %5d updated, %5d deleted)" % \
                                  (n_added, n_updated, n_deleted))
+        elif nogeomskip and n_nogeom > 0:
+            sys.stdout.write(" (%d without geometry skipped)" % n_nogeom)
+        
         sys.stdout.write("\n")
         
         nfeat += ifeat

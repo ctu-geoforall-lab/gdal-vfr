@@ -15,8 +15,9 @@ Usage: vfr2py [-e] [-d] [-s] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [-
                              [--overwrite] [--append]
 
        -e          Extended layer list statistics
-       -d          Save downloaded VFR data in currect directory (--type required)
+       -d          Download VFR data in currect directory (--type required)
        -s          Create new schema for each VFR file
+       -g          Skip features without geometry
        --file      Path to xml.gz or URL list file
        --date      Date in format 'YYYYMMDD'
        --type      Type of request in format XY_ABCD, eg. 'ST_UKSH' or 'OB_000000_ABCD'
@@ -55,11 +56,11 @@ def main():
     # parse cmdline arguments
     options = { 'dbname' : None, 'schema' : None, 'user' : None, 'passwd' : None, 'host' : None, 
                 'overwrite' : False, 'extended' : False, 'layer' : [], 'geom' : None, 'download' : False,
-                'schema_per_file' : False, 'append' : False, 'date' : None}
+                'schema_per_file' : False, 'append' : False, 'date' : None, 'nogeomskip': False}
     try:
-        filename = parse_cmd(sys.argv, "heodsa", ["help", "overwrite", "extended", "append",
-                                              "file=", "date=", "type=", "layer=", "geom=",
-                                              "dbname=", "schema=", "user=", "passwd=", "host="],
+        filename = parse_cmd(sys.argv, "haoedsg", ["help", "overwrite", "extended", "append",
+                                                   "file=", "date=", "type=", "layer=", "geom=",
+                                                   "dbname=", "schema=", "user=", "passwd=", "host="],
                              options)
     except GetoptError, e:
         usage()
@@ -152,9 +153,10 @@ def main():
             
             # do the conversion
             try:
-                nfeat = convert_vfr(ids, odsn, "PostgreSQL", options['layer'],
-                                    options['overwrite'], lco_options, options['geom'],
-                                    mode, {'pgconn': conn})
+                nfeat = convert_vfr(ids=ids, odsn=odsn, frmt="PostgreSQL", layers=options['layer'],
+                                    overwrite=options['overwrite'], options=lco_options,
+                                    geom_name=options['geom'], mode=mode, nogeomskip=options['nogeomskip'],
+                                    userdata={'pgconn': conn})
             except RuntimeError as e:
                 error("Unable to read %s: %s" % (fname, e))
             

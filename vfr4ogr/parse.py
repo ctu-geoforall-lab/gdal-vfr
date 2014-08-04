@@ -32,6 +32,8 @@ def parse_cmd(argv, flags, params, optdir):
             optdir['download'] = True
         elif o == "-s":
             optdir['schema_per_file'] = True
+        elif o == "-g":
+            optdir['nogeomskip'] = True
         elif o == "-f": # unused
             list_formats()
             sys.exit(0)
