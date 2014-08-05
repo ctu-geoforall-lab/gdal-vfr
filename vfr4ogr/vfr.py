@@ -255,7 +255,7 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
         nfeat += ifeat
 
         # update sequence for PG
-        if 'pgconn' in userdata:
+        if 'pgconn' in userdata and fid > 0:
             from pgutils import update_fid_seq
             update_fid_seq(userdata['pgconn'], layer_name_lower, fid)
     
