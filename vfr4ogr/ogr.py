@@ -94,7 +94,7 @@ def open_ds(filename):
     drv = ogr.GetDriverByName("GML")
     ds = drv.Open(filename, False)
     if ds is None:
-        sys.stderr.write("Unable to open '%s'. Skipping.\n" % filename)
+        sys.stderr.write("File '%s' not found. Skipping.\n" % filename)
     
     return ds
 
