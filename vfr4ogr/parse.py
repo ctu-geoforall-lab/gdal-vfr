@@ -83,7 +83,11 @@ def parse_cmd(argv, flags, params, optdir):
                 flist.append(download_vfr(url))
             else:
                 flist.append("/vsicurl/" + url)
+        if not flist:
+            raise getopt.GetoptError("Empty date range")
+        
         filename = os.linesep.join(flist)
+        
     if not filename:
         raise getopt.GetoptError("Invalid input file")
 
