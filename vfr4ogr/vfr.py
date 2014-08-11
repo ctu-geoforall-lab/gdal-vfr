@@ -6,7 +6,7 @@ try:
 except ImportError, e:
     sys.exit('ERROR: Import of ogr from osgeo failed. %s' % e)
 
-from utils import message, remove_option, Mode, Action, warning
+from utils import message, remove_option, Mode, Action, warning, fatal
 from vfr_changes import process_changes, process_deleted_features
 
 # modify output feature - remove remaining geometry columns
@@ -176,7 +176,9 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
             # check for changes first (delete/update/add)
             if mode == Mode.change:
                 c_fid = feature.GetFID()
-                action, o_fid = change_list.get(c_fid, None)
+                action, o_fid = change_list.get(c_fid, (None, None))
+                if action is None:
+                    fatal("Layer %s: unable to find feature %d" % (layer_name, c_fid))
                 
                 # feature marked to be changed (delete first)
                 if action in (Action.delete, Action.update):
