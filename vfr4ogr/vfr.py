@@ -160,10 +160,9 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
             change_list = process_changes(layer, olayer)
             if dlist and layer_name in dlist: # add features to be deleted
                 change_list.update(dlist[layer_name])
-        
+            
         ifeat = 0
-        fid_last = fid = olayer.GetFeatureCount()
-        geom_idx = -1
+        fid = geom_idx = -1
         n_nogeom = 0
         
         # start transaction in output layer
@@ -185,8 +184,7 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
                 
                 # determine fid for new feature
                 if action == Action.add:
-                    fid_last += 1
-                    fid = fid_last
+                    fid = -1
                 else:
                     fid = o_fid
                 
@@ -200,7 +198,7 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
             
             # clone feature
             ofeature = feature.Clone()
-        
+            
             # modify geometry columns if requested
             if mode == Mode.write and geom_name:
                 if geom_idx < 0:
@@ -222,11 +220,13 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
                 continue
 
             # set feature id
-            if fid > 0:
+            if fid >= -1:
+                # fid == -1 -> unknown fid
                 ofeature.SetFID(fid)
+            
             # add new feature to output layer
             olayer.CreateFeature(ofeature)
-                    
+            
             feature = layer.GetNextFeature()
             ifeat += 1
         
