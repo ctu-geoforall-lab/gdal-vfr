@@ -161,19 +161,20 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
             change_list = process_changes(layer, olayer)
             if dlist and layer_name in dlist: # add features to be deleted
                 change_list.update(dlist[layer_name])
-            
-        ifeat = 0
-        fid = geom_idx = -1
-        n_nogeom = 0
+
+        # make sure that PG sequence is up-to-date (import for fid == -1)
+        if 'pgconn' in userdata:
+            fid = get_fid_max(userdata['pgconn'], layer_name_lower)
+            if fid > 0:
+                update_fid_seq(userdata['pgconn'], layer_name_lower, fid)
+        
+        ifeat = n_nogeom = 0
+        geom_idx = -1
+        fid = olayer.GetFeatureCount()
         
         # start transaction in output layer
         if olayer.TestCapability(ogr.OLCTransactions):
             olayer.StartTransaction()
-        
-        # make sure that PG sequence is up-to-date (import for fid == -1)
-        if 'pgconn' in userdata:
-            fid = get_fid_max(userdata['pgconn'], layer_name_lower)
-            update_fid_seq(userdata['pgconn'], layer_name_lower, fid)
         
         # copy features from source to destination layer
         layer.ResetReading()
@@ -255,9 +256,10 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
                     n_deleted += 1
             sys.stdout.write(" (%5d added, %5d updated, %5d deleted)" % \
                                  (n_added, n_updated, n_deleted))
-        elif nogeomskip and n_nogeom > 0:
-            sys.stdout.write(" (%d without geometry skipped)" % n_nogeom)
-        
+        else:
+            sys.stdout.write(" added")
+            if nogeomskip and n_nogeom > 0:
+                sys.stdout.write(" (%d without geometry skipped)" % n_nogeom)
         sys.stdout.write("\n")
         
         nfeat += ifeat
@@ -265,7 +267,8 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
         # update sequence for PG
         if 'pgconn' in userdata:
             fid = get_fid_max(userdata['pgconn'], layer_name_lower)
-            update_fid_seq(userdata['pgconn'], layer_name_lower, fid)
+            if fid > 0:
+                update_fid_seq(userdata['pgconn'], layer_name_lower, fid)
     
     # close output datasource
     ods.Destroy()

@@ -172,7 +172,7 @@ def print_summary(odsn, frmt, layer_list, stime):
         if not layer:
             continue
         
-        sys.stdout.write("Layer          %-20s ... %10d features\n" % (layer_name, layer.GetFeatureCount()))
+        sys.stdout.write("Layer          %-23s ... %10d features\n" % (layer_name, layer.GetFeatureCount()))
 
     nsec = time.time() - stime    
     etime = str(datetime.timedelta(seconds=nsec))

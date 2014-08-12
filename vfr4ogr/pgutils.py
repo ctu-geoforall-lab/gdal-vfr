@@ -117,9 +117,15 @@ def get_fid_max(conn, table, column='ogc_fid'):
     try:
         cursor.execute("SELECT max(%s) FROM %s" % (column, table))
     except StandardError as e:
-        sys.stderr.write("Unable to update FID sequence for table '%s': %s\n" % (table, e))
+        cursor.execute('ROLLBACK')
+        cursor.close()
+        return -1
     
-    fid_max = int(cursor.fetchall()[0][0])
+    try:
+        fid_max = cursor.fetchall()[0][0]
+    except TypeError:
+        fid_max = -1
+    
     cursor.close()
     
     return fid_max
