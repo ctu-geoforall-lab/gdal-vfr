@@ -8,6 +8,7 @@ except ImportError, e:
 
 from utils import message, remove_option, Mode, Action, warning, fatal
 from vfr_changes import process_changes, process_deleted_features
+from pgutils import update_fid_seq, get_fid_max
 
 # modify output feature - remove remaining geometry columns
 def modify_feature(feature, geom_idx, ofeature):
@@ -169,6 +170,11 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
         if olayer.TestCapability(ogr.OLCTransactions):
             olayer.StartTransaction()
         
+        # make sure that PG sequence is up-to-date (import for fid == -1)
+        if 'pgconn' in userdata:
+            fid = get_fid_max(userdata['pgconn'], layer_name_lower)
+            update_fid_seq(userdata['pgconn'], layer_name_lower, fid)
+        
         # copy features from source to destination layer
         layer.ResetReading()
         feature = layer.GetNextFeature()
@@ -257,8 +263,8 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
         nfeat += ifeat
 
         # update sequence for PG
-        if 'pgconn' in userdata and fid > 0:
-            from pgutils import update_fid_seq
+        if 'pgconn' in userdata:
+            fid = get_fid_max(userdata['pgconn'], layer_name_lower)
             update_fid_seq(userdata['pgconn'], layer_name_lower, fid)
     
     # close output datasource

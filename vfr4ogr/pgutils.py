@@ -107,3 +107,19 @@ def update_fid_seq(conn, table, fid, column = 'ogc_fid'):
     
     cursor.close()
 
+# get max fid
+def get_fid_max(conn, table, column='ogc_fid'):
+    if not conn:
+        sys.stderr.write("No DB connection defined.\n" % table)
+        return
+    
+    cursor = conn.cursor()
+    try:
+        cursor.execute("SELECT max(%s) FROM %s" % (column, table))
+    except StandardError as e:
+        sys.stderr.write("Unable to update FID sequence for table '%s': %s\n" % (table, e))
+    
+    fid_max = int(cursor.fetchall()[0][0])
+    cursor.close()
+    
+    return fid_max
