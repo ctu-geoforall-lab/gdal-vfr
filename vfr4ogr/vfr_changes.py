@@ -20,12 +20,17 @@ def process_changes(ilayer, olayer, column='gml_id'):
             found.append(feature.GetFID())
         
         n_feat = len(found)
+        
+        changes_list[ifeature.GetFID()] = (Action.update, found[0]) if n_feat > 0 \
+                                          else (Action.add, -1)
+        
         if n_feat > 1:
             # TODO: how to handle correctly?
-            warning("Layer '%s': %d features '%s=%s' found, skipping..." % \
-                        (olayer.GetName(), n_feat, column, fcode))
-        else:
-            changes_list[ifeature.GetFID()] = (Action.update, found[0]) if n_feat > 0 else (Action.add, -1)
+            warning("Layer '%s': %d features '%s' found. Duplicated features will be deleted." % \
+                        (olayer.GetName(), n_feat, fcode))
+            for fid in found[1:]:
+                # delete duplicates
+                olayer.DeleteFeature(fid)
         
         ifeature = ilayer.GetNextFeature()
     
@@ -89,10 +94,10 @@ def process_deleted_features(layer, ods):
         
         # check for consistency (one feature should be found)
         if n_feat == 0:
-            warning("No feature in layer '%s' ('%s') found. Nothing to delete." % \
+            warning("Layer '%s': no feature '%s' found. Nothing to delete." % \
                         (layer_name, fcode))
         elif n_feat > 1:
-            warning("More feature in layer '%s' with '%s' found" % (layer_name, fcode))
+            warning("Layer '%s': %d features '%s' found. All of them will be deleted." % (layer_name, n_feat, fcode))
         
         layer_previous = layer_name
         feature = layer.GetNextFeature()
