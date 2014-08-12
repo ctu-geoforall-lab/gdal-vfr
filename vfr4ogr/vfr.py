@@ -159,8 +159,8 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
         # pre-process changes
         if mode == Mode.change:
             change_list = process_changes(layer, olayer)
-            ### if dlist and layer_name in dlist: # add features to be deleted
-            ###     change_list.update(dlist[layer_name])
+            if dlist and layer_name in dlist: # add features to be deleted
+                change_list.update(dlist[layer_name])
         
         # make sure that PG sequence is up-to-date (import for fid == -1)
         if 'pgconn' in userdata:
