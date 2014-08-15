@@ -15,7 +15,7 @@ Usage: vfr2py [-e] [-d] [-s] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [-
                              [--overwrite] [--append]
 
        -e          Extended layer list statistics
-       -d          Download VFR data in currect directory (--type required)
+       -d          Download VFR data in currect directory (--type required) and exit
        -s          Create new schema for each VFR file
        -g          Skip features without geometry
        --file      Path to xml.gz or URL list file
@@ -67,7 +67,7 @@ def main():
         if str(e):
             fatal(e)
         else:
-            sys.exit(0)
+            return 0
 
     # build dsn string and options
     lco_options = []
@@ -87,6 +87,9 @@ def main():
     
     # get list of input VFR file(s)
     file_list = open_file(filename, options['download'], force_date = options['date'])
+    if options['download']:
+        return 0
+    
     # get list of layers
     layer_list = options['layer']
     if layer_list:

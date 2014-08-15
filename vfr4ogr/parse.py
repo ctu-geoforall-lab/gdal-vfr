@@ -78,11 +78,18 @@ def parse_cmd(argv, flags, params, optdir):
     else: # --date & --type
         flist = []
         for d in date_list:
-            url = "http://vdp.cuzk.cz/vymenny_format/soucasna/%s_%s.xml.gz" % (d, ftype)
+            fname = "%s_%s.xml.gz" % (d, ftype)
+            url = "http://vdp.cuzk.cz/vymenny_format/soucasna/" + fname
             if optdir['download']:
+                # download file
                 flist.append(download_vfr(url))
+            elif os.path.exists(fname):
+                # use existing file
+                flist.append(fname)
             else:
+                # process file remotely
                 flist.append("/vsicurl/" + url)
+        
         if not flist:
             raise getopt.GetoptError("Empty date range")
         

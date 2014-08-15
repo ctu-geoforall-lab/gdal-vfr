@@ -57,9 +57,9 @@ def open_file(filename, download = False, force_date = None):
             for line in lines:
                 if len(line) < 1 or line.startswith('#'):
                     continue # skip empty or commented lines 
-                if line.startswith('20'):
-                    line = 'http://vdp.cuzk.cz/vymenny_format/soucasna/' + line
-                elif not line.startswith('http://'):
+                
+                if '20' not in line:
+                    # determine date if missing
                     if not force_date:
                         if line.startswith('ST_Z'):
                             date = yesterday()
@@ -67,14 +67,19 @@ def open_file(filename, download = False, force_date = None):
                             date = last_day_of_month()
                     else:
                         date = force_date
-                    line = 'http://vdp.cuzk.cz/vymenny_format/soucasna/' + date + '_' + line
+                    line = date + '_' + line
                 
                 if not line.endswith('.xml.gz'):
+                    # add extension if missing
                     line += '.xml.gz'
+                
+                if (download or not os.path.exists(line)) and \
+                        not line.startswith('http://'):
+                    line = 'http://vdp.cuzk.cz/vymenny_format/soucasna/' + line
                 
                 if download:
                     line = download_vfr(line)
-                else:
+                elif not os.path.exists(line):
                     line = '/vsicurl/' + line
                 
                 list_ds.append(line)
