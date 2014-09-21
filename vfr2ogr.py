@@ -36,6 +36,7 @@ import time
 from getopt import GetoptError
 
 from vfr4ogr.ogr import check_ogr, open_file, list_layers, convert_vfr, open_ds, print_summary
+from vfr4ogr.vfr import Mode
 from vfr4ogr.utils import fatal, message, parse_xml_gz, compare_list, error, check_log
 from vfr4ogr.parse import parse_cmd
 
