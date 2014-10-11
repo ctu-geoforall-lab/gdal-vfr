@@ -99,9 +99,10 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
         warning("Driver '%s' doesn't support multiple geometry columns. "
                 "Only first will be used." % odrv.GetName())
     
-    if overwrite:
+    # OVERWRITE is not support by Esri Shapefile
+    if overwrite and frmt != 'Esri Shapefile':
         options.append("OVERWRITE=YES")
-
+    
     # process features marked for deletion first
     dlist = None # statistics
     if mode == Mode.change:

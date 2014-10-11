@@ -8,8 +8,10 @@ import logging
 from xml.dom.minidom import parse, parseString
 
 logger = logging.getLogger()
-logFile = 'log.%d' % os.getpid()
-logger.addHandler(logging.FileHandler(logFile, delay = True))
+logFile = None
+###logFile = 'log.%d' % os.getpid()
+###logger.addHandler(logging.FileHandler(logFile, delay = True))
+logger.addHandler(logging.StreamHandler(sys.stderr))
 
 # file mode
 class Mode:
@@ -25,7 +27,7 @@ class Action:
 
 # check if log file exists and print message about that
 def check_log():
-    if os.path.exists(logFile):
+    if logFile and os.path.exists(logFile):
         message("NOTICE: CHECK OUT '%s' FOR WARNINGS!" % logFile)
 
 # check input VFR file exists
