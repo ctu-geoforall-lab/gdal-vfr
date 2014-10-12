@@ -212,7 +212,9 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
                 fid += 1
             
             # clone feature
-            ofeature = feature.Clone()
+            ### ofeature = feature.Clone() # replace by SetFrom()
+            ofeature = ogr.Feature(olayer.GetLayerDefn())
+            ofeature.SetFrom(feature)
             
             # modify geometry columns if requested
             if mode == Mode.write and geom_name:
@@ -220,12 +222,13 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
                     geom_idx = feature.GetGeomFieldIndex(geom_name)
                     
                     # delete remaining geometry columns
-                    odefn = ofeature.GetDefnRef()
-                    for i in range(odefn.GetGeomFieldCount()):
-                        if i == geom_idx:
-                            continue
-                        odefn.DeleteGeomFieldDefn(i)
-
+                    ### not needed - see SetFrom()
+                    ### odefn = ofeature.GetDefnRef()
+                    ### for i in range(odefn.GetGeomFieldCount()):
+                    ###    if i == geom_idx:
+                    ###        continue
+                    ###    odefn.DeleteGeomFieldDefn(i)
+                
                 modify_feature(feature, geom_idx, ofeature)
             
             if nogeomskip and ofeature.GetGeometryRef() is None:
