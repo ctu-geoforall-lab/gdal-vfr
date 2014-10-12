@@ -77,9 +77,14 @@ def parse_cmd(argv, flags, params, optdir):
         filename = check_file(filename)
     else: # --date & --type
         flist = []
+        base_url = "http://vdp.cuzk.cz/vymenny_format/"
+        if ftype != 'ST_UVOH':
+            base_url += "soucasna/"
+        else:
+            base_url += "specialni/"
         for d in date_list:
             fname = "%s_%s.xml.gz" % (d, ftype)
-            url = "http://vdp.cuzk.cz/vymenny_format/soucasna/" + fname
+            url = base_url + fname
             if optdir['download']:
                 # download file
                 flist.append(download_vfr(url))
