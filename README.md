@@ -1,9 +1,9 @@
 ogr-vfr
 =======
 
-VFR (Vymenny format RUIAN) support in OGR library.
+Support scripts for VFR (Vymenny format RUIAN) in GDAL library.
 
 References
 ==========
 
-http://freegis.fsv.cvut.cz/gwiki/RUIAN_/_OGR-VFR#VFR_konverzn.C3.AD_skripty
+http://freegis.fsv.cvut.cz/gwiki/RUIAN_/_GDAL#VFR_konverzn.C3.AD_skripty
