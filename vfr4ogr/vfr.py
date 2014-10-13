@@ -35,6 +35,7 @@ def delete_layer(ids, ods, layerName):
 
 # create new layer in output data-source
 def create_layer(ods, ilayer, layerName, geom_name, create_geom, options):
+    ofrmt = ods.GetDriver().GetName()
     # determine geometry type
     if geom_name or not create_geom:
         feat_defn = ilayer.GetLayerDefn()
@@ -50,7 +51,7 @@ def create_layer(ods, ilayer, layerName, geom_name, create_geom, options):
             geom_type = ilayer.GetGeomType()
             idx = 0
 
-        if ods.GetDriver().GetName() in ('PostgreSQL', 'OCI'):
+        if ofrmt in ('PostgreSQL', 'OCI'):
             remove_option(options, 'GEOMETRY_NAME')
             options.append('GEOMETRY_NAME=%s' % feat_defn.GetGeomFieldDefn(idx).GetName().lower())
     else:
@@ -66,7 +67,15 @@ def create_layer(ods, ilayer, layerName, geom_name, create_geom, options):
     # create attributes                     
     feat_defn = ilayer.GetLayerDefn()
     for i in range(feat_defn.GetFieldCount()):
-        olayer.CreateField(feat_defn.GetFieldDefn(i))
+        ifield = feat_defn.GetFieldDefn(i)
+        ofield = ogr.FieldDefn(ifield.GetNameRef(), ifield.GetType())
+        ofield.SetWidth(ifield.GetWidth())
+        if ofrmt == 'ESRI Shapefile':
+            # StringList not supported by Esri Shapefile
+            if ifield.GetType() in (ogr.OFTIntegerList, ogr.OFTRealList, ogr.OFTStringList):
+                ofield.SetType(ogr.OFTString)
+        
+        olayer.CreateField(ofield)
 
     # create also geometry attributes
     if not geom_name and \
