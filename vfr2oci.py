@@ -77,6 +77,10 @@ def main():
 
     # get list of input VFR files
     file_list  = open_file(filename, options['download'], force_date = options['date'])
+    if options['download']:
+        return 0
+
+    # get list of layers
     layer_list = options['layer']
     
     ipass = 0
