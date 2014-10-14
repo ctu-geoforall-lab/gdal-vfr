@@ -190,6 +190,10 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
         if mode == Mode.change and dlist and layer_name in dlist:
             for fid in dlist[layer_name].keys():
                 olayer.DeleteFeature(fid)
+
+        # do mapping for fields (needed for Esri Shapefile when
+        # field names are truncated)
+        field_map = [i for i in range(0, layer.GetLayerDefn().GetFieldCount())]
         
         # copy features from source to destination layer
         layer.ResetReading()
@@ -223,7 +227,7 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
             # clone feature
             ### ofeature = feature.Clone() # replace by SetFrom()
             ofeature = ogr.Feature(olayer.GetLayerDefn())
-            ofeature.SetFrom(feature)
+            ofeature.SetFromWithMap(feature, True, field_map)
             
             # modify geometry columns if requested
             if mode == Mode.write and geom_name:
