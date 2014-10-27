@@ -184,10 +184,17 @@ def main():
 
     # delete layers with 0 features
     ods = odrv.Open(options['dsn'], True)
-    nlayersOut = ods.GetLayerCount()
-    for iLayerOut in range(nlayersOut): # do it better
-        if ods.GetLayer(iLayerOut).GetFeatureCount() < 1:
-            ods.DeleteLayer(iLayerOut)
+    deleted = True
+    while deleted:
+        nCount = ods.GetLayerCount()
+        deleted = False
+        for iLayerOut in range(nCount): # do it better
+            if ods.GetLayer(iLayerOut).GetFeatureCount() < 1:
+                print iLayerOut
+                ods.DeleteLayer(iLayerOut)
+                deleted = True
+                break
+            
     ods.Destroy()
     
     return 0
