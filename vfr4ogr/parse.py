@@ -5,21 +5,20 @@ import getopt
 from utils import fatal, message, check_file, download_vfr, last_day_of_month, yesterday, get_date_interval
 from ogr import list_formats
 
-def parse_cmd(argv, flags, params, optdir):
+def get_opt(argv, flags, params, optdir):
     try:
         opts, args = getopt.getopt(argv[1:], flags, params)
     except getopt.GetoptError as err:
         sys.exit(str(err))
     
-    filename = date = ftype = None
     for o, a in opts:
         so = o[2:]
         if o == "--file":
-            filename = a
+            optdir['filename'] = a
         elif o == "--date":
-            optdir['date'] = date = a
+            optdir['date'] = a
         elif o == "--type":
-            ftype = a
+            optdir['ftype'] = a
         elif o in ("-h", "--help"):
             raise getopt.GetoptError("")
         elif o in ("-o", "--overwrite"):
@@ -46,6 +45,13 @@ def parse_cmd(argv, flags, params, optdir):
                 optdir[so] = True
         else:
             sys.exit("unhandled option: %s" % o)
+
+def parse_cmd(argv, flags, params, optdir):
+    get_opt(argv, flags, params, optdir)
+
+    filename = optdir.get('filename', None)
+    date = optdir.get('date', None)
+    ftype = optdir.get('ftype', None)
     
     # check required options
     if not filename and not ftype:

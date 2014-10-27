@@ -11,15 +11,18 @@ from vfr_changes import process_changes, process_deleted_features
 from pgutils import update_fid_seq, get_fid_max
 
 # modify output feature - remove remaining geometry columns
-def modify_feature(feature, geom_idx, ofeature):
+def modify_feature(feature, geom_idx, ofeature, suppress=False):
     # set requested geometry
     if geom_idx > -1:
         geom = feature.GetGeomFieldRef(geom_idx)
         if geom:
             ofeature.SetGeometry(geom.Clone())
         else:
-            warning("Feature %d has no geometry (geometry column: %d)" % \
-                    (feature.GetFID(), geom_idx))
+            ofeature.SetGeometry(None)
+            if not suppress:
+                warning("Feature %d has no geometry (geometry column: %d)" % \
+                            (feature.GetFID(), geom_idx))
+    
     return geom_idx
 
 

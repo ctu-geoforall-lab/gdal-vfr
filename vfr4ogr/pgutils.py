@@ -129,3 +129,17 @@ def get_fid_max(conn, table, column='ogc_fid'):
     cursor.close()
     
     return fid_max
+
+def build_dsn(options):
+    if 'dbname' not in options:
+        return None
+    
+    odsn = "PG:dbname=%s" % options['dbname']
+    if options['user']:
+        odsn += " user=%s" % options['user']
+    if options['passwd']:
+        odsn += " password=%s" % options['passwd']
+    if options['host']:
+        odsn += " host=%s" % options['host']
+    
+    return odsn

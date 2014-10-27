@@ -3,7 +3,7 @@
 """
 Imports VFR data to Oracle Spatial database
 
-Requires GDAL/OGR library version 1.11 or later.
+Requires GDAL library version 1.11 or later.
 
 One of input options must be given:
        --file

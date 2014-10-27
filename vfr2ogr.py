@@ -3,7 +3,7 @@
 """
 Converts VFR file into desired GIS format supported by OGR library.
 
-Requires GDAL/OGR library version 1.11 or later.
+Requires GDAL library version 1.11 or later.
 
 One of input options must be given:
        --file

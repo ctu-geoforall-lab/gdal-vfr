@@ -3,13 +3,13 @@
 """
 Imports VFR data to PostGIS database
 
-Requires GDAL/OGR library version 1.11 or later.
+Requires GDAL library version 1.11 or later.
 
 One of input options must be given:
        --file
        --type
 
-Usage: vfr2py [-e] [-d] [-s] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type=ST_ABCD|OB_XXXXXX_ABCD] [--layer=layer1,layer2,...] [--geom=OriginalniHranice|GeneralizovaneHranice]
+Usage: vfr2pg [-e] [-d] [-s] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type=ST_ABCD|OB_XXXXXX_ABCD] [--layer=layer1,layer2,...] [--geom=OriginalniHranice|GeneralizovaneHranice]
                               --dbname <database name>
                              [--schema <schema name>] [--user <user name>] [--passwd <password>] [--host <host name>]
                              [--overwrite] [--append]
@@ -43,7 +43,7 @@ from vfr4ogr.ogr import check_ogr, open_file, list_layers, convert_vfr, open_ds,
 from vfr4ogr.vfr import Mode
 from vfr4ogr.utils import fatal, message, parse_xml_gz, compare_list, error, check_log
 from vfr4ogr.parse import parse_cmd
-from vfr4ogr.pgutils import open_db, create_schema, check_epsg, create_indices
+from vfr4ogr.pgutils import open_db, create_schema, check_epsg, create_indices, build_dsn
 
 # print program usage
 def usage():
@@ -71,20 +71,13 @@ def main():
 
     # build dsn string and options
     lco_options = []
-    odsn = ''
-    conn = None
+    odsn = build_dsn(options)
     if options['dbname']:
-        odsn += "PG:dbname=%s" % options['dbname']
-        if options['user']:
-            odsn += " user=%s" % options['user']
-        if options['passwd']:
-            odsn += " password=%s" % options['passwd']
-        if options['host']:
-            odsn += " host=%s" % options['host']
-        
         # open connection to DB
         conn = open_db(odsn[3:])
-    
+    else:
+        conn = None
+
     # get list of input VFR file(s)
     file_list = open_file(filename, options['download'], force_date = options['date'])
     if options['download']:
