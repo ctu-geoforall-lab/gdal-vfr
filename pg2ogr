@@ -1,0 +1,5 @@
+#!/bin/sh
+
+./pg2ogr.py $*
+
+exit 0
