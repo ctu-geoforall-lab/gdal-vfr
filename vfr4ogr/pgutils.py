@@ -34,7 +34,6 @@ def create_schema(conn, name):
 # insert EPSG 5514 definition into output DB if not defined
 def check_epsg(conn):
     if not conn:
-        sys.stderr.write("Unable to add EPSG 5514: %s\n" % e)
         return
     
     cursor = conn.cursor()
@@ -131,7 +130,7 @@ def get_fid_max(conn, table, column='ogc_fid'):
     return fid_max
 
 def build_dsn(options):
-    if 'dbname' not in options:
+    if not options['dbname']:
         return None
     
     odsn = "PG:dbname=%s" % options['dbname']
