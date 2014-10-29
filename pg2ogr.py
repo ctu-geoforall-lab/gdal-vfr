@@ -10,6 +10,7 @@ Usage: vfr2py [-f]  --dbname <database name>
                     [--overwrite]
 
        -f          List supported output formats
+       -g          Skip features without geometry
        --dbname    Output PostGIS database
        --schema    Schema name (default: public)
        --user      User name
@@ -40,13 +41,21 @@ from vfr4ogr.pgutils import build_dsn
 def usage():
     print __doc__
 
-def export_layers(ids, ods, layers, overwrite):
+def export_layers(ids, ods, layers, overwrite, nogeomskip, active_schema):
     nlayers = ids.GetLayerCount()
     for i in range(nlayers):
         layer = ids.GetLayer(i)
         layerName = layer.GetName()
         if layers and layerName not in layers:
             continue
+        
+        if active_schema: # do it better
+            try:
+                schema, table = layerName.split('.', 1)
+            except:
+                schema = None
+            if schema and schema != active_schema:
+                continue # skip table from non-active schema
         
         defn = layer.GetLayerDefn()
         for i in range(defn.GetGeomFieldCount()):
@@ -96,7 +105,7 @@ def export_layers(ids, ods, layers, overwrite):
                 if geom_idx < 0:
                     geom_idx = feature.GetGeomFieldIndex(geom)
                 modify_feature(feature, geom_idx, ofeature, True)
-                if ofeature.GetGeometryRef() is None:
+                if ofeature.GetGeometryRef() is None and nogeomskip:
                     # skip feature without geometry
                     n_nogeom += 1
                     feature = layer.GetNextFeature()
@@ -125,7 +134,7 @@ def main():
     
     # parse cmdline arguments
     options = { 'dbname' : None, 'schema' : None, 'user' : None, 'passwd' : None, 'host' : None, 
-                'overwrite' : False, 'layer' : [], 'format' : None, 'dsn' : None }
+                'overwrite' : False, 'layer' : [], 'format' : None, 'dsn' : None, 'nogeomskip': False }
                 
     try:
         get_opt(sys.argv, "ofl", ["help", "overwrite",
@@ -142,6 +151,8 @@ def main():
     idsn = build_dsn(options)
     if not idsn:
         fatal("--dbname required")
+    if options['schema']:
+        idsn += " active_schema=%s" % options['schema']
     
     # open input PostGIS database
     idrv = ogr.GetDriverByName('PostgreSQL')
@@ -177,7 +188,7 @@ def main():
     if ods is None:
         fatal("Unable to open/create new datasource '%s'" % options['dsn'])
 
-    export_layers(ids, ods, layer_list_all, options['overwrite'])
+    export_layers(ids, ods, layer_list_all, options['overwrite'], options['nogeomskip'], options['schema'])
 
     ids.Destroy()
     ods.Destroy()
@@ -190,7 +201,6 @@ def main():
         deleted = False
         for iLayerOut in range(nCount): # do it better
             if ods.GetLayer(iLayerOut).GetFeatureCount() < 1:
-                print iLayerOut
                 ods.DeleteLayer(iLayerOut)
                 deleted = True
                 break
