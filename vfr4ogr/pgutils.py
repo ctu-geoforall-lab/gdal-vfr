@@ -7,12 +7,21 @@ def open_db(conn_string):
     try:
         import psycopg2
     except ImportError as e:
-        return None
+        sys.exit(e)
     
     try:
         conn = psycopg2.connect(conn_string)
     except psycopg2.OperationalError as e:
         sys.exit("Unable to connect to DB: %s\nTry to define --user and/or --passwd" % e)
+
+    # check if PostGIS is installed
+    cursor = conn.cursor()
+    try:
+        cursor.execute("SELECT postgis_version()")
+    except StandardError as e:
+        sys.exit("ERROR: PostGIS doesn't seems to be installed.\n\n%s" % e)
+        
+    cursor.close()
     
     return conn
 

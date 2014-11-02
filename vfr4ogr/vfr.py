@@ -104,7 +104,7 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
         # if fails, try to create new datasource
         ods = odrv.CreateDataSource(odsn)
     if ods is None:
-        fatal("Unable to open/create new datasource '%s'" % odsn)
+        fatal("Unable to open or create new datasource '%s'" % odsn)
     
     create_geom = ods.TestCapability(ogr.ODsCCreateGeomFieldAfterCreateLayer)
     if not geom_name and not create_geom:
