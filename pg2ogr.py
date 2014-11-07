@@ -150,6 +150,7 @@ def main():
     # build dsn string
     idsn = build_dsn(options)
     if not idsn:
+        usage()
         fatal("--dbname required")
     if options['schema']:
         idsn += " active_schema=%s" % options['schema']
