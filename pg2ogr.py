@@ -99,33 +99,42 @@ def export_layers(ids, ods, layers, overwrite, nogeomskip, active_schema):
             geom_idx = -1
             fid = 0
             n_nogeom = 0
+            feat_without_geom = []
             while feature:
                 ofeature = ogr.Feature(olayer.GetLayerDefn())
                 ofeature.SetFromWithMap(feature, True, field_map)
                 if geom_idx < 0:
                     geom_idx = feature.GetGeomFieldIndex(geom)
                 modify_feature(feature, geom_idx, ofeature, True)
-                if ofeature.GetGeometryRef() is None and nogeomskip:
-                    # skip feature without geometry
-                    n_nogeom += 1
-                    feature = layer.GetNextFeature()
-                    continue
                 
                 # add new feature to output layer
                 fid += 1
                 ofeature.SetFID(fid)
                 olayer.CreateFeature(ofeature)
-            
+                
+                if ofeature.GetGeometryRef() is None:
+                    # feature without geometry
+                    feat_without_geom.append(fid)
+                
                 feature = layer.GetNextFeature()
 
+            n_feat_no_geom = len(feat_without_geom)
+            if n_feat_no_geom > 0 and \
+               n_feat_no_geom != layer.GetFeatureCount():
+                if not nogeomskip:
+                    feat_without_geom = [] 
+            
+            # print statistics per layer
+            sys.stdout.write(" %10d features exported" % fid)
+            if len(feat_without_geom) > 0:
+                for fid in feat_without_geom:
+                    olayer.DeleteFeature(fid)
+                sys.stdout.write(" (%d without geometry skipped)" % n_feat_no_geom)
+            
             # commit transaction in output layer
             if olayer.TestCapability(ogr.OLCTransactions):
                 olayer.CommitTransaction()
             
-            # print statistics per layer
-            sys.stdout.write(" %10d features exported" % fid)
-            if n_nogeom > 0:
-                sys.stdout.write(" (%d without geometry skipped)" % n_nogeom)
             sys.stdout.write("\n")
             
 def main():
@@ -137,7 +146,7 @@ def main():
                 'overwrite' : False, 'layer' : [], 'format' : None, 'dsn' : None, 'nogeomskip': False }
                 
     try:
-        get_opt(sys.argv, "ofl", ["help", "overwrite",
+        get_opt(sys.argv, "ofg", ["help", "overwrite",
                                   "dbname=", "schema=", "user=", "passwd=", "host=", "layer=",
                                   "format=", "dsn="], options)
     except GetoptError, e:
