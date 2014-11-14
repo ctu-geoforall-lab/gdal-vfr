@@ -40,7 +40,7 @@ def process_changes(ilayer, olayer, column='gml_id'):
     return changes_list
 
 # process deleted features (process OGR layer 'ZaniklePrvky')
-def process_deleted_features(layer, ods):
+def process_deleted_features(layer, ods, layers):
     lcode2lname = {
         'ST' : 'Staty',
         'RS' : 'RegionySoudrznosti',
@@ -75,12 +75,17 @@ def process_deleted_features(layer, ods):
         layer_name = lcode2lname.get(lcode, None)
         if not layer_name:
             error("Unknown layer code '%s'" % lcode)
+            feature = layer.GetNextFeature()
+            continue
+        if layers and layer_name not in layers:
+            feature = layer.GetNextFeature()
             continue
         fcode = "%s.%s" % (lcode, feature.GetField("PrvekId"))
         if not layer_previous or layer_previous != layer_name:
             dlayer = ods.GetLayerByName('%s' % layer_name)
             if dlayer is None:
                 error("Layer '%s' not found" % layer_name)
+                feature = layer.GetNextFeature()
                 continue
         
         # find features to be deleted (collect their FIDs)

@@ -120,7 +120,7 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
     if mode == Mode.change:
         dlayer = ids.GetLayerByName('ZaniklePrvky')
         if dlayer:
-            dlist = process_deleted_features(dlayer, ods)
+            dlist = process_deleted_features(dlayer, ods, layers)
     
     # process layers
     start = time.time()
