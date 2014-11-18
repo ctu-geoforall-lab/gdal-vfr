@@ -34,6 +34,9 @@ merge_st() {
 merge_ob() {
     FILE="ruian_vf_ob_v1.gfs"
     merge "Obce" \
+        "SpravniObvody" \
+        "Mop" \
+        "Momc" \
         "CastiObci" \
         "KatastralniUzemi" \
         "Zsj" \
