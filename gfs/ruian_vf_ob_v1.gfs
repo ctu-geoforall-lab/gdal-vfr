@@ -923,7 +923,7 @@
       <ElementPath>Geometrie|DefinicniBod</ElementPath> 
       <Type>Point</Type>
     </GeomPropertyDefn>
-    <!-- Originální geometrie hranice parcely ? -->
+    <!-- Originální geometrie hranice parcely -->
     <GeomPropertyDefn>
       <Name>OriginalniHranice</Name> 
       <ElementPath>Geometrie|OriginalniHranice</ElementPath> 
@@ -1098,7 +1098,7 @@
       <ElementPath>Geometrie|DefinicniBod</ElementPath> 
       <Type>Point</Type>
     </GeomPropertyDefn>
-    <!-- Originální geometrie hranice stavebního objektu ? -->
+    <!-- Originální geometrie hranice stavebního objektu -->
     <GeomPropertyDefn>
       <Name>OriginalniHranice</Name> 
       <ElementPath>Geometrie|OriginalniHranice</ElementPath> 
