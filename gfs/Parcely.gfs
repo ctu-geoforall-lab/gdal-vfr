@@ -26,7 +26,7 @@
       <Type>String</Type>
       <Width>18</Width>
     </PropertyDefn>
-    <!-- Identifikátor nesprávnosti na prvku (?) -->
+    <!-- Identifikátor nesprávnosti na prvku -->
     <PropertyDefn>
       <Name>Nespravny</Name>
       <ElementPath>Nespravny</ElementPath>

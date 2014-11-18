@@ -22,7 +22,7 @@
       <ElementPath>Kod</ElementPath>
       <Type>Integer</Type>
     </PropertyDefn>
-    <!-- Identifikátor nesprávnosti na prvku (?) -->
+    <!-- Identifikátor nesprávnosti na prvku -->
     <PropertyDefn>
       <Name>Nespravny</Name>
       <ElementPath>Nespravny</ElementPath>
@@ -215,7 +215,7 @@
       <Type>String</Type>
       <Width>18</Width>
     </PropertyDefn>
-    <!-- Detailní tecnicko-ekonomické atributy (TEA) (?) -->
+    <!-- Detailní tecnicko-ekonomické atributy (TEA) -->
     <PropertyDefn>
       <Name>DetailniTEAKod</Name>
       <ElementPath>DetailniTEA|Kod</ElementPath>

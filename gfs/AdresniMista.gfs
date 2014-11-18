@@ -28,7 +28,7 @@
       <ElementPath>Kod</ElementPath>
       <Type>Integer</Type>
     </PropertyDefn>
-    <!-- Identifikátor nesprávnosti na prvku (?) -->
+    <!-- Identifikátor nesprávnosti na prvku -->
     <PropertyDefn>
       <Name>Nespravny</Name>
       <ElementPath>Nespravny</ElementPath>
