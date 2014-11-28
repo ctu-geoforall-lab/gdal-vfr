@@ -144,8 +144,12 @@ def main():
             mode = Mode.write
             if fname.split('_')[-1][0] == 'Z':
                 mode = Mode.change
+                # insert required
+                os.environ['PG_USE_COPY'] = 'NO'
             elif append:
                 mode = Mode.append
+                # force copy over insert
+                os.environ['PG_USE_COPY'] = 'YES'
             
             # do the conversion
             try:
