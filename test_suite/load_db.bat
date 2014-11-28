@@ -1,7 +1,7 @@
 @echo off
 
 set DB=ruian
-set FILE=db_uksh.txt
+set FILE=bin\test_suite\db_uksh.txt
 set USER=postgres
 set LOG=log.txt
 set LOG_ERR=log_err.txt
