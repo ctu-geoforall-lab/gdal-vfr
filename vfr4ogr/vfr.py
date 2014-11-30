@@ -112,8 +112,14 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
                 "Only first will be used." % odrv.GetName())
     
     # OVERWRITE is not support by Esri Shapefile
-    if overwrite and frmt != 'Esri Shapefile':
-        options.append("OVERWRITE=YES")
+    if overwrite:
+        if frmt != 'Esri Shapefile':
+            options.append("OVERWRITE=YES")
+        if mode == Mode.write:
+            # delete also layers which are not part of ST_UKSH
+            for layer in ("ulice", "parcely", "stavebniobjekty", "adresnimista"):
+                if ods.GetLayerByName(layer) is not None:
+                    ods.DeleteLayer(layer)
     
     # process features marked for deletion first
     dlist = None # statistics
@@ -174,21 +180,21 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
             change_list = process_changes(layer, olayer)
             if dlist and layer_name in dlist: # add features to be deleted
                 change_list.update(dlist[layer_name])
-        
-        # make sure that PG sequence is up-to-date (import for fid == -1)
-        if 'pgconn' in userdata:
-            fid = get_fid_max(userdata['pgconn'], layer_name_lower)
-            if fid > 0:
-                update_fid_seq(userdata['pgconn'], layer_name_lower, fid)
-        
+
         ifeat = n_nogeom = 0
         geom_idx = -1
         fid = olayer.GetFeatureCount()
         
+        # make sure that PG sequence is up-to-date (import for fid == -1)
+        if 'pgconn' in userdata:
+            ### fid = get_fid_max(userdata['pgconn'], layer_name_lower)
+            if fid > 0:
+                update_fid_seq(userdata['pgconn'], layer_name_lower, fid)
+            
         # start transaction in output layer
         if olayer.TestCapability(ogr.OLCTransactions):
             olayer.StartTransaction()
-        
+
         # delete marked features first (changes only)
         if mode == Mode.change and dlist and layer_name in dlist:
             for fid in dlist[layer_name].keys():
@@ -257,7 +263,7 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
             if fid >= -1:
                 # fid == -1 -> unknown fid
                 ofeature.SetFID(fid)
-            
+                
             # add new feature to output layer
             olayer.CreateFeature(ofeature)
             
@@ -291,10 +297,10 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
 
         # update sequence for PG
         if 'pgconn' in userdata:
-            fid = get_fid_max(userdata['pgconn'], layer_name_lower)
+            ### fid = get_fid_max(userdata['pgconn'], layer_name_lower)
             if fid > 0:
                 update_fid_seq(userdata['pgconn'], layer_name_lower, fid)
-    
+                
     # close output datasource
     ods.Destroy()
 

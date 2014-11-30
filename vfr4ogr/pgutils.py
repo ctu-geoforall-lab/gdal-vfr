@@ -130,7 +130,7 @@ def get_fid_max(conn, table, column='ogc_fid'):
         return -1
     
     try:
-        fid_max = cursor.fetchall()[0][0]
+        fid_max = int(cursor.fetchall()[0][0])
     except TypeError:
         fid_max = -1
     

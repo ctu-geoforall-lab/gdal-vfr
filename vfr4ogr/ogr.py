@@ -73,14 +73,10 @@ def open_file(filename, download = False, force_date = None):
                     # add extension if missing
                     line += '.xml.gz'
                 
-                if (download or not os.path.exists(line)) and \
-                        not line.startswith('http://'):
-                    line = 'http://vdp.cuzk.cz/vymenny_format/soucasna/' + line
-                
-                if download:
+                if not os.path.exists(line):
+                    if not line.startswith('http://'):
+                        line = 'http://vdp.cuzk.cz/vymenny_format/soucasna/' + line
                     line = download_vfr(line)
-                elif not os.path.exists(line):
-                    line = '/vsicurl/' + line
                 
                 list_ds.append(line)
                 i += 1
