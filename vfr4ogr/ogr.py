@@ -58,7 +58,8 @@ def open_file(filename, download = False, force_date = None):
                 if len(line) < 1 or line.startswith('#'):
                     continue # skip empty or commented lines 
                 
-                if '20' not in line:
+                if not line.startswith('http://') and \
+                        not line.startswith('20'):
                     # determine date if missing
                     if not force_date:
                         if line.startswith('ST_Z'):
