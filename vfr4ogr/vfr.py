@@ -183,14 +183,15 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
 
         ifeat = n_nogeom = 0
         geom_idx = -1
-        fid = olayer.GetFeatureCount()
         
         # make sure that PG sequence is up-to-date (import for fid == -1)
         if 'pgconn' in userdata:
-            ### fid = get_fid_max(userdata['pgconn'], layer_name_lower)
+            fid = get_fid_max(userdata['pgconn'], layer_name_lower)
             if fid > 0:
                 update_fid_seq(userdata['pgconn'], layer_name_lower, fid)
-            
+        if fid is None or fid == -1:
+            fid = olayer.GetFeatureCount()
+        
         # start transaction in output layer
         if olayer.TestCapability(ogr.OLCTransactions):
             olayer.StartTransaction()
