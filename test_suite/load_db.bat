@@ -1,7 +1,7 @@
 @echo off
 
 set DB=ruian
-set DIR=%osgeo4w_root%\fulldb
+set DIR=c:\vfr_files
 set FILE=%osgeo4w_root%\bin\test_suite\db_uksh.txt
 set USER=postgres
 set LOG=log.txt
