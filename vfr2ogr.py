@@ -16,7 +16,7 @@ Usage: vfr2ogr [-f] [-e] [-d] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [
        -f          List supported output formats
        -e          Extended layer list statistics 
        -d          Download VFR data in currect directory (--type required)
-       -g          Do not skip features without geometry
+       -g          Skip features without geometry
        --file      Path to xml.gz or URL list file
        --date      Date in format 'YYYYMMDD'
        --type      Type of request in format XY_ABCD, eg. 'ST_UKSH' or 'OB_000000_ABCD'
@@ -113,7 +113,7 @@ def main():
                 nfeat = convert_vfr(ids=ids, odsn=options['dsn'], frmt=options['format'],
                                     layers=options['layer'], overwrite=options['overwrite'],
                                     options=lco_options, geom_name=options['geom'], mode=mode,
-                                    nogeomskip=options['nogeomskip'] is False)
+                                    nogeomskip=options['nogeomskip'])
             except RuntimeError as e:
                 error("Unable to read %s: %s" % (fname, e))
             
