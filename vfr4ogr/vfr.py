@@ -93,7 +93,7 @@ def create_layer(ods, ilayer, layerName, geom_name, create_geom, options):
 
 # write VFR features to output data-source
 def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_name = None,
-                mode = Mode.write, nogeomskip = False, userdata={}):
+                mode = Mode.write, nogeomskip = True, userdata={}):
     odrv = ogr.GetDriverByName(frmt)
     if odrv is None:
         fatal("Format '%s' is not supported" % frmt)
@@ -185,6 +185,7 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
         geom_idx = -1
         
         # make sure that PG sequence is up-to-date (import for fid == -1)
+	fid = -1
         if 'pgconn' in userdata:
             fid = get_fid_max(userdata['pgconn'], layer_name_lower)
             if fid > 0:
@@ -258,6 +259,7 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
                 # skip feature without geometry
                 n_nogeom += 1
                 feature = layer.GetNextFeature()
+	        ofeature.Destroy()
                 continue
 
             # set feature id
