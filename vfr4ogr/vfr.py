@@ -113,7 +113,7 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
     
     # OVERWRITE is not support by Esri Shapefile
     if overwrite:
-        if frmt != 'Esri Shapefile':
+        if frmt != 'ESRI Shapefile':
             options.append("OVERWRITE=YES")
         if mode == Mode.write:
             # delete also layers which are not part of ST_UKSH
@@ -255,12 +255,13 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
                 
                 modify_feature(feature, geom_idx, ofeature)
             
-            if nogeomskip and ofeature.GetGeometryRef() is None:
-                # skip feature without geometry
+            if ofeature.GetGeometryRef() is None:
                 n_nogeom += 1
-                feature = layer.GetNextFeature()
-	        ofeature.Destroy()
-                continue
+                if nogeomskip:
+                    # skip feature without geometry
+                    feature = layer.GetNextFeature()
+                    ofeature.Destroy()
+                    continue
 
             # set feature id
             if fid >= -1:
@@ -292,8 +293,11 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
                                  (n_added, n_updated, n_deleted))
         else:
             sys.stdout.write(" added")
-            if nogeomskip and n_nogeom > 0:
-                sys.stdout.write(" (%d without geometry skipped)" % n_nogeom)
+            if n_nogeom > 0:
+                if nogeomskip:
+                    sys.stdout.write(" (%d without geometry skipped)" % n_nogeom)
+                else:
+                    sys.stdout.write(" (%d without geometry)" % n_nogeom)
         sys.stdout.write("\n")
         
         nfeat += ifeat

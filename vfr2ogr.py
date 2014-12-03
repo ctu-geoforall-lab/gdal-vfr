@@ -74,7 +74,7 @@ def main():
     # set up driver-specific options
     if options['format'] == 'SQLite':
         os.environ['OGR_SQLITE_SYNCHRONOUS'] = 'OFF'
-    elif options['format'] == 'Esri Shapefile':
+    elif options['format'] == 'ESRI Shapefile':
         lco_options.append('ENCODING=UTF-8')
     
     append = options['append']

@@ -113,7 +113,7 @@ def list_formats():
         if driverName == 'GML':
             continue
         
-        formatsList.append(driverName)
+        formatsList.append(driverName.replace(' ', '_'))
     
     for i in sorted(formatsList):
         print i
