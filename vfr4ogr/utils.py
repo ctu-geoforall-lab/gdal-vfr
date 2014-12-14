@@ -1,7 +1,7 @@
 import os
 import sys
 import gzip
-import urllib
+import urllib2
 import datetime
 import logging
 
@@ -94,7 +94,16 @@ def compare_list(list1, list2):
 def download_vfr(url):
     message("Downloading %s into currect directory..." % url)
     local_file = os.path.basename(url)
-    urllib.urlretrieve (url, local_file)
+    ### urllib.urlretrieve (url, local_file)
+    fd = open(local_file, 'w')
+    try:
+        fd.write(urllib2.urlopen(url).read())
+    except urllib2.HTTPError as e:
+        fd.close()
+        if e.code == 404:
+            error("File '%s' not found" % url)
+    
+    fd.close()
     
     return local_file
 
