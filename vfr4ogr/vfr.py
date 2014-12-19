@@ -241,7 +241,7 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
             ofeature.SetFromWithMap(feature, True, field_map)
             
             # modify geometry columns if requested
-            if mode == Mode.write and geom_name:
+            if geom_name:
                 if geom_idx < 0:
                     geom_idx = feature.GetGeomFieldIndex(geom_name)
                     
