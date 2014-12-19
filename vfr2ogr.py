@@ -96,7 +96,7 @@ def main():
                 compare_list(layer_list, parse_xml_gz(filename))
         else:
             if options['dsn'] is None:
-                fatal("Output datasource not defined")
+                options['dsn'] = '.' # current directory
             
             if not layer_list:
                 layer_list = list_layers(ids, False, None)
