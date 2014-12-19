@@ -1,5 +1,5 @@
-ogr-vfr
-=======
+GDAL-VFR
+========
 
 Support scripts for VFR (Vymenny format RUIAN) in GDAL library.
 
