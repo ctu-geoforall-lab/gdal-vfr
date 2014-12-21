@@ -95,7 +95,7 @@ def download_vfr(url):
     message("Downloading %s into currect directory..." % url)
     local_file = os.path.basename(url)
     ### urllib.urlretrieve (url, local_file)
-    fd = open(local_file, 'w')
+    fd = open(local_file, 'wb')
     try:
         fd.write(urllib2.urlopen(url).read())
     except urllib2.HTTPError as e:
