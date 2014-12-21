@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import datetime
+import mimetypes
 
 from utils import fatal, error, message, warning, download_vfr, last_day_of_month, \
     yesterday, remove_option, logger
@@ -46,10 +47,8 @@ def open_file(filename, download = False, force_date = None):
         # already list of files (date range)
         return filename.split(os.linesep)
     
-    ds = drv.Open(filename, False)
-    if ds is None:
-        # unable to open input file with GML driver, so it's probably
-        # URL list file
+    if mimetypes.guess_type(filename)[0] == 'text/plain':
+        # list of files given as text file
         try:
             f = open(filename)
             i = 0
@@ -86,9 +85,9 @@ def open_file(filename, download = False, force_date = None):
             fatal("Unable to read '%s'" % filename)
         f.close()    
     else:
+        # single VFR file
         list_ds.append(filename)
-        ds.Destroy()
-
+    
     return list_ds
 
 # open OGR data-source for reading
