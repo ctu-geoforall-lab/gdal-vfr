@@ -46,7 +46,9 @@ def open_file(filename, download = False, force_date = None):
     if os.linesep in filename:
         # already list of files (date range)
         return filename.split(os.linesep)
-    if mimetypes.guess_type(filename)[0] != 'application/xml':
+
+    mtype = mimetypes.guess_type(filename)[0]
+    if mtype is None or 'xml' not in mtype:
         # assuming text file containing list of VFR files
         try:
             f = open(filename)
