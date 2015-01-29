@@ -46,9 +46,8 @@ def open_file(filename, download = False, force_date = None):
     if os.linesep in filename:
         # already list of files (date range)
         return filename.split(os.linesep)
-    
-    if mimetypes.guess_type(filename)[0] == 'text/plain':
-        # list of files given as text file
+    if mimetypes.guess_type(filename)[0] != 'application/xml':
+        # assuming text file containing list of VFR files
         try:
             f = open(filename)
             i = 0
@@ -95,7 +94,7 @@ def open_ds(filename):
     drv = ogr.GetDriverByName("GML")
     ds = drv.Open(filename, False)
     if ds is None:
-        sys.stderr.write("File '%s' not found. Skipping.\n" % filename)
+        sys.stderr.write("Unable to open file '%s'. Skipping.\n" % filename)
     
     return ds
 
