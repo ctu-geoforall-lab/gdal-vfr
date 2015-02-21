@@ -60,21 +60,15 @@
     <PropertyDefn>
       <Name>IdTransakce</Name>
       <ElementPath>IdTransakce</ElementPath>
-      <!-- OGR integers are only 32 bit wide for now, see http://trac.osgeo.org/gdal/wiki/rfc31_ogr_64
       <Type>Integer</Type>
-      -->
-      <Type>String</Type>
-      <Width>18</Width>
+      <SubType>Integer64</SubType>
     </PropertyDefn>
     <!-- ID návrhu změn v ISUI -->
     <PropertyDefn>
       <Name>GlobalniIdNavrhuZmeny</Name>
       <ElementPath>GlobalniIdNavrhuZmeny</ElementPath>
-      <!-- OGR integers are only 32 bit wide for now, see http://trac.osgeo.org/gdal/wiki/rfc31_ogr_64
       <Type>Integer</Type>
-      -->
-      <Type>String</Type>
-      <Width>18</Width>
+      <SubType>Integer64</SubType>
     </PropertyDefn>
     <!-- Mluvnické charakteristiky 2 až 7 pád -->
     <PropertyDefn>
@@ -111,11 +105,8 @@
     <PropertyDefn>
       <Name>Vymera</Name>
       <ElementPath>Vymera</ElementPath>
-      <!-- OGR integers are only 32 bit wide for now, see http://trac.osgeo.org/gdal/wiki/rfc31_ogr_64
       <Type>Integer</Type>
-      -->
-      <Type>String</Type>
-      <Width>18</Width>
+      <SubType>Integer64</SubType>
     </PropertyDefn>
     <!-- Převažující charakter využití ZSJ -->
     <PropertyDefn>
