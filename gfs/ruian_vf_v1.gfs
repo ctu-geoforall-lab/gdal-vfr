@@ -1571,7 +1571,7 @@
     <GeomPropertyDefn>
       <Name>OriginalniHraniceOmpv</Name>
       <ElementPath>Geometrie|OriginalniHraniceOmpv</ElementPath>
-      <Type>Polygon</Type>
+      <Type>MultiPolygon</Type>
     </GeomPropertyDefn>
     <!-- Jednoznační identifikátor parcely -->
     <PropertyDefn>
@@ -1752,7 +1752,7 @@
     <GeomPropertyDefn>
       <Name>OriginalniHraniceOmpv</Name>
       <ElementPath>Geometrie|OriginalniHraniceOmpv</ElementPath>
-      <Type>Polygon</Type>
+      <Type>MultiPolygon</Type>
     </GeomPropertyDefn>
     <!-- Kód stavebního objektu -->
     <PropertyDefn>
