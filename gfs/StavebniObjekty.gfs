@@ -16,6 +16,12 @@
       <ElementPath>Geometrie|OriginalniHranice</ElementPath> 
       <Type>MultiPolygon</Type>
     </GeomPropertyDefn>
+    <!-- Originální geometrie hranice stavebního objektu (Ompv) -->
+    <GeomPropertyDefn>
+      <Name>OriginalniHraniceOmpv</Name>
+      <ElementPath>Geometrie|OriginalniHraniceOmpv</ElementPath>
+      <Type>Polygon</Type>
+    </GeomPropertyDefn>
     <!-- Kód stavebního objektu -->
     <PropertyDefn>
       <Name>Kod</Name>
