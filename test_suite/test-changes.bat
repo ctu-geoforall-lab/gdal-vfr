@@ -1,6 +1,6 @@
 @echo off
 
-set DB=vfr
+set DB=ruian_test
 set PATH=C:\Program Files (x86)\PostgreSQL\9.3\bin;%PATH%
 
 IF "%1"=="ogr" (
