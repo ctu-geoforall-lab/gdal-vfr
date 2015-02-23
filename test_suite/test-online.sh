@@ -1,6 +1,6 @@
 #!/bin/sh
 
-DB=vfr
+DB=ruian_test
 
 if test -z "$1" ; then
     PGM=pg

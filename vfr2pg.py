@@ -9,15 +9,17 @@ One of input options must be given:
        --file
        --type
 
-Usage: vfr2pg [-e] [-d] [-s] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type=ST_ABCD|OB_XXXXXX_ABCD] [--layer=layer1,layer2,...] [--geom=OriginalniHranice|GeneralizovaneHranice]
-                              --dbname <database name>
-                             [--schema <schema name>] [--user <user name>] [--passwd <password>] [--host <host name>]
-                             [--overwrite] [--append]
+Usage: vfr2pg [-edsgl] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type=ST_ABCD|OB_XXXXXX_ABCD] [--layer=layer1,layer2,...]
+                       [--geom=OriginalniHranice|GeneralizovaneHranice]
+                       --dbname <database name>
+                       [--schema <schema name>] [--user <user name>] [--passwd <password>] [--host <host name>]
+                       [--overwrite] [--append]
 
        -e          Extended layer list statistics
        -d          Download VFR data in currect directory (--type required) and exit
        -s          Create new schema for each VFR file
        -g          Skip features without geometry
+       -l          List layers in output database and exit
        --file      Path to xml.gz or URL list file
        --date      Date in format 'YYYYMMDD'
        --type      Type of request in format XY_ABCD, eg. 'ST_UKSH' or 'OB_000000_ABCD'
@@ -56,11 +58,11 @@ def main():
     # parse cmdline arguments
     options = { 'dbname' : None, 'schema' : None, 'user' : None, 'passwd' : None, 'host' : None, 
                 'overwrite' : False, 'extended' : False, 'layer' : [], 'geom' : None, 'download' : False,
-                'schema_per_file' : False, 'append' : False, 'date' : None, 'nogeomskip': False}
+                'schema_per_file' : False, 'append' : False, 'date' : None, 'nogeomskip': False, 'list' : False}
     try:
-        filename = parse_cmd(sys.argv, "haoedsg", ["help", "overwrite", "extended", "append",
-                                                   "file=", "date=", "type=", "layer=", "geom=",
-                                                   "dbname=", "schema=", "user=", "passwd=", "host="],
+        filename = parse_cmd(sys.argv, "haoedsgl", ["help", "overwrite", "extended", "append",
+                                                    "file=", "date=", "type=", "layer=", "geom=",
+                                                    "dbname=", "schema=", "user=", "passwd=", "host="],
                              options)
     except GetoptError, e:
         usage()
@@ -78,19 +80,24 @@ def main():
     else:
         conn = None
 
-    # get list of input VFR file(s)
-    file_list = open_file(filename, options['download'], force_date = options['date'])
-    if options['download']:
-        return 0
-    
     # get list of layers
     layer_list = options['layer']
     if layer_list:
         layer_list_all = layer_list
     else:
         layer_list_all = []
-    schema_list = []
     
+    # list output database and exit
+    if options['list']:
+        print_summary(odsn, "PostgreSQL", layer_list_all, time.time())
+        return 0
+    
+    # get list of input VFR file(s)
+    file_list = open_file(filename, options['download'], force_date = options['date'])
+    if options['download']:
+        return 0
+    
+    schema_list = []
     epsg_checked = False
     append = options['append']
     ipass = 0

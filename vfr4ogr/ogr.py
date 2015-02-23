@@ -168,6 +168,10 @@ def print_summary(odsn, frmt, layer_list, stime):
         return
     # fatal("Unable to open datasource '%s'" % odsn)
 
+    if not layer_list:
+        for idx in range(ods.GetLayerCount()):
+            layer_list.append(ods.GetLayer(idx).GetName())
+    
     message("Summary")
     for layer_name in layer_list:
         layer = ods.GetLayerByName(layer_name)

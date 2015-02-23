@@ -33,6 +33,8 @@ def get_opt(argv, flags, params, optdir):
             optdir['schema_per_file'] = True
         elif o == "-g":
             optdir['nogeomskip'] = True
+        elif o == "-l":
+            optdir['list'] = True
         elif o == "-f": # unused
             list_formats()
             sys.exit(0)
@@ -49,6 +51,11 @@ def get_opt(argv, flags, params, optdir):
 def parse_cmd(argv, flags, params, optdir):
     get_opt(argv, flags, params, optdir)
 
+    if optdir['list']:
+        if not optdir['dbname']:
+            raise getopt.GetoptError("--dbname required")
+        return 0
+    
     filename = optdir.get('filename', None)
     date = optdir.get('date', None)
     ftype = optdir.get('ftype', None)

@@ -9,14 +9,16 @@ One of input options must be given:
        --file
        --type
 
-Usage: vfr2ogr [-f] [-e] [-d] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type=ST_ABCD|OB_000000_ABCD] [--layer=layer1,layer2,...] [--geom=OriginalniHranice|GeneralizovaneHranice]
-                              [--format=<output format>] [--dsn=<OGR datasource>]
-                              [--overwrite] [--append]
+Usage: vfr2ogr [-fedgl] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type=ST_ABCD|OB_000000_ABCD] [--layer=layer1,layer2,...]
+                        [--geom=OriginalniHranice|GeneralizovaneHranice]
+                        [--format=<output format>] [--dsn=<OGR datasource>]
+                        [--overwrite] [--append]
 
        -f          List supported output formats
        -e          Extended layer list statistics 
        -d          Download VFR data in currect directory (--type required)
        -g          Skip features without geometry
+       -l          List layers in output datasource and exit
        --file      Path to xml.gz or URL list file
        --date      Date in format 'YYYYMMDD'
        --type      Type of request in format XY_ABCD, eg. 'ST_UKSH' or 'OB_000000_ABCD'
@@ -51,11 +53,11 @@ def main():
     # parse cmd arguments
     options = { 'format' : None, 'dsn' : None, 'overwrite' : False, 'extended' : False,
                 'layer' : [], 'geom' : None, 'download' : False, 'append' : False, 'date' : None,
-                'nogeomskip': False}
+                'nogeomskip': False, 'list' : False}
     try:
-        filename = parse_cmd(sys.argv, "haofedg", ["help", "overwrite", "extended", "append",
-                                                   "file=", "date=", "type=", "layer=", "geom=",
-                                                   "format=", "dsn="], options)
+        filename = parse_cmd(sys.argv, "haofedgl", ["help", "overwrite", "extended", "append",
+                                                    "file=", "date=", "type=", "layer=", "geom=",
+                                                    "format=", "dsn="], options)
     except GetoptError, e:
         usage()
         if str(e):
@@ -70,6 +72,11 @@ def main():
     
     # get list of layers
     layer_list = options['layer']
+    
+    # list output database and exit
+    if options['list']:
+        print_summary(options['dsn'], options['format'], layer_list, time.time())
+        return 0
     
     # set up driver-specific options
     if options['format'] == 'SQLite':
