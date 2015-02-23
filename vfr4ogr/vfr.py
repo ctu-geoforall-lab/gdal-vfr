@@ -187,9 +187,13 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
         # make sure that PG sequence is up-to-date (import for fid == -1)
 	fid = -1
         if 'pgconn' in userdata:
-            fid = get_fid_max(userdata['pgconn'], layer_name_lower)
+            if userdata.get('schema', None):
+                table_name = '%s.%s' % (userdata['schema'], layer_name_lower)
+            else:
+                table_name = layer_name_lower
+            fid = get_fid_max(userdata['pgconn'], table_name)
             if fid > 0:
-                update_fid_seq(userdata['pgconn'], layer_name_lower, fid)
+                update_fid_seq(userdata['pgconn'], table_name, fid)
         if fid is None or fid == -1:
             fid = olayer.GetFeatureCount()
         
@@ -306,7 +310,11 @@ def convert_vfr(ids, odsn, frmt, layers=[], overwrite = False, options=[], geom_
         if 'pgconn' in userdata:
             ### fid = get_fid_max(userdata['pgconn'], layer_name_lower)
             if fid > 0:
-                update_fid_seq(userdata['pgconn'], layer_name_lower, fid)
+                if userdata.get('schema', None):
+                    table_name = '%s.%s' % (userdata['schema'], layer_name_lower)
+                else:
+                    table_name = layer_name_lower
+                update_fid_seq(userdata['pgconn'], table_name, fid)
                 
     # close output datasource
     ods.Destroy()

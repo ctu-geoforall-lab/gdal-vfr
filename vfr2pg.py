@@ -132,6 +132,7 @@ def main():
             
             # build datasource string per file
             odsn_reset = odsn
+            schema_name = None
             if options['schema_per_file'] or options['schema']:
                 if options['schema_per_file']:
                     # set schema per file
@@ -146,7 +147,7 @@ def main():
                 odsn += ' active_schema=%s' % schema_name
                 if schema_name not in schema_list:
                     schema_list.append(schema_name)
-            
+                
             # check mode - process changes or append
             mode = Mode.write
             if fname.split('_')[-1][0] == 'Z':
@@ -163,7 +164,7 @@ def main():
                 nfeat = convert_vfr(ids=ids, odsn=odsn, frmt="PostgreSQL", layers=options['layer'],
                                     overwrite=options['overwrite'], options=lco_options,
                                     geom_name=options['geom'], mode=mode, nogeomskip=options['nogeomskip'],
-                                    userdata={'pgconn': conn})
+                                    userdata={'pgconn': conn, 'schema': schema_name})
             except RuntimeError as e:
                 error("Unable to read %s: %s" % (fname, e))
             
