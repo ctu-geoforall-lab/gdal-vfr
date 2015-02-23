@@ -18,7 +18,7 @@ Usage: vfr2ogr [-fedgl] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type
        -e          Extended layer list statistics 
        -d          Download VFR data in currect directory (--type required)
        -g          Skip features without geometry
-       -l          List layers in output datasource and exit
+       -l          List existing layers in output datasource and exit
        --file      Path to xml.gz or URL list file
        --date      Date in format 'YYYYMMDD'
        --type      Type of request in format XY_ABCD, eg. 'ST_UKSH' or 'OB_000000_ABCD'

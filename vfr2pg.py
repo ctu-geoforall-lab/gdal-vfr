@@ -19,7 +19,7 @@ Usage: vfr2pg [-edsgl] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type=
        -d          Download VFR data in currect directory (--type required) and exit
        -s          Create new schema for each VFR file
        -g          Skip features without geometry
-       -l          List layers in output database and exit
+       -l          List existing layers in output database and exit
        --file      Path to xml.gz or URL list file
        --date      Date in format 'YYYYMMDD'
        --type      Type of request in format XY_ABCD, eg. 'ST_UKSH' or 'OB_000000_ABCD'
