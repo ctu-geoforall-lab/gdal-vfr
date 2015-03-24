@@ -1,9 +1,9 @@
 GDAL-VFR
 ========
 
-Support scripts for VFR (Vymenny format RUIAN) in GDAL library.
+Full VFR (Vymenny format RUIAN) support in GDAL library.
 
-References
-==========
+References (in Czech)
+=====================
 
 http://freegis.fsv.cvut.cz/gwiki/RUIAN_/_GDAL#VFR_konverzn.C3.AD_skripty
