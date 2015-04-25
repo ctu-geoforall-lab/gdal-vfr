@@ -1,5 +1,2 @@
-__all__ = [ "ogr",
-            "parse",
-            "utils",
-            "vfr",
-            "vfr_changes" ]
+from vfrogr import VfrOgr
+from vfrpg import VfrPg

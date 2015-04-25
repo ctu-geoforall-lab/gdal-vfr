@@ -2,8 +2,8 @@ import os
 import sys
 import getopt
 
-from utils import fatal, message, check_file, download_vfr, last_day_of_month, yesterday, get_date_interval
-from ogr import list_formats
+from utils import check_file, download_vfr, last_day_of_month, \
+    yesterday, get_date_interval
 
 def get_opt(argv, flags, params, optdir):
     try:
@@ -36,7 +36,7 @@ def get_opt(argv, flags, params, optdir):
         elif o == "-l":
             optdir['list'] = True
         elif o == "-f": # unused
-            list_formats()
+            list_formats() # TODO
             sys.exit(0)
         elif o == "--format":
             optdir['format'] = a.replace('_', ' ')

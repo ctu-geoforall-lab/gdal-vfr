@@ -31,25 +31,19 @@ Usage: vfr2ogr [-fedgl] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type
 
 """
 
-import os
 import sys
 import atexit
-import time
 from getopt import GetoptError
 
-from vfr4ogr.ogr import check_ogr, open_file, list_layers, convert_vfr, open_ds, print_summary
-from vfr4ogr.vfr import Mode
-from vfr4ogr.utils import fatal, message, parse_xml_gz, compare_list, error, check_log
+from vfr4ogr import VfrOgr
 from vfr4ogr.parse import parse_cmd
+from vfr4ogr.logger import check_log
 
 # print usage
 def usage():
     print __doc__
 
 def main():
-    # check requirements
-    check_ogr()
-
     # parse cmd arguments
     options = { 'format' : None, 'dsn' : None, 'overwrite' : False, 'extended' : False,
                 'layer' : [], 'geom' : None, 'download' : False, 'append' : False, 'date' : None,
@@ -61,77 +55,34 @@ def main():
     except GetoptError, e:
         usage()
         if str(e):
-            fatal(e)
+            sys.exit(e)
         else:
-            sys.exit(0)
-   
-    lco_options = []
-    file_list  = open_file(filename, options['download'], force_date = options['date'])
-    if options['download']:
-        return 0
-    
-    # get list of layers
-    layer_list = options['layer']
-    
-    # list output database and exit
-    if options['list']:
-        print_summary(options['dsn'], options['format'], layer_list, time.time())
-        return 0
-    
+            return 0
+
     # set up driver-specific options
+    lco_options = []
     if options['format'] == 'SQLite':
         os.environ['OGR_SQLITE_SYNCHRONOUS'] = 'OFF'
     elif options['format'] == 'ESRI Shapefile':
         lco_options.append('ENCODING=UTF-8')
-    
-    append = options['append']
-    ipass = 0
-    stime = time.time()
-    for fname in file_list:
-        message("Processing %s (%d out of %d)..." % (fname, ipass+1, len(file_list)))
+   
+    ogr = VfrOgr(options['format'], options, lco_options)
 
-        # open OGR datasource
-        ids = open_ds(fname)
-        if ids is None:
-            ipass += 1
-            continue # unable to open - skip
+   # list output datasource and exit
+    if options['list']:
+        ogr.print_summary()
+        return 0
+
+    # get list of input VFR file(s)
+    ogr.open_file(filename)
+    if options['download']:
+        return 0
+    
+    # import VFR files
+    ipass = ogr.run()
         
-        if options['format'] is None:
-            # list available layers and exit
-            layer_list = list_layers(ids, options['extended'])
-            if options['extended'] and os.path.exists(filename):
-                compare_list(layer_list, parse_xml_gz(filename))
-        else:
-            if options['dsn'] is None:
-                options['dsn'] = '.' # current directory
-            
-            if not layer_list:
-                layer_list = list_layers(ids, False, None)
-            
-            # check mode - process changes or append
-            mode = Mode.write
-            if fname.split('_')[-1][0] == 'Z':
-                mode = Mode.change
-            elif append:
-                mode = Mode.append
-
-            # do the conversion
-            try:
-                nfeat = convert_vfr(ids=ids, odsn=options['dsn'], frmt=options['format'],
-                                    layers=options['layer'], overwrite=options['overwrite'],
-                                    options=lco_options, geom_name=options['geom'], mode=mode,
-                                    nogeomskip=options['nogeomskip'])
-            except RuntimeError as e:
-                error("Unable to read %s: %s" % (fname, e))
-            
-            if nfeat > 0:
-                append = True # append on next passes
-
-        ids.Destroy()
-        ipass += 1
-    
     if ipass > 1 or options.get('append', True):
-        print_summary(options['dsn'], options['format'], layer_list, stime)
+        ogr.print_summary()
     
     return 0
 
