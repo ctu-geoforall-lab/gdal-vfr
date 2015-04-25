@@ -216,7 +216,7 @@ class VfrOgr:
         # process features marked for deletion first
         dlist = None # statistics
         if mode == Mode.change:
-            dlayer = ids.GetLayerByName('ZaniklePrvky')
+            dlayer = self._ids.GetLayerByName('ZaniklePrvky')
             if dlayer:
                 dlist = self._process_deleted_features(dlayer)
         
