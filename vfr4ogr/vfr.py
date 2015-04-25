@@ -75,7 +75,10 @@ def create_layer(ods, ilayer, layerName, geom_name, create_geom, options):
         ofield.SetWidth(ifield.GetWidth())
         if ofrmt == 'ESRI Shapefile':
             # StringList not supported by Esri Shapefile
-            if ifield.GetType() in (ogr.OFTIntegerList, ogr.OFTInteger64List, ogr.OFTRealList, ogr.OFTStringList):
+            types = [ogr.OFTIntegerList, ogr.OFTRealList, ogr.OFTStringList]
+            if gdal.__version__.split('.')[0] == '2':
+                types.append(ogr.OFTInteger64List)
+            if ifield.GetType() in types:
                 ofield.SetType(ogr.OFTString)
         
         olayer.CreateField(ofield)
