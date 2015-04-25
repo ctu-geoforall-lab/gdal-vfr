@@ -12,6 +12,7 @@ except ImportError, e:
 
 from exception import VfrError
 from logger import VfrLogger
+from utils import last_day_of_month, yesterday, download_vfr
 
 # file mode
 class Mode:
@@ -681,7 +682,7 @@ class VfrOgr:
                             if schema_name[0].isdigit():
                                 schema_name = 'vfr_' + schema_name
                         else:
-                            schema_name = options['schema'].lower()
+                            schema_name = self._schema.lower()
 
                         # create schema in output DB if needed
                         self._create_schema(schema_name)
