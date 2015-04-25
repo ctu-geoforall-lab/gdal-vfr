@@ -66,7 +66,9 @@ def main():
     elif options['format'] == 'ESRI Shapefile':
         lco_options.append('ENCODING=UTF-8')
    
-    ogr = VfrOgr(options['format'], options, lco_options)
+    ogr = VfrOgr(options['format'], options['dsn'],
+                 options['geom'], options['layer'], options['nogeomskip'],
+                 options['overwrite'], lco_options)
 
    # list output datasource and exit
     if options['list']:

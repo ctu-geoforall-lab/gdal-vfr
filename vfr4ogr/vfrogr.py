@@ -3,6 +3,7 @@ import sys
 import mimetypes
 import time
 import datetime
+import copy
 
 try:
     from osgeo import gdal, ogr
@@ -25,13 +26,17 @@ class Action:
     delete = 2
 
 class VfrOgr:
-    def __init__(self, frmt, options, lco_options=[]):
+    def __init__(self, frmt, dsn, geom_name=None, layers=[], nogeomskip=False,
+                 overwrite=False, lco_options=[]):
         self._check_ogr()
         
         self.frmt = frmt
-        self._options = options
+        self._geom_name = geom_name
+        self._overwrite = overwrite
+        self._layer_list = layers
+        self._nogeomskip = nogeomskip
         self._lco_options = lco_options
-        self.layer_list = options['layer']
+        
         self._file_list = []
         
         # input
@@ -41,7 +46,7 @@ class VfrOgr:
         self._ids = None
         
         # output
-        self.odsn = self._build_dsn(options)
+        self.odsn = dsn
         if not self.odsn:
             self._odrv = self._ods = None
             return
@@ -58,13 +63,13 @@ class VfrOgr:
         if self._ods is None:
             raise VfrError("Unable to open or create new datasource '%s'" % self.odsn)
         self._create_geom = self._ods.TestCapability(ogr.ODsCCreateGeomFieldAfterCreateLayer)
-        if not self._options['geom'] and \
+        if not self._geom_name and \
            not self._create_geom:
             VfrLogger.warning("Driver '%s' doesn't support multiple geometry columns. "
                               "Only first will be used." % self._odrv.GetName())
 
         # OVERWRITE is not support by Esri Shapefile
-        if self._options['overwrite']:
+        if self._overwrite:
             if self.frmt != 'ESRI Shapefile':
                 self._lco_options.append("OVERWRITE=YES")
 
@@ -73,9 +78,6 @@ class VfrOgr:
             # close output datasource
             self._ods.Destroy()
 
-    def _build_dsn(self, options):
-        return options['dsn']
-    
     def _check_ogr(self):
         # check GDAL/OGR library, version >= 1.11 required
         version = gdal.__version__.split('.', 1)
@@ -151,12 +153,10 @@ class VfrOgr:
     # print summary for multiple file input
     def print_summary(self):
         stime = time.time()
-        
-        if not self.layer_list:
+        layer_list = copy.deepcopy(self._layer_list)
+        if not layer_list:
             for idx in range(self._ods.GetLayerCount()):
                 layer_list.append(self._ods.GetLayer(idx).GetName())
-        else:
-            layer_list = self.layer_list
         
         VfrLogger.msg("Summary")
         for layer_name in layer_list:
@@ -206,7 +206,7 @@ class VfrOgr:
 
     # write VFR features to output data-source
     def _convert_vfr(self, mode = Mode.write, schema=None):
-        if self._options['overwrite'] and mode == Mode.write:
+        if self._overwrite and mode == Mode.write:
             # delete also layers which are not part of ST_UKSH
             for layer in ("ulice", "parcely", "stavebniobjekty", "adresnimista"):
                 if self._ods.GetLayerByName(layer) is not None:
@@ -230,7 +230,7 @@ class VfrOgr:
             ### that automatically anyway
             layer_name_lower = layer_name.lower()
 
-            if self._options['layer'] and layer_name not in self._options['layer']:
+            if self._layer_list and layer_name not in self._layer_list:
                 # process only selected layers
                 continue
 
@@ -240,13 +240,13 @@ class VfrOgr:
 
             olayer = self._ods.GetLayerByName('%s' % layer_name_lower)
             sys.stdout.write("Processing layer %-20s ..." % layer_name)
-            if not self._options['overwrite'] and (olayer and mode == Mode.write):
+            if not self._overwrite and (olayer and mode == Mode.write):
                 sys.stdout.write(" already exists (use --overwrite or --append to modify existing data)\n")
                 continue
 
             ### TODO: fix output drivers not to use default geometry
             ### names
-            if self.frmt in ('PostgreSQL', 'OCI') and not self._options['geom']:
+            if self.frmt in ('PostgreSQL', 'OCI') and not self._geom_name:
                 if layer_name_lower == 'ulice':
                     self._remove_option('GEOMETRY_NAME')
                     self._lco_options.append('GEOMETRY_NAME=definicnicara')
@@ -336,9 +336,9 @@ class VfrOgr:
                 ofeature.SetFromWithMap(feature, True, field_map)
 
                 # modify geometry columns if requested
-                if self._options['geom']:
+                if self._geom_name:
                     if geom_idx < 0:
-                        geom_idx = feature.GetGeomFieldIndex(self._options['geom'])
+                        geom_idx = feature.GetGeomFieldIndex(self._geom_name)
 
                         # delete remaining geometry columns
                         ### not needed - see SetFrom()
@@ -352,7 +352,7 @@ class VfrOgr:
 
                 if ofeature.GetGeometryRef() is None:
                     n_nogeom += 1
-                    if self._options['nogeomskip']:
+                    if self._nogeomskip:
                         # skip feature without geometry
                         feature = layer.GetNextFeature()
                         ofeature.Destroy()
@@ -389,7 +389,7 @@ class VfrOgr:
             else:
                 sys.stdout.write(" added")
                 if n_nogeom > 0:
-                    if self._options['nogeomskip']:
+                    if self._nogeomskip:
                         sys.stdout.write(" (%d without geometry skipped)" % n_nogeom)
                     else:
                         sys.stdout.write(" (%d without geometry)" % n_nogeom)
@@ -435,10 +435,10 @@ class VfrOgr:
     def _create_layer(self, layerName, ilayer):
         ofrmt = self._ods.GetDriver().GetName()
         # determine geometry type
-        if self._options['geom'] or not self._create_geom:
+        if self._geom_name or not self._create_geom:
             feat_defn = ilayer.GetLayerDefn()
-            if self._options['geom']:
-                idx = feat_defn.GetGeomFieldIndex(self._options['geom'])
+            if self._geom_name:
+                idx = feat_defn.GetGeomFieldIndex(self._geom_name)
             else:
                 idx = 0
 
@@ -479,12 +479,12 @@ class VfrOgr:
             olayer.CreateField(ofield)
 
         # create also geometry attributes
-        if not self._options['geom'] and \
+        if not self._geom_name and \
                 olayer.TestCapability(ogr.OLCCreateGeomField):
             for i in range(feat_defn.GetGeomFieldCount()):
                 geom_defn = feat_defn.GetGeomFieldDefn(i) 
-                if self._options['geom'] and \
-                   geom_defn.GetName() != self._options['geom']:
+                if self._geom_name and \
+                   geom_defn.GetName() != self._geom_name:
                     continue
                 olayer.CreateGeomField(feat_defn.GetGeomFieldDefn(i))
 
@@ -596,7 +596,7 @@ class VfrOgr:
                 error("Unknown layer code '%s'" % lcode)
                 feature = layer.GetNextFeature()
                 continue
-            if self._options['layers'] and layer_name not in self._options['layers']:
+            if self._layer_list and layer_name not in self._layer_list:
                 feature = layer.GetNextFeature()
                 continue
             fcode = "%s.%s" % (lcode, feature.GetField("PrvekId"))
@@ -631,11 +631,10 @@ class VfrOgr:
         # return statistics
         return dlist
 
-    def run(self):
+    def run(self, append=False, extended=False):
         ipass = 0
         stime = time.time()
-        layer_list = self._options['layer']
-        append = self._options['append']
+        layer_list = copy.deepcopy(self._layer_list)
         
         pg = hasattr(self, "_conn")
         if pg:
@@ -654,8 +653,8 @@ class VfrOgr:
             
             if not self.odsn:
                 # no output datasource given -> list available layers and exit
-                layer_list = self._list_layers(self._options['extended'], sys.stdout)
-                if self._options['extended'] and os.path.exists(filename):
+                layer_list = self._list_layers(extended, sys.stdout)
+                if extended and os.path.exists(filename):
                     compare_list(layer_list, parse_xml_gz(filename))
             else:
                 if self.odsn is None:
@@ -675,8 +674,8 @@ class VfrOgr:
                     # build datasource string per file
                     odsn_reset = self.odsn
                     schema_name = None
-                    if self._options['schema_per_file'] or self._options['schema']:
-                        if self._options['schema_per_file']:
+                    if self._schema_per_file or self._schema:
+                        if self._schema_per_file:
                             # set schema per file
                             schema_name = os.path.basename(fname).rstrip('.xml.gz').lower()
                             if schema_name[0].isdigit():
@@ -711,7 +710,7 @@ class VfrOgr:
                 
                 if pg:
                     # reset datasource string per file
-                    if self._options['schema_per_file']:
+                    if self._schema_per_file:
                         self.odsn = odsn_reset
                 
                 if nfeat > 0:

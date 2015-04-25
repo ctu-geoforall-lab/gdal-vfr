@@ -65,7 +65,19 @@ def main():
         else:
             return 0
     
-    pg = VfrPg(options)
+    odsn = None
+    if options['dbname']:
+        odsn = "PG:dbname=%s" % options['dbname']
+        if options['user']:
+            odsn += " user=%s" % options['user']
+        if options['passwd']:
+            odsn += " password=%s" % options['passwd']
+        if options['host']:
+            odsn += " host=%s" % options['host']
+    
+    pg = VfrPg(options['schema'], options['schema_per_file'], odsn,
+               options['geom'], options['layer'], options['nogeomskip'],
+               options['overwrite'])
     
     # list output database and exit
     if options['list']:
@@ -78,7 +90,7 @@ def main():
         return 0
     
     # import VFR files
-    ipass = pg.run()
+    ipass = pg.run(options['append'], options['extended'])
     
     # create indices for output tables
     pg.create_indices()

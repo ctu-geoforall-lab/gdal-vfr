@@ -4,12 +4,14 @@ from vfrogr import VfrOgr, Mode
 from logger import VfrLogger
 
 class VfrPg(VfrOgr):
-    def __init__(self, options):
-        VfrOgr.__init__(self, "PostgreSQL", options)
+    def __init__(self, schema='public', schema_per_file=False, *args):
+        VfrOgr.__init__(self, "PostgreSQL", *args)
+        self._schema = schema
+        self._schema_per_file = schema_per_file
         
         # build dsn string and options
         self._lco_options = []
-        if options['dbname']:
+        if self.odsn:
             # open connection to DB
             self._conn = self._opendb(self.odsn[3:])
         else:
@@ -21,20 +23,6 @@ class VfrPg(VfrOgr):
         # todo: close ogr ds?
         pass
         
-    def _build_dsn(self, options):
-        if not options['dbname']:
-            return None
-    
-        odsn = "PG:dbname=%s" % options['dbname']
-        if options['user']:
-            odsn += " user=%s" % options['user']
-        if options['passwd']:
-            odsn += " password=%s" % options['passwd']
-        if options['host']:
-            odsn += " host=%s" % options['host']
-        
-        return odsn
-
     def _opendb(self, conn_string):
         try:
             import psycopg2
@@ -104,7 +92,7 @@ class VfrPg(VfrOgr):
 
         cursor = self._conn.cursor()
         for schema in self.schema_list:
-            for layer in self.layer_list:
+            for layer in self._layer_list:
                 if layer == 'ZaniklePrvky':
                     # skip deleted features
                     continue
