@@ -450,8 +450,8 @@ class VfrOgr:
                 idx = 0
 
             if ofrmt in ('PostgreSQL', 'OCI'):
-                remove_option(options, 'GEOMETRY_NAME')
-                options.append('GEOMETRY_NAME=%s' % feat_defn.GetGeomFieldDefn(idx).GetName().lower())
+                self._remove_option('GEOMETRY_NAME')
+                self._lco_options.append('GEOMETRY_NAME=%s' % feat_defn.GetGeomFieldDefn(idx).GetName().lower())
         else:
             geom_type = ogr.wkbNone
 
@@ -684,10 +684,12 @@ class VfrOgr:
                             schema_name = options['schema'].lower()
 
                         # create schema in output DB if needed
-                        self._create_schema(conn, schema_name)
-                        odsn += ' active_schema=%s' % schema_name
+                        self._create_schema(schema_name)
+                        self.odsn += ' active_schema=%s' % schema_name
                         if schema_name not in self.schema_list:
                             self.schema_list.append(schema_name)
+                        self._ods.Destroy() # TODO: do it better
+                        self._ods = self._odrv.Open(self.odsn, True)
 
                 # check mode - process changes or append
                 mode = Mode.write
@@ -712,6 +714,8 @@ class VfrOgr:
                     # reset datasource string per file
                     if self._schema_per_file:
                         self.odsn = odsn_reset
+                        self._ods.Destroy()
+                        self._ods = self._odrv.Open(self.odsn, True)
                 
                 if nfeat > 0:
                     append = True # append on next passes
