@@ -20,8 +20,6 @@ class VfrPg(VfrOgr):
                 
     def __del__(self):
         self._conn.close()
-        # todo: close ogr ds?
-        pass
         
     def _opendb(self, conn_string):
         try:
