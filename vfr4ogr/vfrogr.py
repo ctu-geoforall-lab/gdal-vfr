@@ -691,7 +691,9 @@ class VfrOgr:
                             self.schema_list.append(schema_name)
                         self._ods.Destroy() # TODO: do it better
                         self._ods = self._odrv.Open(self.odsn, True)
-
+                        if self._ods is None:
+                            raise VfrError("Unable to open or create new datasource '%s'" % self.odsn)
+                
                 # check mode - process changes or append
                 mode = Mode.write
                 if fname.split('_')[-1][0] == 'Z':
@@ -713,10 +715,12 @@ class VfrOgr:
                 
                 if pg:
                     # reset datasource string per file
-                    if self._schema_per_file:
+                    if self._schema_per_file or self._schema:
                         self.odsn = odsn_reset
                         self._ods.Destroy()
                         self._ods = self._odrv.Open(self.odsn, True)
+                        if self._ods is None:
+                            raise VfrError("Unable to open or create new datasource '%s'" % self.odsn)
                 
                 if nfeat > 0:
                     append = True # append on next passes
