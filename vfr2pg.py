@@ -169,7 +169,7 @@ def main():
                 error("Unable to read %s: %s" % (fname, e))
             
             # reset datasource string per file
-            if options['schema_per_file']:
+            if options['schema_per_file'] or options['schema']:
                 odsn = odsn_reset
             
             if nfeat > 0:
