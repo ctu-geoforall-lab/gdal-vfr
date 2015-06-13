@@ -82,8 +82,9 @@ def download_vfr(url):
     except urllib2.HTTPError as e:
         fd.close()
         if e.code == 404:
-            error("File '%s' not found" % url)
-    
+            os.remove(local_file)
+            raise VfrError("File '%s' not found" % url)
+        
     fd.close()
     
     return local_file
