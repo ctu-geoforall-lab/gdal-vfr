@@ -670,11 +670,11 @@ class VfrOgr:
                     for l in self._list_layers(fd=None):
                         if l not in layer_list:
                             layer_list.append(l)
-                
+
+                schema_name = None                
                 if pg:
                     # build datasource string per file
                     odsn_reset = self.odsn
-                    schema_name = None
                     if self._schema_per_file or self._schema:
                         if self._schema_per_file:
                             # set schema per file
@@ -709,7 +709,7 @@ class VfrOgr:
                 
                 # do the conversion
                 try:
-                    nfeat = self._convert_vfr(mode)
+                    nfeat = self._convert_vfr(mode, schema_name)
                 except RuntimeError as e:
                     raise VfrError("Unable to read %s: %s" % (fname, e))
                 
