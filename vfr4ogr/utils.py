@@ -3,32 +3,33 @@ import sys
 import gzip
 import urllib2
 import datetime
-import logging
-
 from xml.dom.minidom import parse, parseString
 
-logger = logging.getLogger()
-logFile = None
-###logFile = 'log.%d' % os.getpid()
-###logger.addHandler(logging.FileHandler(logFile, delay = True))
-logger.addHandler(logging.StreamHandler(sys.stderr))
+try:
+    from osgeo import gdal, ogr
+except ImportError, e:
+    sys.exit('ERROR: Import of ogr from osgeo failed. %s' % e)
 
-# file mode
-class Mode:
-    write  = 0
-    append = 1
-    change = 2
+from exception import VfrError
+from logger import VfrLogger
 
-# feature action (changes only)
-class Action:
-    add    = 0
-    update = 1
-    delete = 2
-
-# check if log file exists and print message about that
-def check_log():
-    if logFile and os.path.exists(logFile):
-        message("NOTICE: CHECK OUT '%s' FOR WARNINGS!" % logFile)
+# list supported OGR formats
+def list_formats():
+    cnt = ogr.GetDriverCount()
+    
+    formatsList = [] 
+    for i in range(cnt):
+        driver = ogr.GetDriver(i)
+        if not driver.TestCapability("CreateDataSource"):
+            continue
+        driverName = driver.GetName()
+        if driverName == 'GML':
+            continue
+        
+        formatsList.append(driverName.replace(' ', '_'))
+    
+    for i in sorted(formatsList):
+        print i
 
 # check input VFR file exists
 def check_file(filename):
@@ -36,35 +37,15 @@ def check_file(filename):
         return None
     
     if filename.startswith('-'):
-        fatal('No input file specified')
+        raise VfrError('No input file specified')
     if not os.path.isfile(filename):
-        fatal("'%s' doesn't exists or it's not a file" % filename)
+        raise VfrError("'%s' doesn't exists or it's not a file" % filename)
     
     return filename
 
-# print fatal error message and exit
-def fatal(msg):
-    sys.exit('ERROR: ' + str(msg))
-
-# print warning message
-def warning(msg):
-    # sys.stderr.write('WARNING: %s%s' % (str(msg), os.linesep))
-    logger.warning(msg)
-
-# print error message
-def error(msg):
-    sys.stderr.write('ERROR: %s%s' % (str(msg), os.linesep))
-
-# print message to stdout
-def message(msg):
-    sys.stdout.write('-' * 80 + os.linesep)
-    sys.stdout.write(msg + os.linesep)
-    sys.stdout.write('-' * 80 + os.linesep)
-    sys.stdout.flush()
-    
 # parse VFR (XML) file
 def parse_xml_gz(filename):
-    message("Comparing OGR layers and input XML file (may take some time)...")
+    VfrLogger.msg("Comparing OGR layers and input XML file (may take some time)...")
     infile = gzip.open(filename)
     content = infile.read()
     
@@ -72,7 +53,7 @@ def parse_xml_gz(filename):
     dom = parseString(content)
     data = dom.getElementsByTagName('vf:Data')[0]
     if data is None:
-        fatal("vf:Data not found")
+        raise VfrError("vf:Data not found")
 
     item_list = []
     for item in data.childNodes:
@@ -92,7 +73,7 @@ def compare_list(list1, list2):
 
 # download VFR file to local disc
 def download_vfr(url):
-    message("Downloading %s into currect directory..." % url)
+    VfrLogger.msg("Downloading %s into currect directory..." % url)
     local_file = os.path.basename(url)
     ### urllib.urlretrieve (url, local_file)
     fd = open(local_file, 'wb')
@@ -101,8 +82,9 @@ def download_vfr(url):
     except urllib2.HTTPError as e:
         fd.close()
         if e.code == 404:
-            error("File '%s' not found" % url)
-    
+            os.remove(local_file)
+            raise VfrError("File '%s' not found" % url)
+        
     fd.close()
     
     return local_file
@@ -124,15 +106,6 @@ def yesterday(string = True):
     if string:
         return day.strftime("%Y%m%d")
     return day
-
-# remove specified option from list
-def remove_option(options, name):
-    i = 0
-    for opt in options:
-        if opt.startswith(name):
-            del options[i]
-            return 
-        i += 1
 
 # get date internal
 def get_date_interval(date):

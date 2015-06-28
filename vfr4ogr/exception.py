@@ -1,0 +1,2 @@
+class VfrError(Exception):
+    pass
