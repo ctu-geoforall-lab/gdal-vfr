@@ -84,5 +84,12 @@
       <Type>Integer</Type>
       <SubType>Integer64</SubType>
     </PropertyDefn>
+    <!-- Datum vzniku -->
+    <PropertyDefn>
+      <Name>DatumVzniku</Name>
+      <ElementPath>DatumVzniku</ElementPath>
+      <Type>String</Type>
+      <Width>19</Width>
+    </PropertyDefn>
   </GMLFeatureClass>
 </GMLFeatureClassList>

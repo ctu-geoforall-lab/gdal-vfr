@@ -114,5 +114,12 @@
       <ElementPath>CharakterZsjKod</ElementPath>
       <Type>Integer</Type>
     </PropertyDefn>
+    <!-- Datum vzniku -->
+    <PropertyDefn>
+      <Name>DatumVzniku</Name>
+      <ElementPath>DatumVzniku</ElementPath>
+      <Type>String</Type>
+      <Width>19</Width>
+    </PropertyDefn>
   </GMLFeatureClass>
 </GMLFeatureClassList>
