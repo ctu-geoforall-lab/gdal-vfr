@@ -1,3 +1,13 @@
+###############################################################################
+#
+# VFR importer based on GDAL library
+#
+# Author: Martin Landa <landa.martin gmail.com>
+#
+# Licence: MIT/X
+#
+###############################################################################
+
 import logging
 import sys
 import os
@@ -7,8 +17,9 @@ logFile = None
 ###logger.addHandler(logging.FileHandler(logFile, delay = True))
 
 class Logger(logging.getLoggerClass()):
-    # print message to stdout
     def msg(self, msg):
+        """Print messages to stdout
+        """
         sys.stdout.write('-' * 80 + os.linesep)
         sys.stdout.write(msg + os.linesep)
         sys.stdout.write('-' * 80 + os.linesep)
@@ -21,4 +32,3 @@ VfrLogger.addHandler(logging.StreamHandler(sys.stderr))
 def check_log():
     if logFile and os.path.exists(logFile):
         VfrLogger.msg("NOTICE: CHECK OUT '%s' FOR WARNINGS!" % logFile)
-

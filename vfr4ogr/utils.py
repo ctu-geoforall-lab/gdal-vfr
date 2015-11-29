@@ -1,3 +1,13 @@
+###############################################################################
+#
+# VFR importer based on GDAL library
+#
+# Author: Martin Landa <landa.martin gmail.com>
+#
+# Licence: MIT/X
+#
+###############################################################################
+
 import os
 import sys
 import gzip
@@ -13,8 +23,9 @@ except ImportError, e:
 from exception import VfrError
 from logger import VfrLogger
 
-# list supported OGR formats
 def list_formats():
+    """List supported OGR formats (write access).
+    """
     cnt = ogr.GetDriverCount()
     
     formatsList = [] 
@@ -31,8 +42,15 @@ def list_formats():
     for i in sorted(formatsList):
         print i
 
-# check input VFR file exists
 def check_file(filename):
+    """Check input VFR file exists.
+
+    Raise VfrError on error.
+    
+    @param: file name
+    
+    @return file name or None
+    """
     if not filename:
         return None
     
@@ -43,8 +61,13 @@ def check_file(filename):
     
     return filename
 
-# parse VFR (XML) file
 def parse_xml_gz(filename):
+    """Parse VFR (XML) file.
+
+    @param filename: name of VFR file to be parsed
+
+    @return list of items
+    """
     VfrLogger.msg("Comparing OGR layers and input XML file (may take some time)...")
     infile = gzip.open(filename)
     content = infile.read()
@@ -61,8 +84,12 @@ def parse_xml_gz(filename):
     
     return item_list
 
-# compate to list of XML nodes (see parse_xml_gz())
 def compare_list(list1, list2):
+    """Compare list of XML nodes (see parse_xml_gz()).
+
+    @param list1: first list
+    @param list2: second list
+    """
     for item in list1:
         if item not in list2:
             print "+ %s" % item
@@ -71,11 +98,15 @@ def compare_list(list1, list2):
         if item not in list1:
             print "- %s" % item
 
-# download VFR file to local disc
 def download_vfr(url):
+    """Downloading VFR file to current directory.
+
+    Raise VfrError on error.
+    
+    @param url: URL where file can be downloaded
+    """
     VfrLogger.msg("Downloading %s into currect directory..." % url)
     local_file = os.path.basename(url)
-    ### urllib.urlretrieve (url, local_file)
     fd = open(local_file, 'wb')
     try:
         fd.write(urllib2.urlopen(url).read())
@@ -89,8 +120,13 @@ def download_vfr(url):
     
     return local_file
 
-# get last day of current month
 def last_day_of_month(string = True):
+    """Get last day of current month.
+
+    @param string: True to return string otherwise DateTime
+
+    @return date as string or DateTime
+    """
     today = datetime.date.today()
     if today.month == 12:
         day = today.replace(day=31)
@@ -99,16 +135,26 @@ def last_day_of_month(string = True):
         return day.strftime("%Y%m%d")
     return day
 
-# get formated yesterday 
 def yesterday(string = True):
+    """Get formated yesterday.
+
+    @param string: True to return string otherwise DateTime
+
+    @return date as string or DateTime
+    """
     today = datetime.date.today()
     day = today - datetime.timedelta(days=1)
     if string:
         return day.strftime("%Y%m%d")
     return day
 
-# get date internal
 def get_date_interval(date):
+    """Get date internal.
+
+    @param date internal as string, eg. 20150311:20150327
+
+    @return list of dates
+    """
     dlist = []
     if ':' not in date:
         return [date]

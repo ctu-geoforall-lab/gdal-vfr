@@ -1,5 +1,15 @@
 #!/usr/bin/env python
 
+###############################################################################
+#
+# VFR importer based on GDAL library
+#
+# Author: Martin Landa <landa.martin gmail.com>
+#
+# Licence: MIT/X
+#
+###############################################################################
+
 """
 Converts VFR file into desired GIS format supported by OGR library.
 
@@ -16,7 +26,7 @@ Usage: vfr2ogr [-fedgl] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type
 
        -f          List supported output formats
        -e          Extended layer list statistics 
-       -d          Download VFR data in currect directory (--type required)
+       -d          Download VFR data to the currect directory (--type required)
        -g          Skip features without geometry
        -l          List existing layers in output datasource and exit
        --file      Path to xml.gz or URL list file
@@ -65,24 +75,27 @@ def main():
         os.environ['OGR_SQLITE_SYNCHRONOUS'] = 'OFF'
     elif options['format'] == 'ESRI Shapefile':
         lco_options.append('ENCODING=UTF-8')
-   
+
+    # create convertor
     ogr = VfrOgr(options['format'], options['dsn'],
                  options['geom'], options['layer'], options['nogeomskip'],
                  options['overwrite'], lco_options)
 
-   # list output datasource and exit
     if options['list']:
+        # list output datasource and exit
         ogr.print_summary()
         return 0
 
-    # get list of input VFR file(s)
+    # open input file (VFR or URL list)
     ogr.open_file(filename)
     if options['download']:
+        # download only requested, exiting
         return 0
     
     # import VFR files
     ipass = ogr.run()
-        
+
+    # print final summary
     if ipass > 1 or options.get('append', True):
         ogr.print_summary()
     

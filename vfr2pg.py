@@ -1,5 +1,15 @@
 #!/usr/bin/env python
 
+###############################################################################
+#
+# VFR importer based on GDAL library
+#
+# Author: Martin Landa <landa.martin gmail.com>
+#
+# Licence: MIT/X
+#
+###############################################################################
+
 """
 Imports VFR data to PostGIS database
 
@@ -16,7 +26,7 @@ Usage: vfr2pg [-edsgl] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type=
                        [--overwrite] [--append]
 
        -e          Extended layer list statistics
-       -d          Download VFR data in currect directory (--type required) and exit
+       -d          Download VFR data to the currect directory (--type required) and exit
        -s          Create new schema for each VFR file
        -g          Skip features without geometry
        -l          List existing layers in output database and exit
@@ -58,13 +68,14 @@ def main():
                                                     "file=", "date=", "type=", "layer=", "geom=",
                                                     "dbname=", "schema=", "user=", "passwd=", "host="],
                              options)
-    except GetoptError, e:
+    except GetoptError as e:
         usage()
         if str(e):
             sys.exit(e)
         else:
             return 0
-    
+
+    # build datasource name
     odsn = None
     if options['dbname']:
         odsn = "PG:dbname=%s" % options['dbname']
@@ -74,22 +85,24 @@ def main():
             odsn += " password=%s" % options['passwd']
         if options['host']:
             odsn += " host=%s" % options['host']
-    
+
+    # create convertor
     pg = VfrPg(options['schema'], options['schema_per_file'], odsn,
                options['geom'], options['layer'], options['nogeomskip'],
                options['overwrite'])
     
-    # list output database and exit
     if options['list']:
+        # list output database and exit
         pg.print_summary()
         return 0
-    
-    # get list of input VFR file(s)
+
+    # open input file (VFR or URL list)
     pg.open_file(filename)
     if options['download']:
+        # download only requested, exiting
         return 0
     
-    # import VFR files
+    # import input VFR files to PostGIS
     ipass = pg.run(options['append'], options['extended'])
     
     # create indices for output tables

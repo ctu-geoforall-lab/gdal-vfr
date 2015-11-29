@@ -1,4 +1,15 @@
 #!/usr/bin/env python
+
+###############################################################################
+#
+# VFR importer based on GDAL library
+#
+# Author: Martin Landa <landa.martin gmail.com>
+#
+# Licence: MIT/X
+#
+###############################################################################
+
 """
 Exports VFR data from PostGIS database to various formats.
 
@@ -11,7 +22,7 @@ Usage: vfr2py [-f]  --dbname <database name>
 
        -f          List supported output formats
        -g          Skip features without geometry
-       --dbname    Output PostGIS database
+       --dbname    Input PostGIS database
        --schema    Schema name (default: public)
        --user      User name
        --passwd    Password
@@ -42,6 +53,14 @@ def usage():
     print __doc__
 
 def export_layers(ids, ods, layers, overwrite, nogeomskip, active_schema):
+    """Export PostGIS layers into given output format
+
+    @param ids: input OGR datasource
+    @param ods: output OGR datasource
+    @param overwrite: True to overwrite output datasource
+    @param nogeomskip: True to not skip features without geometry
+    @param active schema: name of schema with tables to be exported
+    """
     nlayers = ids.GetLayerCount()
     for i in range(nlayers):
         layer = ids.GetLayer(i)
@@ -68,7 +87,7 @@ def export_layers(ids, ods, layers, overwrite, nogeomskip, active_schema):
                 sys.stdout.write(" already exists (use --overwrite or --append to modify existing data)\n")
                 continue
 
-            # delete layer if exists and append is not True
+            # delete layer if exists
             if olayer:
                 nlayersOut = ods.GetLayerCount()
                 for iLayerOut in range(nlayersOut): # do it better
@@ -87,19 +106,18 @@ def export_layers(ids, ods, layers, overwrite, nogeomskip, active_schema):
             # start transaction in output layer
             if olayer.TestCapability(ogr.OLCTransactions):
                 olayer.StartTransaction()
-
-                
+            
             # do mapping for fields (needed for Esri Shapefile when
             # field names are truncated)
             field_map = [i for i in range(0, layer.GetLayerDefn().GetFieldCount())]
             
             # copy features from source to destination layer
+            geom_idx = -1
+            fid = n_nogeom = 0
+            feat_without_geom = []
+            
             layer.ResetReading()
             feature = layer.GetNextFeature()
-            geom_idx = -1
-            fid = 0
-            n_nogeom = 0
-            feat_without_geom = []
             while feature:
                 ofeature = ogr.Feature(olayer.GetLayerDefn())
                 ofeature.SetFromWithMap(feature, True, field_map)
@@ -118,6 +136,7 @@ def export_layers(ids, ods, layers, overwrite, nogeomskip, active_schema):
                 
                 feature = layer.GetNextFeature()
 
+            # collect statistics about features without geometry
             n_feat_no_geom = len(feat_without_geom)
             if n_feat_no_geom > 0 and \
                n_feat_no_geom != layer.GetFeatureCount():
@@ -126,6 +145,8 @@ def export_layers(ids, ods, layers, overwrite, nogeomskip, active_schema):
             
             # print statistics per layer
             sys.stdout.write(" %10d features exported" % fid)
+
+            # delete features without geometry if requested
             if len(feat_without_geom) > 0:
                 for fid in feat_without_geom:
                     olayer.DeleteFeature(fid)
@@ -156,7 +177,7 @@ def main():
         else:
             sys.exit(0)
 
-    # build dsn string
+    # build datasource name
     idsn = build_dsn(options)
     if not idsn:
         usage()
@@ -198,11 +219,13 @@ def main():
     if ods is None:
         fatal("Unable to open/create new datasource '%s'" % options['dsn'])
 
+    # export selected layers to destination datasource
     export_layers(ids, ods, layer_list_all, options['overwrite'], options['nogeomskip'], options['schema'])
 
+    # close input and output datasources
     ids.Destroy()
     ods.Destroy()
-
+    
     # delete layers with 0 features
     ods = odrv.Open(options['dsn'], True)
     deleted = True
@@ -222,4 +245,3 @@ def main():
 if __name__ == "__main__":
     atexit.register(check_log)
     sys.exit(main())
-

@@ -1,3 +1,13 @@
+###############################################################################
+#
+# VFR importer based on GDAL library
+#
+# Author: Martin Landa <landa.martin gmail.com>
+#
+# Licence: MIT/X
+#
+###############################################################################
+
 import os
 import sys
 import mimetypes
@@ -14,14 +24,16 @@ from exception import VfrError
 from logger import VfrLogger
 from utils import last_day_of_month, yesterday, download_vfr
 
-# file mode
 class Mode:
+    """File open mode.
+    """
     write  = 0
     append = 1
     change = 2
 
-# feature action (changes only)
 class Action:
+    """Feature action (changes only).
+    """
     add    = 0
     update = 1
     delete = 2
@@ -29,6 +41,19 @@ class Action:
 class VfrOgr:
     def __init__(self, frmt, dsn, geom_name=None, layers=[], nogeomskip=False,
                  overwrite=False, lco_options=[]):
+        """Class for importing VFK data into selected format using GDAL library.
+
+        Raise VfrError on error.
+        
+        @param frmt: output format
+        @param dsn: output datasource name
+        @param geom_name: preferred geometry column name (None for all columns)
+        @param layers: list of selected layes ([] for all layers)
+        @param nogeomskip: True to skip features without geometry
+        @param overwrite: True to overwrite existing files
+        @param lco_options: list of layer creation options (see GDAL library for details
+        """
+        # check for required GDAL version
         self._check_ogr()
         
         self.frmt = frmt
@@ -40,37 +65,39 @@ class VfrOgr:
         
         self._file_list = []
         
-        # input
+        # input datasource
         self._idrv = ogr.GetDriverByName("GML")
         if self._idrv is None:
             raise VfrError("Unable to select GML driver")
         self._ids = None
         
-        # output
+        # check output datasource
         self.odsn = dsn
         if not self.odsn:
             self._odrv = self._ods = None
             return
 
+        # open driver for output format
         self._odrv = ogr.GetDriverByName(frmt)
         if self._odrv is None:
             raise VfrError("Format '%s' is not supported" % frmt)
         
-        # try to open datasource
+        # try to open output datasource
         self._ods = self._odrv.Open(self.odsn, True)
         if self._ods is None:
             # if fails, try to create new datasource
             self._ods = self._odrv.CreateDataSource(self.odsn)
         if self._ods is None:
             raise VfrError("Unable to open or create new datasource '%s'" % self.odsn)
+        # check also capability to create geometry columns
         self._create_geom = self._ods.TestCapability(ogr.ODsCCreateGeomFieldAfterCreateLayer)
         if not self._geom_name and \
            not self._create_geom:
             VfrLogger.warning("Driver '%s' doesn't support multiple geometry columns. "
                               "Only first will be used." % self._odrv.GetName())
 
-        # OVERWRITE is not support by Esri Shapefile
         if self._overwrite:
+            # overwrite is not support by Esri Shapefile
             if self.frmt != 'ESRI Shapefile':
                 self._lco_options.append("OVERWRITE=YES")
 
@@ -80,7 +107,10 @@ class VfrOgr:
             self._ods.Destroy()
 
     def _check_ogr(self):
-        # check GDAL/OGR library, version >= 1.11 required
+        """Check GDAL/OGR library, version >= 1.11 required.
+
+        Raise VfrError when condition is not satisfied.
+        """
         version = gdal.__version__.split('.', 1)
         if not (int(version[0]) > 1 or int(version[1].split('.', 1)[0]) >= 11):
             raise VfrError("GDAL/OGR 1.11 or later required (%s found)" % '.'.join(version))
@@ -91,8 +121,13 @@ class VfrOgr:
         
         gdal.PushErrorHandler(self._error_handler)
 
-    # redirect warnings to the file
-    def _error_handler(self,err_level, err_no, err_msg):
+    def _error_handler(self, err_level, err_no, err_msg):
+        """Redirect warnings produced by GDAL library to the file.
+
+        @param err_level: error level to be redirected
+        @param err_no: unused 
+        @param error_msg: message
+        """
         if err_level > gdal.CE_Warning:
             raise RuntimeError(err_msg)
         elif err_level == gdal.CE_Debug:
@@ -101,6 +136,13 @@ class VfrOgr:
             VfrLogger.warning(err_msg)
 
     def open_file(self, filename, force_date = None):
+        """Open input file.
+
+        @param filename: name of file to be open
+        @param force_date: force date
+
+        @return list of open files
+        """
         self._file_list = list()
         ds = None
         if os.linesep in filename:
@@ -151,8 +193,9 @@ class VfrOgr:
 
         return self._file_list
 
-    # print summary for multiple file input
     def print_summary(self):
+        """Print summary for multiple file input.
+        """
         stime = time.time()
         layer_list = copy.deepcopy(self._layer_list)
         if not layer_list:
@@ -172,16 +215,29 @@ class VfrOgr:
         etime = str(datetime.timedelta(seconds=nsec))
         VfrLogger.msg("Time elapsed: %s" % str(etime))
 
-    # open OGR data-source for reading
     def _open_ds(self, filename):
+        """Open datasource for reading.
+        
+        Raise VfrError on failure.
+        
+        @param filename: name of file to be open as datasource
+
+        @return datasource instance
+        """
         self._ids = self._idrv.Open(filename, False)
         if self._ids is None:
             raise VfrError("Unable to open file '%s'. Skipping.\n" % filename)
 
         return self._ids
     
-    # list OGR layers of input VFR file
     def _list_layers(self, extended = False, fd = sys.stdout):
+        """List OGR layers of input VFR file.
+
+        @param extended: True for extended output
+        @param fd: file description for output
+
+        @return list of layers
+        """
         nlayers = self._ids.GetLayerCount()
         layer_list = list()
         for i in range(nlayers):
@@ -205,10 +261,16 @@ class VfrOgr:
 
         return layer_list
 
-    # write VFR features to output data-source
     def _convert_vfr(self, mode = Mode.write, schema=None):
+        """Write features from input (VFR) datasource to output datasource
+
+        @param: file mode (see class Mode for details
+        @param schema: name of DB schema (relevant only for PG output datasource
+
+        @return number of converted features
+        """
         if self._overwrite and mode == Mode.write:
-            # delete also layers which are not part of ST_UKSH
+            # delete also layers which are not part of ST_UKSH (do it better?)
             for layer in ("ulice", "parcely", "stavebniobjekty", "adresnimista"):
                 if self._ods.GetLayerByName(layer) is not None:
                     self._ods.DeleteLayer(layer)
@@ -227,8 +289,8 @@ class VfrOgr:
         for iLayer in range(nlayers):
             layer = self._ids.GetLayer(iLayer)
             layer_name = layer.GetName()
-            ### force lower case for output layers, some drivers are doing
-            ### that automatically anyway
+            # force lower case for output layers, some drivers are
+            # doing that automatically anyway
             layer_name_lower = layer_name.lower()
 
             if self._layer_list and layer_name not in self._layer_list:
@@ -245,8 +307,7 @@ class VfrOgr:
                 sys.stdout.write(" already exists (use --overwrite or --append to modify existing data)\n")
                 continue
 
-            ### TODO: fix output drivers not to use default geometry
-            ### names
+            # fix output drivers not to use default geometry names
             if self.frmt in ('PostgreSQL', 'OCI') and not self._geom_name:
                 if layer_name_lower == 'ulice':
                     self._remove_option('GEOMETRY_NAME')
@@ -277,7 +338,7 @@ class VfrOgr:
 
             # make sure that PG sequence is up-to-date (import for fid == -1)
             fid = -1
-            if hasattr(self, "_conn"): # TODO (do it better)
+            if hasattr(self, "_conn"): # do it better?
                 if schema:
                     table_name = '%s.%s' % (schema, layer_name_lower)
                 else:
@@ -332,7 +393,6 @@ class VfrOgr:
                     fid += 1
 
                 # clone feature
-                ### ofeature = feature.Clone() # replace by SetFrom()
                 ofeature = ogr.Feature(olayer.GetLayerDefn())
                 ofeature.SetFromWithMap(feature, True, field_map)
 
@@ -340,14 +400,6 @@ class VfrOgr:
                 if self._geom_name:
                     if geom_idx < 0:
                         geom_idx = feature.GetGeomFieldIndex(self._geom_name)
-
-                        # delete remaining geometry columns
-                        ### not needed - see SetFrom()
-                        ### odefn = ofeature.GetDefnRef()
-                        ### for i in range(odefn.GetGeomFieldCount()):
-                        ###    if i == geom_idx:
-                        ###        continue
-                        ###    odefn.DeleteGeomFieldDefn(i)
 
                     self._modify_feature(feature, geom_idx, ofeature)
 
@@ -374,7 +426,7 @@ class VfrOgr:
             if olayer.TestCapability(ogr.OLCTransactions):
                 olayer.CommitTransaction()
 
-            # print statistics per layer
+            # print statistics per layer to the stdout
             sys.stdout.write(" %10d features" % ifeat)
             if mode == Mode.change:
                 n_added = n_updated = n_deleted = 0
@@ -400,7 +452,6 @@ class VfrOgr:
 
             # update sequence for PG
             if hasattr(self, "_conn"):
-                ### fid = get_fid_max(userdata['pgconn'], layer_name_lower)
                 if fid > 0:
                     if schema:
                         table_name = '%s.%s' % (schema, layer_name_lower)
@@ -413,8 +464,11 @@ class VfrOgr:
 
         return nfeat
 
-    # remove specified option from list
     def _remove_option(self, name):
+        """Remove specified option from list
+
+        @param name: option to be removed
+        """
         i = 0
         for opt in self._lco_options:
             if opt.startswith(name):
@@ -422,8 +476,13 @@ class VfrOgr:
                 return 
             i += 1
 
-    # delete specified layer from output data-source
     def _delete_layer(self, layerName):
+        """Delete specified layer from output datasource
+
+        @param layerName: name of layer to be deleted
+
+        @return True if deleted other False
+        """
         nlayersOut = self._ods.GetLayerCount()
         for iLayerOut in range(nlayersOut): # do it better
             if self._ods.GetLayer(iLayerOut).GetName() == layerName:
@@ -432,8 +491,14 @@ class VfrOgr:
 
         return False
 
-    # create new layer in output data-source
     def _create_layer(self, layerName, ilayer):
+        """Create new layer in output datasource.
+
+        @param layerName: name of layer to be created
+        @param ilayer: layer instance (input datasource)
+
+        @return layer instance (output datasource)
+        """
         ofrmt = self._ods.GetDriver().GetName()
         # determine geometry type
         if self._geom_name or not self._create_geom:
@@ -446,7 +511,6 @@ class VfrOgr:
             if idx > -1:
                 geom_type = feat_defn.GetGeomFieldDefn(idx).GetType()
             else:
-                # warning("Layer '%s': geometry '%s' not available" % (layerName, geom_name))
                 geom_type = ilayer.GetGeomType()
                 idx = 0
 
@@ -491,8 +555,13 @@ class VfrOgr:
 
         return olayer
 
-    # get list of geometry column for specified layer
     def _get_geom_count(self, layer):
+        """Get list of geometry column for specified layer.
+
+        @param: layer instance
+        
+        @return list of column names
+        """
         defn = layer.GetLayerDefn()
         geom_list = list()
         for i in range(defn.GetGeomFieldCount()):
@@ -505,8 +574,14 @@ class VfrOgr:
 
         return geom_list
 
-    # modify output feature - remove remaining geometry columns
     def _modify_feature(self, feature, geom_idx, ofeature, suppress=False):
+        """Modify output feature - remove remaining geometry columns.
+
+        @param feature: input feature
+        @param geom_idx: index of geometry column to be kept
+        @param ofeature: feature to be modified
+        @param suppress: suppress warnings
+        """
         # set requested geometry
         if geom_idx > -1:
             geom = feature.GetGeomFieldRef(geom_idx)
@@ -520,13 +595,18 @@ class VfrOgr:
                     
         return geom_idx
 
-    # process list of features (per layer) to be modified (update/add)
-    #
-    # returns directory where keys are fids from input (VFR) layer and
-    # items are tuples (action, fid of existing feature if found)
-    #
-    # TODO: use numeric data as key
     def _process_changes(self, ilayer, olayer, column='gml_id'):
+        """Process list of features (per layer) to be modified (update/add).
+
+        @todo: use numeric data as key
+
+        @param ilayer: input layer instance
+        @param olayer: output layer instance
+        @param column: key column to be processed
+        
+        @return directory where keys are fids from input (VFR) layer and
+        items are tuples (action, fid of existing feature if found)
+        """
         changes_list = {}
 
         ilayer.ResetReading()
@@ -546,7 +626,8 @@ class VfrOgr:
 
             if n_feat > 1:
                 # TODO: how to handle correctly?
-                VfrLogger.warning("Layer '%s': %d features '%s' found. Duplicated features will be deleted." % \
+                VfrLogger.warning("Layer '%s': %d features '%s' found. "
+                                  "Duplicated features will be deleted." % \
                             (olayer.GetName(), n_feat, fcode))
                 for fid in found[1:]:
                     # delete duplicates
@@ -559,8 +640,14 @@ class VfrOgr:
 
         return changes_list
 
-    # process deleted features (process OGR layer 'ZaniklePrvky')
     def _process_deleted_features(self, layer):
+        """Process deleted features (process OGR layer 'ZaniklePrvky')
+
+        @param layer: layer instance
+
+        @return: list of deleted features per layer as tuple (action,
+        fid)
+        """
         lcode2lname = {
             'ST' : 'Staty',
             'RS' : 'RegionySoudrznosti',
@@ -633,11 +720,16 @@ class VfrOgr:
         return dlist
 
     def run(self, append=False, extended=False):
+        """Run conversion process.
+
+        @param append: True for append mode (add features to output)
+        @param extended: True for extended statistics
+        """
         ipass = 0
         stime = time.time()
         layer_list = copy.deepcopy(self._layer_list)
         
-        pg = hasattr(self, "_conn")
+        pg = hasattr(self, "_conn") # PG is output datasource
         if pg:
             self.schema_list = []
             epsg_checked = False

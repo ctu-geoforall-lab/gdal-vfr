@@ -1,3 +1,13 @@
+###############################################################################
+#
+# VFR importer based on GDAL library
+#
+# Author: Martin Landa <landa.martin gmail.com>
+#
+# Licence: MIT/X
+#
+###############################################################################
+
 import os
 import sys
 import getopt
@@ -6,6 +16,13 @@ from utils import check_file, download_vfr, last_day_of_month, \
     yesterday, get_date_interval
 
 def get_opt(argv, flags, params, optdir):
+    """Parse options.
+
+    @param argv: arguments
+    @param flags: flags
+    @param params: parameters
+    @param optdir: option directory to be set up
+    """
     try:
         opts, args = getopt.getopt(argv[1:], flags, params)
     except getopt.GetoptError as err:
@@ -49,6 +66,13 @@ def get_opt(argv, flags, params, optdir):
             sys.exit("unhandled option: %s" % o)
 
 def parse_cmd(argv, flags, params, optdir):
+    """Parse command.
+
+    @param argv: arguments
+    @param flags: flags
+    @param params: parameters
+    @param optdir: option directory to be set up
+    """
     get_opt(argv, flags, params, optdir)
 
     if optdir['list']:

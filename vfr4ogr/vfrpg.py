@@ -1,3 +1,13 @@
+###############################################################################
+#
+# VFR importer based on GDAL library
+#
+# Author: Martin Landa <landa.martin gmail.com>
+#
+# Licence: MIT/X
+#
+###############################################################################
+
 import sys
 
 from vfrogr import VfrOgr, Mode
@@ -6,6 +16,12 @@ from exception import VfrError
 
 class VfrPg(VfrOgr):
     def __init__(self, schema='public', schema_per_file=False, *args):
+        """Class for importing VFK data into PostGIS database.
+
+        @param schema: name of schema where to import data
+        @param schema_per_file: True to create for each file separate schema
+        @param args: other argumenets, see VfrOgr class for details
+        """
         VfrOgr.__init__(self, "PostgreSQL", *args)
         self._schema = schema
         self._schema_per_file = schema_per_file
@@ -23,6 +39,10 @@ class VfrPg(VfrOgr):
         self._conn.close()
         
     def _opendb(self, conn_string):
+        """Open DB connection.
+
+        @param conn_string: PG connection string
+        """
         try:
             import psycopg2
         except ImportError as e:
@@ -44,8 +64,11 @@ class VfrPg(VfrOgr):
         
         return conn
 
-    # create output schema if not exists
     def _create_schema(self, name):
+        """Create output schema if not exists.
+
+        @param name: name of schema to be created
+        """
         cursor = self._conn.cursor()
         try:
             cursor.execute("SELECT schema_name FROM information_schema.schemata "
@@ -59,8 +82,9 @@ class VfrPg(VfrOgr):
 
         cursor.close()
 
-    # insert EPSG 5514 definition into output DB if not defined
     def _check_epsg(self):
+        """Insert EPSG 5514 definition into output DB if not defined.
+        """
         if not self._conn:
             return
 
@@ -79,8 +103,9 @@ class VfrPg(VfrOgr):
 
         cursor.close()
 
-    # create indices for output tables (gml_id)
     def create_indices(self):
+        """Create indices for output tables (gml_id).
+        """
         if not self._conn:
             return
 
@@ -119,8 +144,13 @@ class VfrPg(VfrOgr):
 
         cursor.close()
 
-    # update fid sequence
     def _update_fid_seq(self, table, fid, column = 'ogc_fid'):
+        """Update fid sequence.
+
+        @param table: name of table
+        @param fid: feature id (max)
+        @param column: name of column
+        """
         if not self._conn:
             VfrLogger.warning("Unable to update FID sequence for table '%s'" % table)
             return
@@ -133,8 +163,14 @@ class VfrPg(VfrOgr):
 
         cursor.close()
 
-    # get max fid
     def _get_fid_max(self, table, column='ogc_fid'):
+        """Get maximal feature id.
+
+        @param table: name of table
+        @param column: name of column (key)
+
+        @return max fid or -1 on error
+        """
         if not self._conn:
             VfrLogger.warning("No DB connection defined." % table)
             return
