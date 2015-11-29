@@ -1,5 +1,8 @@
 #!/bin/sh
 
-./vfr2pg.py $*
+SCRIPT=`realpath $0`
+SCRIPTPATH=`dirname $SCRIPT`
 
-exit 0
+$SCRIPTPATH/vfr2pg.py $*
+
+exit `echo $?`

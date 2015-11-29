@@ -1,5 +1,8 @@
 #!/bin/sh
 
-./pg2ogr.py $*
+SCRIPT=`realpath $0`
+SCRIPTPATH=`dirname $SCRIPT`
 
-exit 0
+$SCRIPTPATH/pg2ogr.py $*
+
+exit `echo $?`
