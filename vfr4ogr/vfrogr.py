@@ -15,6 +15,7 @@ import time
 import datetime
 import copy
 import logging
+import urllib2
 
 try:
     from osgeo import gdal, ogr
@@ -23,7 +24,7 @@ except ImportError, e:
 
 from exception import VfrError
 from logger import VfrLogger
-from utils import last_day_of_month, yesterday, download_vfr
+from utils import last_day_of_month, yesterday
 
 class Mode:
     """File open mode.
@@ -157,8 +158,14 @@ class VfrOgr:
             VfrError("Configuration file not found")
 
         # set default values
-        conf = { 'LOG_DIR' : '.' }
+        conf = { 'LOG_DIR' : '.',
+                 'DATA_DIR' : 'data' }
 
+        # create data directory if not exists
+        if not os.path.exists(conf['DATA_DIR']):
+            os.makedirs(conf['DATA_DIR'])
+            VfrLogger.info("Creating <{}>".format(conf['DATA_DIR']))
+        
         # read configuration from file
         with open(cfile) as f:
             for line in f.readlines():
@@ -173,6 +180,36 @@ class VfrOgr:
                 conf[key] = value
         
         return conf
+
+    def _download_vfr(self, url):
+        """Downloading VFR file to selected directory.
+
+        Raise VfrError on error.
+
+        @param url: URL where file can be downloaded
+        """
+        if os.path.exists(url): # don't download file if found
+            return
+
+        VfrLogger.msg("Downloading {} ({})...".format(url, os.path.abspath(self._conf['DATA_DIR'])),
+                      header=True)
+        
+        if not url.startswith('http://'):
+            url = 'http://vdp.cuzk.cz/vymenny_format/soucasna/' + url
+
+        local_file = os.path.basename(url)
+        fd = open(os.path.join(self._conf['DATA_DIR'], local_file), 'wb')
+        try:
+            fd.write(urllib2.urlopen(url).read())
+        except urllib2.HTTPError as e:
+            fd.close()
+            if e.code == 404:
+                os.remove(local_file)
+                raise VfrError("File '%s' not found" % url)
+
+        fd.close()
+
+        return local_file
 
     def open_file(self, filename, force_date = None):
         """Open input file.
@@ -214,11 +251,7 @@ class VfrOgr:
                     if not line.endswith('.xml.gz'):
                         # add extension if missing
                         line += '.xml.gz'
-
-                    if not os.path.exists(line):
-                        if not line.startswith('http://'):
-                            line = 'http://vdp.cuzk.cz/vymenny_format/soucasna/' + line
-                        line = download_vfr(line)
+                        line = self._download_vfr(line)
 
                     self._file_list.append(line)
                     i += 1
@@ -229,7 +262,8 @@ class VfrOgr:
         else:
             # single VFR file
             self._file_list.append(filename)
-
+            self._download_vfr(filename)
+        
         return self._file_list
 
     def print_summary(self):

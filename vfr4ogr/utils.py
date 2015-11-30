@@ -11,7 +11,6 @@
 import os
 import sys
 import gzip
-import urllib2
 import datetime
 import getpass
 from time import gmtime, strftime
@@ -99,28 +98,6 @@ def compare_list(list1, list2):
     for item in list2:
         if item not in list1:
             print "- %s" % item
-
-def download_vfr(url):
-    """Downloading VFR file to current directory.
-
-    Raise VfrError on error.
-    
-    @param url: URL where file can be downloaded
-    """
-    VfrLogger.msg("Downloading %s into currect directory..." % url, header=True)
-    local_file = os.path.basename(url)
-    fd = open(local_file, 'wb')
-    try:
-        fd.write(urllib2.urlopen(url).read())
-    except urllib2.HTTPError as e:
-        fd.close()
-        if e.code == 404:
-            os.remove(local_file)
-            raise VfrError("File '%s' not found" % url)
-        
-    fd.close()
-    
-    return local_file
 
 def last_day_of_month(string = True):
     """Get last day of current month.

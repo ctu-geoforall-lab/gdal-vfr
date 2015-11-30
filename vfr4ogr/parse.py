@@ -12,8 +12,7 @@ import os
 import sys
 import getopt
 
-from utils import check_file, download_vfr, last_day_of_month, \
-    yesterday, get_date_interval
+from utils import check_file, last_day_of_month, yesterday, get_date_interval
 
 def get_opt(argv, flags, params, optdir):
     """Parse options.
@@ -121,14 +120,9 @@ def parse_cmd(argv, flags, params, optdir):
             base_url += "specialni/"
         for d in date_list:
             fname = "%s_%s.xml.gz" % (d, ftype)
-            url = base_url + fname
-            if os.path.exists(fname):
-                # use existing file
-                flist.append(fname)
-            else:
-                # download file
-                flist.append(download_vfr(url))
-            
+            # use existing file
+            flist.append(base_url + fname)
+        
         if not flist:
             raise getopt.GetoptError("Empty date range")
         
