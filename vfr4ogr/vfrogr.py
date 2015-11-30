@@ -188,8 +188,9 @@ class VfrOgr:
 
         @param url: URL where file can be downloaded
         """
-        if os.path.exists(url): # don't download file if found
-            return
+        local_file = os.path.join(self._conf['DATA_DIR'], os.path.basename(url))
+        if os.path.exists(local_file): # don't download file if found
+            return local_file
 
         VfrLogger.msg("Downloading {} ({})...".format(url, os.path.abspath(self._conf['DATA_DIR'])),
                       header=True)
@@ -197,8 +198,8 @@ class VfrOgr:
         if not url.startswith('http://'):
             url = 'http://vdp.cuzk.cz/vymenny_format/soucasna/' + url
 
-        local_file = os.path.basename(url)
-        fd = open(os.path.join(self._conf['DATA_DIR'], local_file), 'wb')
+
+        fd = open(local_file, 'wb')
         try:
             fd.write(urllib2.urlopen(url).read())
         except urllib2.HTTPError as e:
@@ -812,7 +813,12 @@ class VfrOgr:
                           (fname, ipass+1, len(self._file_list)), header=True)
             
             # open OGR datasource
-            ids = self._open_ds(fname)
+            try:
+                ids = self._open_ds(fname)
+            except VfrError as e:
+                VfrLogger.error(str(e))
+                continue
+            
             if ids is None:
                 ipass += 1
                 continue # unable to open - skip

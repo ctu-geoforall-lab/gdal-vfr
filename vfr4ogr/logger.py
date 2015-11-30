@@ -63,6 +63,9 @@ class Logger(logging.getLoggerClass()):
 
     def warning(self, message, *args, **kwargs):
         self._log(logging.WARNING, 'WARNING: ' + message + os.linesep, args, **kwargs)
+
+    def error(self, message, *args, **kwargs):
+        self._log(logging.ERROR, 'ERROR: ' + message + os.linesep, args, **kwargs)
         
 VfrLogger = Logger('Vfr')
 VfrLogger.msg = VfrLogger.msg
