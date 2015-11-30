@@ -188,7 +188,11 @@ class VfrOgr:
 
         @param url: URL where file can be downloaded
         """
+        if os.path.join(url): # single VFR file
+            return url
+        
         local_file = os.path.join(self._conf['DATA_DIR'], os.path.basename(url))
+        VfrLogger.debug('download_vfr(): local_file={}'.format(local_file))
         if os.path.exists(local_file): # don't download file if found
             return local_file
 

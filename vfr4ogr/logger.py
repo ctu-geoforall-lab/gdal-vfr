@@ -66,7 +66,10 @@ class Logger(logging.getLoggerClass()):
 
     def error(self, message, *args, **kwargs):
         self._log(logging.ERROR, 'ERROR: ' + message + os.linesep, args, **kwargs)
-        
+
+    def debug(self, message, *args, **kwargs):
+        self._log(logging.DEBUG, 'DEBUG: ' + message + os.linesep, args, **kwargs)
+
 VfrLogger = Logger('Vfr')
 VfrLogger.msg = VfrLogger.msg
 VfrLogger.addHandler(NoNewLineLogHandler(sys.stderr))
