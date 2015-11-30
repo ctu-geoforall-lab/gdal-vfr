@@ -173,8 +173,13 @@ class VfrOgr:
                     VfrError("Invalid configuration file on line: {}".format(line))
 
                 conf[key] = value
-
+                
         # create data directory if not exists
+        if not os.path.isabs(conf['DATA_DIR']):
+            # convert path to absolute
+            mypath = os.path.dirname(os.path.realpath(__file__)).split(os.path.sep)[:-2] + [ conf['DATA_DIR']]
+            conf['DATA_DIR'] = os.path.abspath(os.path.join(*mypath))
+        
         if not os.path.exists(conf['DATA_DIR']):
             os.makedirs(conf['DATA_DIR'])
             VfrLogger.info("Creating <{}>".format(conf['DATA_DIR']))
@@ -265,8 +270,11 @@ class VfrOgr:
             f.close()    
         else:
             # single VFR file
-            self._file_list.append(filename)
-            self._download_vfr(filename)
+            try:
+                filename = self._download_vfr(filename)
+                self._file_list.append(filename)
+            except VfrError as e:
+                VfrLogger.error(str(e))
         
         return self._file_list
 

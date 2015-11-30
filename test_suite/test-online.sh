@@ -30,23 +30,23 @@ fi
 echo "Using vfr2${PGM}..."
 
 echo "1st PASS (empty DB...)"
-$SCRIPTPATH/../vfr2${PGM}.py --type $SCRIPTPATH/OB_564729_UKSH $OPT
+$SCRIPTPATH/../vfr2${PGM}.py --type OB_564729_UKSH $OPT
 
 echo "2d PASS (already exists...)"
-$SCRIPTPATH/../vfr2${PGM}.py --type $SCRIPTPATH/OB_564729_UKSH $OPT
+$SCRIPTPATH/../vfr2${PGM}.py --type OB_564729_UKSH $OPT
 
 echo "3d PASS (overwrite...)"
-$SCRIPTPATH/../vfr2${PGM}.py --type $SCRIPTPATH/OB_564729_UKSH $OPT --o
+$SCRIPTPATH/../vfr2${PGM}.py --type OB_564729_UKSH $OPT --o
 
 echo "4th PASS (append...)"
-$SCRIPTPATH/../vfr2${PGM}.py --type $SCRIPTPATH/OB_554979_UKSH $OPT --a
+$SCRIPTPATH/../vfr2${PGM}.py --type OB_554979_UKSH $OPT --a
 
 echo "5th PASS (geom_name...)"
-$SCRIPTPATH/../vfr2${PGM}.py --type $SCRIPTPATH/OB_564729_UKSH $OPT --o --geom OriginalniHranice
+$SCRIPTPATH/../vfr2${PGM}.py --type OB_564729_UKSH $OPT --o --geom OriginalniHranice
 
 if [ "$PGM" = "pg" ] ; then
     echo "6th PASS (schema per file...)"
-    $SCRIPTPATH/../vfr2${PGM}.py --type $SCRIPTPATH/OB_564729_UKSH $OPT --schema vfr_xxxxxxx_ob_564729_uksh
+    $SCRIPTPATH/../vfr2${PGM}.py --type OB_564729_UKSH $OPT --schema vfr_xxxxxxx_ob_564729_uksh
 fi
 
 exit 0

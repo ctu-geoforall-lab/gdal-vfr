@@ -40,7 +40,7 @@ echo "3rd PASS (overwrite...)"
 $SCRIPTPATH/../vfr2${PGM}.py --file $SCRIPTPATH/seznam.txt $OPT --o
 
 echo "4th PASS (append...)"
-$SCRIPTPATH/../vfr2${PGM}.py --type $SCRIPTPATH/OB_554979_UKSH $OPT --a
+$SCRIPTPATH/../vfr2${PGM}.py --type OB_554979_UKSH $OPT --a
 
 echo "5th PASS (geom_name...)"
 $SCRIPTPATH/../vfr2${PGM}.py --file $SCRIPTPATH/seznam.txt $OPT --o --geom OriginalniHranice
