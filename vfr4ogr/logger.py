@@ -14,7 +14,7 @@ import os
 import types
 
 logFile = None
-MSG_LEVEL = 5
+MSG_LEVEL = 15
 logging.addLevelName(MSG_LEVEL, "MSG")
 
 # python 2.7 hack (in Python 3 can be replaced by 'terminates')
@@ -68,12 +68,15 @@ class Logger(logging.getLoggerClass()):
         self._log(logging.ERROR, 'ERROR: ' + message + os.linesep, args, **kwargs)
 
     def debug(self, message, *args, **kwargs):
+        if not self.isEnabledFor(logging.DEBUG):
+            return
         self._log(logging.DEBUG, 'DEBUG: ' + message + os.linesep, args, **kwargs)
 
 VfrLogger = Logger('Vfr')
 VfrLogger.msg = VfrLogger.msg
 VfrLogger.addHandler(NoNewLineLogHandler(sys.stderr))
 VfrLogger.setLevel(MSG_LEVEL)
+#VfrLogger.setLevel(logging.DEBUG)
 
 # check if log file exists and print message about that
 def check_log():

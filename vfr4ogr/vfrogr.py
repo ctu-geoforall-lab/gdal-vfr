@@ -73,8 +73,8 @@ class VfrOgr:
             self._logFile = os.path.join(self._conf['LOG_DIR'], self._logFile)
             if not self._logFile.endswith('.log'):
                 self._logFile += '.log'
-            VfrLogger.debug("log: {}".format(self._logFile))
             VfrLogger.addHandler(logging.FileHandler(self._logFile, delay = True))
+            VfrLogger.debug("log: {}".format(self._logFile))
         
         self.frmt = frmt
         self._geom_name = geom_name
