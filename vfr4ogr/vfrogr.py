@@ -14,6 +14,7 @@ import mimetypes
 import time
 import datetime
 import copy
+import logging
 
 try:
     from osgeo import gdal, ogr
@@ -55,6 +56,17 @@ class VfrOgr:
         """
         # check for required GDAL version
         self._check_ogr()
+
+        # read configuration
+        self._conf = self._read_conf()
+
+        # set up logging
+        if self._conf['LOG_DIR']:
+            if not hasattr(self, '_logFile'):
+                self._logFile = os.path.join(self._conf['LOG_DIR'], 'vfr2ogr-{}'.format(dsn))
+            else:
+                self._logFile = os.path.join(self._conf['LOG_DIR'], self._logFile)
+            VfrLogger.addHandler(logging.FileHandler(self._logFile + '.log', delay = True))
         
         self.frmt = frmt
         self._geom_name = geom_name
@@ -135,6 +147,33 @@ class VfrOgr:
         else:
             VfrLogger.warning(err_msg)
 
+    def _read_conf(self):
+        """Read configuration from file.
+
+        Raise VfrError on failure
+        """
+        cfile = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'vfr4ogr.conf')
+        if not os.path.isfile(cfile):
+            VfrError("Configuration file not found")
+
+        # set default values
+        conf = { 'LOG_DIR' : '.' }
+
+        # read configuration from file
+        with open(cfile) as f:
+            for line in f.readlines():
+                line = line.strip()
+                if line.startswith('#'):
+                    continue
+                try:
+                    key, value = line.split('=')
+                except ValueError as e:
+                    VfrError("Invalid configuration file on line: {}".format(line))
+
+                conf[key] = value
+        
+        return conf
+
     def open_file(self, filename, force_date = None):
         """Open input file.
 
@@ -183,7 +222,7 @@ class VfrOgr:
 
                     self._file_list.append(line)
                     i += 1
-                VfrLogger.msg("%d VFR files will be processed..." % len(self._file_list))
+                VfrLogger.msg("%d VFR files will be processed..." % len(self._file_list), header=True)
             except IOError:
                 raise VfrError("Unable to read '%s'" % filename)
             f.close()    
@@ -202,18 +241,18 @@ class VfrOgr:
             for idx in range(self._ods.GetLayerCount()):
                 layer_list.append(self._ods.GetLayer(idx).GetName())
         
-        VfrLogger.msg("Summary")
+        VfrLogger.msg("Summary", header=True)
         for layer_name in layer_list:
             layer = self._ods.GetLayerByName(layer_name)
             if not layer:
                 continue
 
-            sys.stdout.write("Layer            %-20s ... %10d features\n" % \
+            VfrLogger.msg("Layer            %-20s ... %10d features\n" % \
                              (layer_name, layer.GetFeatureCount()))
         
         nsec = time.time() - stime    
         etime = str(datetime.timedelta(seconds=nsec))
-        VfrLogger.msg("Time elapsed: %s" % str(etime))
+        VfrLogger.msg("Time elapsed: %s" % str(etime), header=True)
 
     def _open_ds(self, filename):
         """Open datasource for reading.
@@ -302,9 +341,9 @@ class VfrOgr:
                 continue
 
             olayer = self._ods.GetLayerByName('%s' % layer_name_lower)
-            sys.stdout.write("Processing layer %-20s ..." % layer_name)
+            VfrLogger.msg("Processing layer %-20s ..." % layer_name)
             if not self._overwrite and (olayer and mode == Mode.write):
-                sys.stdout.write(" already exists (use --overwrite or --append to modify existing data)\n")
+                VfrLogger.msg(" already exists (use --overwrite or --append to modify existing data)\n")
                 continue
 
             # fix output drivers not to use default geometry names
@@ -427,7 +466,7 @@ class VfrOgr:
                 olayer.CommitTransaction()
 
             # print statistics per layer to the stdout
-            sys.stdout.write(" %10d features" % ifeat)
+            VfrLogger.msg(" %10d features" % ifeat)
             if mode == Mode.change:
                 n_added = n_updated = n_deleted = 0
                 for action, unused in change_list.itervalues():
@@ -437,16 +476,16 @@ class VfrOgr:
                         n_added += 1
                     else: # Action.delete:
                         n_deleted += 1
-                sys.stdout.write(" (%5d added, %5d updated, %5d deleted)" % \
+                VfrLogger.msg(" (%5d added, %5d updated, %5d deleted)" % \
                                      (n_added, n_updated, n_deleted))
             else:
-                sys.stdout.write(" added")
+                VfrLogger.msg(" added")
                 if n_nogeom > 0:
                     if self._nogeomskip:
-                        sys.stdout.write(" (%d without geometry skipped)" % n_nogeom)
+                        VfrLogger.msg(" (%d without geometry skipped)" % n_nogeom)
                     else:
-                        sys.stdout.write(" (%d without geometry)" % n_nogeom)
-            sys.stdout.write("\n")
+                        VfrLogger.msg(" (%d without geometry)" % n_nogeom)
+            VfrLogger.msg("\n")
 
             nfeat += ifeat
 
@@ -460,7 +499,7 @@ class VfrOgr:
                     self._update_fid_seq(table_name, fid)
         
         # final statistics (time elapsed)
-        VfrLogger.msg("Time elapsed: %d sec" % (time.time() - start))
+        VfrLogger.msg("Time elapsed: %d sec" % (time.time() - start), header=True)
 
         return nfeat
 
@@ -736,7 +775,7 @@ class VfrOgr:
         
         for fname in self._file_list:
             VfrLogger.msg("Processing %s (%d out of %d)..." % \
-                          (fname, ipass+1, len(self._file_list)))
+                          (fname, ipass+1, len(self._file_list)), header=True)
             
             # open OGR datasource
             ids = self._open_ds(fname)

@@ -47,12 +47,12 @@ Usage: vfr2pg [-edsgl] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type=
 
 import sys
 import atexit
-
 from getopt import GetoptError
 
 from vfr4ogr import VfrPg
 from vfr4ogr.parse import parse_cmd
-from vfr4ogr.logger import check_log
+from vfr4ogr.logger import check_log, VfrLogger
+from vfr4ogr.utils import cmd_log
 
 # print program usage
 def usage():
@@ -87,9 +87,13 @@ def main():
             odsn += " host=%s" % options['host']
 
     # create convertor
-    pg = VfrPg(options['schema'], options['schema_per_file'], odsn,
-               options['geom'], options['layer'], options['nogeomskip'],
-               options['overwrite'])
+    pg = VfrPg(schema=options['schema'], schema_per_file=options['schema_per_file'],
+               dsn=odsn, geom_name=options['geom'], layers=options['layer'],
+               nogeomskip=options['nogeomskip'], overwrite=options['overwrite'])
+
+    # write process header
+    VfrLogger.msg(cmd_log(sys.argv),
+                  header=True, style='#')
     
     if options['list']:
         # list output database and exit

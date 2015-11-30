@@ -13,6 +13,8 @@ import sys
 import gzip
 import urllib2
 import datetime
+import getpass
+from time import gmtime, strftime
 from xml.dom.minidom import parse, parseString
 
 try:
@@ -68,7 +70,7 @@ def parse_xml_gz(filename):
 
     @return list of items
     """
-    VfrLogger.msg("Comparing OGR layers and input XML file (may take some time)...")
+    VfrLogger.msg("Comparing OGR layers and input XML file (may take some time)...", header=True)
     infile = gzip.open(filename)
     content = infile.read()
     
@@ -105,7 +107,7 @@ def download_vfr(url):
     
     @param url: URL where file can be downloaded
     """
-    VfrLogger.msg("Downloading %s into currect directory..." % url)
+    VfrLogger.msg("Downloading %s into currect directory..." % url, header=True)
     local_file = os.path.basename(url)
     fd = open(local_file, 'wb')
     try:
@@ -177,3 +179,10 @@ def get_date_interval(date):
         d += delta
     
     return dlist
+
+def cmd_log(cmd):
+    return 'cmd={}\npid={}\nuser={}\ndate={}\ncwd={}'.format(' '.join(sys.argv),
+                                                             os.getpid(),
+                                                             getpass.getuser(),
+                                                             strftime("%Y-%m-%d %H:%M:%S", gmtime()),
+                                                             os.getcwd())
