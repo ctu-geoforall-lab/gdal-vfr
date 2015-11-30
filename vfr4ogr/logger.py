@@ -73,6 +73,7 @@ class Logger(logging.getLoggerClass()):
 VfrLogger = Logger('Vfr')
 VfrLogger.msg = VfrLogger.msg
 VfrLogger.addHandler(NoNewLineLogHandler(sys.stderr))
+VfrLogger.setLevel(MSG_LEVEL)
 
 # check if log file exists and print message about that
 def check_log():
