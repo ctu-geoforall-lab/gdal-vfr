@@ -258,8 +258,10 @@ class VfrOgr:
         ds = None
         if os.linesep in filename:
             # already list of files (date range)
-            return filename.split(os.linesep)
-
+            for line in filename.split(os.linesep):
+                self._file_list.append(self._download_vfr(line))
+            return self._file_list
+        
         mtype = mimetypes.guess_type(filename)[0]
         if mtype is None or 'xml' not in mtype:
             # assuming text file containing list of VFR files
