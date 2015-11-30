@@ -1,7 +1,12 @@
 #!/bin/sh
 
-SCRIPT=`realpath $0`
-SCRIPTPATH=`dirname $SCRIPT`
+SCRIPT=`realpath $0` # realpath is a separate package and doesn't need
+                     # to be installed
+if [ -z $SCRIPT ] ; then
+    SCRIPTPATH='.'
+else
+    SCRIPTPATH=`dirname $SCRIPT`
+fi
 
 $SCRIPTPATH/vfr2pg.py $*
 
