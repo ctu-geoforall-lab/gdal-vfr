@@ -212,7 +212,7 @@ class VfrOgr:
         if os.path.exists(local_file): # don't download file if found
             return local_file
 
-        VfrLogger.msg("Downloading {} ({})...".format(url, os.path.abspath(self._conf['DATA_DIR'])),
+        VfrLogger.msg("Downloading {} ({})...".format(url, self._conf['DATA_DIR']),
                       header=True)
         
         if not url.startswith('http://'):
