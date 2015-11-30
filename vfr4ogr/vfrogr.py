@@ -161,11 +161,6 @@ class VfrOgr:
         conf = { 'LOG_DIR' : '.',
                  'DATA_DIR' : 'data' }
 
-        # create data directory if not exists
-        if not os.path.exists(conf['DATA_DIR']):
-            os.makedirs(conf['DATA_DIR'])
-            VfrLogger.info("Creating <{}>".format(conf['DATA_DIR']))
-        
         # read configuration from file
         with open(cfile) as f:
             for line in f.readlines():
@@ -178,6 +173,11 @@ class VfrOgr:
                     VfrError("Invalid configuration file on line: {}".format(line))
 
                 conf[key] = value
+
+        # create data directory if not exists
+        if not os.path.exists(conf['DATA_DIR']):
+            os.makedirs(conf['DATA_DIR'])
+            VfrLogger.info("Creating <{}>".format(conf['DATA_DIR']))
         
         return conf
 
@@ -197,7 +197,6 @@ class VfrOgr:
         
         if not url.startswith('http://'):
             url = 'http://vdp.cuzk.cz/vymenny_format/soucasna/' + url
-
 
         fd = open(local_file, 'wb')
         try:
@@ -257,8 +256,8 @@ class VfrOgr:
                     self._file_list.append(line)
                     i += 1
                 VfrLogger.msg("%d VFR files will be processed..." % len(self._file_list), header=True)
-            except IOError:
-                raise VfrError("Unable to read '%s'" % filename)
+            except IOError as e:
+                raise VfrError("Unable to read '%s': %s" % (filename, str(e)))
             f.close()    
         else:
             # single VFR file
