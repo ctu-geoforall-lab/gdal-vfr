@@ -260,7 +260,7 @@ class VfrOgr:
                     if not line.endswith('.xml.gz'):
                         # add extension if missing
                         line += '.xml.gz'
-                        line = self._download_vfr(line)
+                    line = self._download_vfr(line)
 
                     self._file_list.append(line)
                     i += 1
