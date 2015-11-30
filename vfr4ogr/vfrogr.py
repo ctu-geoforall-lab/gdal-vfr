@@ -188,12 +188,11 @@ class VfrOgr:
         # create data directory if not exists
         if not os.path.isabs(conf['DATA_DIR']):
             # convert path to absolute
-            mypath = os.path.dirname(os.path.realpath(__file__)).split(os.path.sep)[:-2] + [ conf['DATA_DIR']]
-            conf['DATA_DIR'] = os.path.abspath(os.path.join(*mypath))
+            conf['DATA_DIR'] = os.path.abspath(conf['DATA_DIR'])
         
         if not os.path.exists(conf['DATA_DIR']):
             os.makedirs(conf['DATA_DIR'])
-            VfrLogger.info("Creating <{}>".format(conf['DATA_DIR']))
+            VfrLogger.debug("Creating <{}>".format(conf['DATA_DIR']))
         
         return conf
 
