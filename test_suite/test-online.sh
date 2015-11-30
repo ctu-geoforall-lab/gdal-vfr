@@ -9,6 +9,7 @@ else
 fi
 
 DB=ruian_test
+export DATA_DIR=$SCRIPTPATH
 export LOG_FILE=${SCRIPT}.log
 rm -f $LOG
 

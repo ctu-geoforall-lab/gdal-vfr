@@ -184,6 +184,10 @@ class VfrOgr:
         # check also environmental variables
         if 'LOG_FILE' in os.environ:
             conf['LOG_FILE'] = os.environ['LOG_FILE']
+        if 'DATA_DIR' in os.environ:
+            conf['DATA_DIR'] = os.environ['DATA_DIR']
+        if 'LOG_DIR' in os.environ:
+            conf['LOG_DIR'] = os.environ['LOG_DIR']
         
         # create data directory if not exists
         if not os.path.isabs(conf['DATA_DIR']):
