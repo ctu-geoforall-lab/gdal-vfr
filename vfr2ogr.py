@@ -41,13 +41,16 @@ Usage: vfr2ogr [-fedgl] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type
 
 """
 
+import os
 import sys
 import atexit
 from getopt import GetoptError
 
 from vfr4ogr import VfrOgr
 from vfr4ogr.parse import parse_cmd
-from vfr4ogr.logger import check_log
+from vfr4ogr.logger import check_log, VfrLogger
+from vfr4ogr.exception import VfrError
+from vfr4ogr.utils import cmd_log
 
 # print usage
 def usage():
@@ -62,13 +65,15 @@ def main():
         filename = parse_cmd(sys.argv, "haofedgl", ["help", "overwrite", "extended", "append",
                                                     "file=", "date=", "type=", "layer=", "geom=",
                                                     "format=", "dsn="], options)
-    except GetoptError, e:
+    except GetoptError as e:
         usage()
         if str(e):
-            sys.exit(e)
+            sys.exit('ERROR: ' + str(e))
         else:
             return 0
-
+    except VfrError as e:
+        sys.exit('ERROR: ' + str(e))
+    
     # set up driver-specific options
     lco_options = []
     if options['format'] == 'SQLite':
@@ -77,10 +82,15 @@ def main():
         lco_options.append('ENCODING=UTF-8')
 
     # create convertor
-    ogr = VfrOgr(options['format'], options['dsn'],
-                 options['geom'], options['layer'], options['nogeomskip'],
-                 options['overwrite'], lco_options)
+    ogr = VfrOgr(frmt=options['format'], dsn=options['dsn'],
+                 geom_name=options['geom'], layers=options['layer'],
+                 nogeomskip=options['nogeomskip'], overwrite=options['overwrite'],
+                 lco_options=lco_options)
 
+    # write log process header
+    VfrLogger.msg(cmd_log(sys.argv),
+                  header=True, style='#')
+    
     if options['list']:
         # list output datasource and exit
         ogr.print_summary()

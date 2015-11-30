@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+\#!/usr/bin/env python
 
 ###############################################################################
 #
@@ -52,6 +52,7 @@ from getopt import GetoptError
 from vfr4ogr import VfrPg
 from vfr4ogr.parse import parse_cmd
 from vfr4ogr.logger import check_log, VfrLogger
+from vfr4ogr.exception import VfrError
 from vfr4ogr.utils import cmd_log
 
 # print program usage
@@ -74,7 +75,9 @@ def main():
             sys.exit(e)
         else:
             return 0
-
+    except VfrError as e:
+        sys.exit('ERROR: ' + str(e))
+        
     # build datasource name
     odsn = None
     if options['dbname']:
@@ -91,7 +94,7 @@ def main():
                dsn=odsn, geom_name=options['geom'], layers=options['layer'],
                nogeomskip=options['nogeomskip'], overwrite=options['overwrite'])
 
-    # write process header
+    # write log process header
     VfrLogger.msg(cmd_log(sys.argv),
                   header=True, style='#')
     
