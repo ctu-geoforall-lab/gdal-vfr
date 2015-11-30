@@ -12,8 +12,6 @@ import os
 import sys
 import gzip
 import datetime
-import getpass
-from time import gmtime, strftime
 from xml.dom.minidom import parse, parseString
 
 try:
@@ -157,9 +155,3 @@ def get_date_interval(date):
     
     return dlist
 
-def cmd_log(cmd):
-    return 'cmd={}\npid={}\nuser={}\ndate={}\ncwd={}'.format(' '.join(sys.argv),
-                                                             os.getpid(),
-                                                             getpass.getuser(),
-                                                             strftime("%Y-%m-%d %H:%M:%S", gmtime()),
-                                                             os.getcwd())

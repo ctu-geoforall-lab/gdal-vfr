@@ -16,6 +16,8 @@ import datetime
 import copy
 import logging
 import urllib2
+import getpass
+from time import gmtime, strftime
 
 try:
     from osgeo import gdal, ogr
@@ -63,11 +65,16 @@ class VfrOgr:
 
         # set up logging
         if self._conf['LOG_DIR']:
-            if not hasattr(self, '_logFile'):
-                self._logFile = os.path.join(self._conf['LOG_DIR'], 'vfr2ogr-{}'.format(dsn))
+            if 'LOG_FILE' in self._conf:
+                self._logFile = self._conf['LOG_FILE']
             else:
-                self._logFile = os.path.join(self._conf['LOG_DIR'], self._logFile)
-            VfrLogger.addHandler(logging.FileHandler(self._logFile + '.log', delay = True))
+                if not hasattr(self, '_logFile'):
+                    self._logFile = 'vfr2ogr-{}'.format(dsn)
+            self._logFile = os.path.join(self._conf['LOG_DIR'], self._logFile)
+            if not self._logFile.endswith('.log'):
+                self._logFile += '.log'
+            VfrLogger.debug("log: {}".format(self._logFile))
+            VfrLogger.addHandler(logging.FileHandler(self._logFile, delay = True))
         
         self.frmt = frmt
         self._geom_name = geom_name
@@ -173,7 +180,11 @@ class VfrOgr:
                     VfrError("Invalid configuration file on line: {}".format(line))
 
                 conf[key] = value
-                
+
+        # check also environmental variables
+        if 'LOG_FILE' in os.environ:
+            conf['LOG_FILE'] = os.environ['LOG_FILE']
+        
         # create data directory if not exists
         if not os.path.isabs(conf['DATA_DIR']):
             # convert path to absolute
@@ -220,6 +231,18 @@ class VfrOgr:
 
         return local_file
 
+    def cmd_log(self, cmd):
+        """Return cmd log file
+
+        @return string
+        """
+        VfrLogger.msg('cmd={}\npid={}\nuser={}\ndate={}\ncwd={}\ndata={}\nlog={}'.format(' '.join(sys.argv),
+                                                                                         os.getpid(),
+                                                                                         getpass.getuser(),
+                                                                                         strftime("%Y-%m-%d %H:%M:%S", gmtime()),
+                                                                                         os.getcwd(), self._conf['DATA_DIR'], self._logFile),
+                      header=True, style='#')
+    
     def open_file(self, filename, force_date = None):
         """Open input file.
 

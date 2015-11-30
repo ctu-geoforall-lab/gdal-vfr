@@ -53,7 +53,6 @@ from vfr4ogr import VfrPg
 from vfr4ogr.parse import parse_cmd
 from vfr4ogr.logger import check_log, VfrLogger
 from vfr4ogr.exception import VfrError
-from vfr4ogr.utils import cmd_log
 
 # print program usage
 def usage():
@@ -95,8 +94,7 @@ def main():
                nogeomskip=options['nogeomskip'], overwrite=options['overwrite'])
 
     # write log process header
-    VfrLogger.msg(cmd_log(sys.argv),
-                  header=True, style='#')
+    pg.cmd_log(sys.argv)
     
     if options['list']:
         # list output database and exit

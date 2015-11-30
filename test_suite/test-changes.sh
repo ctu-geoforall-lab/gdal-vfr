@@ -9,6 +9,8 @@ else
 fi
 
 DB=ruian_test
+export LOG_FILE=${SCRIPT}.log
+rm -f $LOG
 
 # single file 
 if test -z "$1" ; then
