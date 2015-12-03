@@ -246,72 +246,46 @@ class VfrOgr:
                                                                                          os.getcwd(), self._conf['DATA_DIR'], self._logFile),
                       header=True, style='#')
 
-    def read_file_list(self, file_list):
-        """Read file list and download files
+    def download(self, file_list, force_date):
+        """Download VFR files.
 
-        @param file_list: file list
-
-        @return list of open files
+        @param file_list: file list to be processed
+        @param force_date: force date if not defined
+        
+        @return list of VFR files
         """
         VfrLogger.msg("%d VFR files will be processed..." % len(file_list), header=True)
         
+        base_url = "http://vdp.cuzk.cz/vymenny_format/"
         for line in file_list:
+            if not line.startswith('http://') and \
+                    not line.startswith('20'):
+                # determine date if missing
+                if not force_date:
+                    if line.startswith('ST_Z'):
+                        date = yesterday()
+                    else:
+                        date = last_day_of_month()
+                else:
+                    date = force_date
+                line = date + '_' + line
+
+            if not line.startswith('http'):
+                # add base url if missing
+                base_url_line = base_url
+                if 'ST_UVOH' not in line:
+                    base_url_line += "soucasna/"
+                else:
+                    base_url_line += "specialni/"
+            
+                line = base_url_line + line
+
+            if not line.endswith('.xml.gz'):
+                # add extension if missing
+                line += '.xml.gz'
+            
             self._file_list.append(self._download_vfr(line))
         
-    def open_file(self, filename, force_date = None):
-        """Open input file.
-
-        @param filename: name of file to be open
-        @param force_date: force date
-
-        @return list of open files
-        """
-        self._file_list = list()
-        ds = None
-        mtype = mimetypes.guess_type(filename)[0]
-        if mtype is None or 'xml' not in mtype:
-            # assuming text file containing list of VFR files
-            try:
-                f = open(filename)
-                i = 0
-                lines = f.read().splitlines()
-                for line in lines:
-                    if len(line) < 1 or line.startswith('#'):
-                        continue # skip empty or commented lines 
-
-                    if not line.startswith('http://') and \
-                            not line.startswith('20'):
-                        # determine date if missing
-                        if not force_date:
-                            if line.startswith('ST_Z'):
-                                date = yesterday()
-                            else:
-                                date = last_day_of_month()
-                        else:
-                            date = force_date
-                        line = date + '_' + line
-
-                    if not line.endswith('.xml.gz'):
-                        # add extension if missing
-                        line += '.xml.gz'
-                    line = self._download_vfr(line)
-
-                    self._file_list.append(line)
-                    i += 1
-                VfrLogger.msg("%d VFR files will be processed..." % len(self._file_list), header=True)
-            except IOError as e:
-                raise VfrError("Unable to read '%s': %s" % (filename, str(e)))
-            f.close()    
-        else:
-            # single VFR file
-            try:
-                filename = self._download_vfr(filename)
-                self._file_list.append(filename)
-            except VfrError as e:
-                VfrLogger.error(str(e))
-        
-        return self._file_list
-
     def print_summary(self):
         """Print summary for multiple file input.
         """

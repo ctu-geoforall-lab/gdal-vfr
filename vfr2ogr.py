@@ -96,7 +96,7 @@ def main():
         return 0
 
     # read file list and download VFR files if needed
-    ogr.read_file_list(file_list)
+    ogr.download(file_list, options['date'])
     if options['download']:
         # download only requested, exiting
         return 0

@@ -102,7 +102,7 @@ def main():
         return 0
 
     # read file list and download VFR files if needed
-    pg.read_file_list(file_list)
+    pg.download(file_list, options['date'])
     if options['download']:
         # download only requested, exiting
         return 0

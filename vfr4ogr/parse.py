@@ -112,45 +112,12 @@ def parse_cmd(argv, flags, params, optdir):
         optdir['layer'] = optdir['layer'].split(',')
 
     if filename:               # --filename
-        file_list = read_file(filename, date)
+        file_list = read_file(filename)
     else:                      # --date && --type
         file_list = []
         for d in date_list:
             file_list.append("%s_%s.xml.gz" % (d, ftype))
     
-    base_url = "http://vdp.cuzk.cz/vymenny_format/"
-        
-    force_date = date
-    for i in range(0, len(file_list)):
-        line = file_list[i]
-        if not line.startswith('http://') and \
-                not line.startswith('20'):
-            # determine date if missing
-            if not force_date:
-                if line.startswith('ST_Z'):
-                    date = yesterday()
-                else:
-                    date = last_day_of_month()
-            else:
-                date = force_date
-            line = date + '_' + line
-
-        if not line.startswith('http'):
-            # add base url if missing
-            base_url_line = base_url
-            if (ftype and ftype != 'ST_UVOH') or 'ST_UVOH' not in line:
-                base_url_line += "soucasna/"
-            else:
-                base_url_line += "specialni/"
-            
-            line = base_url_line + line
-
-        if not line.endswith('.xml.gz'):
-            # add extension if missing
-            line += '.xml.gz'
-                    
-        file_list[i] = line
-        
     if not file_list:
         raise getopt.GetoptError("Empty date range")
 
