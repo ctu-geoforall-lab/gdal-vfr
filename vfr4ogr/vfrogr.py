@@ -245,7 +245,19 @@ class VfrOgr:
                                                                                          strftime("%Y-%m-%d %H:%M:%S", gmtime()),
                                                                                          os.getcwd(), self._conf['DATA_DIR'], self._logFile),
                       header=True, style='#')
-    
+
+    def read_file_list(self, file_list):
+        """Read file list and download files
+
+        @param file_list: file list
+
+        @return list of open files
+        """
+        VfrLogger.msg("%d VFR files will be processed..." % len(file_list), header=True)
+        
+        for line in file_list:
+            self._file_list.append(self._download_vfr(line))
+        
     def open_file(self, filename, force_date = None):
         """Open input file.
 
@@ -256,12 +268,6 @@ class VfrOgr:
         """
         self._file_list = list()
         ds = None
-        if os.linesep in filename:
-            # already list of files (date range)
-            for line in filename.split(os.linesep):
-                self._file_list.append(self._download_vfr(line))
-            return self._file_list
-        
         mtype = mimetypes.guess_type(filename)[0]
         if mtype is None or 'xml' not in mtype:
             # assuming text file containing list of VFR files

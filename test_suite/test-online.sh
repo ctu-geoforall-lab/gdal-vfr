@@ -47,8 +47,11 @@ $SCRIPTPATH/../vfr2${PGM}.py --type OB_554979_UKSH $OPT --a
 echo "5th PASS (geom_name...)"
 $SCRIPTPATH/../vfr2${PGM}.py --type OB_564729_UKSH $OPT --o --geom OriginalniHranice
 
+echo "6th PASS (date...)"
+$SCRIPTPATH/../vfr2${PGM}.py --type OB_564729_UKSH $OPT --o --date 20151031
+
 if [ "$PGM" = "pg" ] ; then
-    echo "6th PASS (schema per file...)"
+    echo "7th PASS (schema per file...)"
     $SCRIPTPATH/../vfr2${PGM}.py --type OB_564729_UKSH $OPT --schema vfr_xxxxxxx_ob_564729_uksh
 fi
 

@@ -12,7 +12,7 @@ import os
 import sys
 import getopt
 
-from utils import check_file, last_day_of_month, yesterday, get_date_interval
+from utils import read_file, last_day_of_month, yesterday, get_date_interval
 
 def get_opt(argv, flags, params, optdir):
     """Parse options.
@@ -71,6 +71,8 @@ def parse_cmd(argv, flags, params, optdir):
     @param flags: flags
     @param params: parameters
     @param optdir: option directory to be set up
+
+    @return file list
     """
     get_opt(argv, flags, params, optdir)
 
@@ -89,6 +91,7 @@ def parse_cmd(argv, flags, params, optdir):
     if filename and ftype:
         raise getopt.GetoptError("--file and --type are mutually exclusive")
 
+    date_list = []
     if ftype and not date:
         if ftype.startswith('ST_Z'):
             date_list = [yesterday()]
@@ -99,7 +102,7 @@ def parse_cmd(argv, flags, params, optdir):
                 date_list = get_date_interval(date)
             else:
                 raise getopt.GetoptError("Date interval is valid only for '--type ST_ZXXX'")
-    else:
+    elif date:
         date_list = [date]
     
     if optdir['overwrite'] and optdir.get('append', False):
@@ -107,28 +110,48 @@ def parse_cmd(argv, flags, params, optdir):
     
     if optdir['layer']:
         optdir['layer'] = optdir['layer'].split(',')
-    
-    if filename:
-        # is file a valid VFR file
-        filename = check_file(filename)
-    else: # --date & --type
-        flist = []
-        base_url = "http://vdp.cuzk.cz/vymenny_format/"
-        if ftype != 'ST_UVOH':
-            base_url += "soucasna/"
-        else:
-            base_url += "specialni/"
-        for d in date_list:
-            fname = "%s_%s.xml.gz" % (d, ftype)
-            # use existing file
-            flist.append(base_url + fname)
-        
-        if not flist:
-            raise getopt.GetoptError("Empty date range")
-        
-        filename = os.linesep.join(flist)
-        
-    if not filename:
-        raise getopt.GetoptError("Invalid input file")
 
-    return filename
+    if filename:               # --filename
+        file_list = read_file(filename, date)
+    else:                      # --date && --type
+        file_list = []
+        for d in date_list:
+            file_list.append("%s_%s.xml.gz" % (d, ftype))
+    
+    base_url = "http://vdp.cuzk.cz/vymenny_format/"
+        
+    force_date = date
+    for i in range(0, len(file_list)):
+        line = file_list[i]
+        if not line.startswith('http://') and \
+                not line.startswith('20'):
+            # determine date if missing
+            if not force_date:
+                if line.startswith('ST_Z'):
+                    date = yesterday()
+                else:
+                    date = last_day_of_month()
+            else:
+                date = force_date
+            line = date + '_' + line
+
+        if not line.startswith('http'):
+            # add base url if missing
+            base_url_line = base_url
+            if (ftype and ftype != 'ST_UVOH') or 'ST_UVOH' not in line:
+                base_url_line += "soucasna/"
+            else:
+                base_url_line += "specialni/"
+            
+            line = base_url_line + line
+
+        if not line.endswith('.xml.gz'):
+            # add extension if missing
+            line += '.xml.gz'
+                    
+        file_list[i] = line
+        
+    if not file_list:
+        raise getopt.GetoptError("Empty date range")
+
+    return file_list

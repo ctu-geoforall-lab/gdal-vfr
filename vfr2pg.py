@@ -64,9 +64,9 @@ def main():
                 'overwrite' : False, 'extended' : False, 'layer' : [], 'geom' : None, 'download' : False,
                 'schema_per_file' : False, 'append' : False, 'date' : None, 'nogeomskip': False, 'list' : False}
     try:
-        filename = parse_cmd(sys.argv, "haoedsgl", ["help", "overwrite", "extended", "append",
-                                                    "file=", "date=", "type=", "layer=", "geom=",
-                                                    "dbname=", "schema=", "user=", "passwd=", "host="],
+        file_list = parse_cmd(sys.argv, "haoedsgl", ["help", "overwrite", "extended", "append",
+                                                     "file=", "date=", "type=", "layer=", "geom=",
+                                                     "dbname=", "schema=", "user=", "passwd=", "host="],
                              options)
     except GetoptError as e:
         usage()
@@ -101,8 +101,8 @@ def main():
         pg.print_summary()
         return 0
 
-    # open input file (VFR or URL list)
-    pg.open_file(filename)
+    # read file list and download VFR files if needed
+    pg.read_file_list(file_list)
     if options['download']:
         # download only requested, exiting
         return 0

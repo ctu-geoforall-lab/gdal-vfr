@@ -50,7 +50,6 @@ from vfr4ogr import VfrOgr
 from vfr4ogr.parse import parse_cmd
 from vfr4ogr.logger import check_log, VfrLogger
 from vfr4ogr.exception import VfrError
-from vfr4ogr.utils import cmd_log
 
 # print usage
 def usage():
@@ -62,9 +61,10 @@ def main():
                 'layer' : [], 'geom' : None, 'download' : False, 'append' : False, 'date' : None,
                 'nogeomskip': False, 'list' : False}
     try:
-        filename = parse_cmd(sys.argv, "haofedgl", ["help", "overwrite", "extended", "append",
-                                                    "file=", "date=", "type=", "layer=", "geom=",
-                                                    "format=", "dsn="], options)
+        file_list = parse_cmd(sys.argv, "haofedgl", ["help", "overwrite", "extended", "append",
+                                                     "file=", "date=", "type=", "layer=", "geom=",
+                                                     "format=", "dsn="],
+                              options)
     except GetoptError as e:
         usage()
         if str(e):
@@ -88,16 +88,15 @@ def main():
                  lco_options=lco_options)
 
     # write log process header
-    VfrLogger.msg(cmd_log(sys.argv),
-                  header=True, style='#')
+    ogr.cmd_log(sys.argv)
     
     if options['list']:
         # list output datasource and exit
         ogr.print_summary()
         return 0
 
-    # open input file (VFR or URL list)
-    ogr.open_file(filename)
+    # read file list and download VFR files if needed
+    ogr.read_file_list(file_list)
     if options['download']:
         # download only requested, exiting
         return 0
