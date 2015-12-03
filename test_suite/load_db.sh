@@ -8,13 +8,14 @@ else
     SCRIPTPATH=`dirname $SCRIPT`
 fi
 
-export DB=ruian
-export DIR=fulldb
-export FILE=../db_uksh.txt
-export LOG=log.txt
-export LOG_ERR=log_err.txt
+if test -z $1 ; then
+    echo "usage: $0 dbname"
+    exit 1
+else
+    DB=$1
+fi
+FILE=db_uksh.txt
 
-mkdir -p $DIR
-cd $DIR
+export DATA_DIR=data_$DB
 
-nohup $SCRIPTPATH/../vfr2pg.py --file $FILE --dbname $DB --o >$LOG 2>$LOG_ERR &
+nohup $SCRIPTPATH/../vfr2pg.py --file $SCRIPTPATH/$FILE --dbname $DB --o &
