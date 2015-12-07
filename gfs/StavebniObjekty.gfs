@@ -184,26 +184,26 @@
     <!-- Způsob ochrany stavebního objektu - kód ochrany -->
     <PropertyDefn>
       <Name>ZpusobOchranyKod</Name>
-      <ElementPath>ZpusobyOchranyPozemku|ZpusobOchrany|Kod</ElementPath>
-      <Type>Integer</Type>
+      <ElementPath>ZpusobyOchrany|ZpusobOchrany|Kod</ElementPath>
+      <Type>IntegerList</Type>
     </PropertyDefn>
     <!-- Způsob ochrany stavebního objektu - typ ochrany -->
     <PropertyDefn>
       <Name>ZpusobOchranyTypOchranyKod</Name>
-      <ElementPath>ZpusobyOchrany|TypOchranyKod</ElementPath>
-      <Type>Integer</Type>
+      <ElementPath>ZpusobyOchrany|ZpusobOchrany|TypOchranyKod</ElementPath>
+      <Type>IntegerList</Type>
     </PropertyDefn>
     <!-- Způsob ochrany stavebního objektu - ID transakce v RUIAN -->
     <PropertyDefn>
       <Name>ZpusobOchranyIdTransakce</Name>
-      <ElementPath>ZpusobyOchrany|IdTransakce</ElementPath>
-      <Type>Integer</Type>
+      <ElementPath>ZpusobyOchrany|ZpusobOchrany|IdTransakce</ElementPath>
+      <Type>IntegerList</Type>
     </PropertyDefn>
     <!-- Způsob ochrany stavebního objektu - ID řízení v ISKN -->
     <PropertyDefn>
       <Name>ZpusobOchranyRizeniId</Name>
-      <ElementPath>ZpusobyOchrany|RizeniId</ElementPath>
-      <Type>Integer</Type>
+      <ElementPath>ZpusobyOchrany|ZpusobOchrany|RizeniId</ElementPath>
+      <Type>IntegerList</Type>
       <SubType>Integer64</SubType>
     </PropertyDefn>
     <!-- Detailní tecnicko-ekonomické atributy (TEA) -->
