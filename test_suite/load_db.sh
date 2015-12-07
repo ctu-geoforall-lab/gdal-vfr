@@ -18,4 +18,4 @@ FILE=db_uksh.txt
 
 export DATA_DIR=data_$DB
 
-nohup $SCRIPTPATH/../vfr2pg.py --file $SCRIPTPATH/$FILE --dbname $DB --o &
+nohup $SCRIPTPATH/../vfr2pg.py --file $SCRIPTPATH/$FILE --dbname $DB --o "$2" &

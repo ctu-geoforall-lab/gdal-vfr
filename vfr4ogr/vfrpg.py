@@ -22,7 +22,8 @@ class VfrPg(VfrOgr):
         @param schema_per_file: True to create for each file separate schema
         @param args: other argumenets, see VfrOgr class for details
         """
-        self._logFile = 'vfr2pg-{}'.format(self._get_dbname(kwargs['dsn']))
+        if kwargs['dsn']:
+            self._logFile = 'vfr2pg-{}'.format(self._get_dbname(kwargs['dsn']))
         VfrOgr.__init__(self, "PostgreSQL", **kwargs)
         self._schema = schema
         self._schema_per_file = schema_per_file

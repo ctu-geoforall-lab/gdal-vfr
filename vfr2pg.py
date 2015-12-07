@@ -89,10 +89,13 @@ def main():
             odsn += " host=%s" % options['host']
 
     # create convertor
-    pg = VfrPg(schema=options['schema'], schema_per_file=options['schema_per_file'],
-               dsn=odsn, geom_name=options['geom'], layers=options['layer'],
-               nogeomskip=options['nogeomskip'], overwrite=options['overwrite'])
-
+    try:
+        pg = VfrPg(schema=options['schema'], schema_per_file=options['schema_per_file'],
+                   dsn=odsn, geom_name=options['geom'], layers=options['layer'],
+                   nogeomskip=options['nogeomskip'], overwrite=options['overwrite'])
+    except VfrError as e:
+        sys.exit('ERROR: ' + str(e))
+    
     # write log process header
     pg.cmd_log(sys.argv)
     
