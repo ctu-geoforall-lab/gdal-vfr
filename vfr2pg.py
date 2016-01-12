@@ -94,7 +94,7 @@ def main():
                    dsn=odsn, geom_name=options['geom'], layers=options['layer'],
                    nogeomskip=options['nogeomskip'], overwrite=options['overwrite'])
     except VfrError as e:
-        sys.exit('ERROR: ' + str(e))
+        sys.exit('ERROR: {}'.format(e))
     
     # write log process header
     pg.cmd_log(sys.argv)
@@ -105,7 +105,10 @@ def main():
         return 0
 
     # read file list and download VFR files if needed
-    pg.download(file_list, options['date'])
+    try:
+        pg.download(file_list, options['date'])
+    except VfrError as e:
+        sys.exit('ERROR: {}'.format(e))
     if options['download']:
         # download only requested, exiting
         return 0
