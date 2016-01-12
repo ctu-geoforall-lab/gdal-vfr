@@ -817,6 +817,8 @@ class VfrOgr:
 
         @param append: True for append mode (add features to output)
         @param extended: True for extended statistics
+
+        @return number of passes
         """
         ipass = 0
         stime = time.time()
@@ -918,3 +920,5 @@ class VfrOgr:
             ids.Destroy()
             self._ids = None
             ipass += 1
+        
+        return ipass
