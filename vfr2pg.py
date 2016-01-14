@@ -108,7 +108,7 @@ def main():
     try:
         pg.download(file_list, options['date'])
     except VfrError as e:
-        sys.exit('ERROR: {}'.format(e))
+        VfrLogger.error(str(e))
     if options['download']:
         # download only requested, exiting
         return 0
