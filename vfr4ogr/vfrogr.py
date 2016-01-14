@@ -781,7 +781,7 @@ class VfrOgr:
             lcode = feature.GetField("TypPrvkuKod")
             layer_name = lcode2lname.get(lcode, None)
             if not layer_name:
-                raise VfrError("Unknown layer code '{}'".format(lcode))
+                VfrLogger.error("Unknown layer code '{}'".format(lcode))
                 feature = layer.GetNextFeature()
                 continue
             if self._layer_list and layer_name not in self._layer_list:
@@ -791,7 +791,7 @@ class VfrOgr:
             if not layer_previous or layer_previous != layer_name:
                 dlayer = self._ods.GetLayerByName('%s' % layer_name)
                 if dlayer is None:
-                    raise VfrError("Layer '{}' not found".format(layer_name))
+                    VfrLogger.error("Layer '{}' not found".format(layer_name))
                     feature = layer.GetNextFeature()
                     continue
 
