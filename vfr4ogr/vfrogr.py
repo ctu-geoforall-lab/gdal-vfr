@@ -254,38 +254,45 @@ class VfrOgr:
         
         @return list of VFR files
         """
-        VfrLogger.msg("%d VFR files will be processed..." % len(file_list), header=True)
+        VfrLogger.msg("%d VFR file(s) will be processed..." % len(file_list), header=True)
         
         base_url = "http://vdp.cuzk.cz/vymenny_format/"
         for line in file_list:
-            if not line.startswith('http://') and \
-                    not line.startswith('20'):
-                # determine date if missing
-                if not force_date:
-                    if line.startswith('ST_Z'):
-                        date = yesterday()
+            if os.path.exists(line):
+                ftype, fencoding =  mimetypes.guess_type(line)
+                if ftype == 'application/xml' and fencoding == 'gzip': # downloaded VFR file, skip
+                    self._file_list.append(os.path.abspath(line))
+                else:
+                    VfrLogger.warning("File <{}>: unsupported minetype '{}'".format(line, ftype))
+            else:
+                if not line.startswith('http://') and \
+                        not line.startswith('20'):
+                    # determine date if missing
+                    if not force_date:
+                        if line.startswith('ST_Z'):
+                            date = yesterday()
+                        else:
+                            date = last_day_of_month()
                     else:
-                        date = last_day_of_month()
-                else:
-                    date = force_date
-                line = date + '_' + line
+                        date = force_date
+                    line = date + '_' + line
 
-            if not line.startswith('http'):
-                # add base url if missing
-                base_url_line = base_url
-                if 'ST_UVOH' not in line:
-                    base_url_line += "soucasna/"
-                else:
-                    base_url_line += "specialni/"
-            
-                line = base_url_line + line
+                if not line.startswith('http'):
+                    # add base url if missing
+                    base_url_line = base_url
+                    if 'ST_UVOH' not in line:
+                        base_url_line += "soucasna/"
+                    else:
+                        base_url_line += "specialni/"
 
-            if not line.endswith('.xml.gz'):
-                # add extension if missing
-                line += '.xml.gz'
-            
-            self._file_list.append(self._download_vfr(line))
-        
+                    line = base_url_line + line
+
+                if not line.endswith('.xml.gz'):
+                    # add extension if missing
+                    line += '.xml.gz'
+
+                self._file_list.append(self._download_vfr(line))
+               
     def print_summary(self):
         """Print summary for multiple file input.
         """
