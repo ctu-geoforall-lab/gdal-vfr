@@ -124,6 +124,10 @@ class VfrPg(VfrOgr):
         if not self.schema_list:
             self.schema_list = ['public']
 
+        if not self._layer_list:
+            for idx in range(self._ods.GetLayerCount()):
+                self._layer_list.append(self._ods.GetLayer(idx).GetName())
+        
         column = "gml_id"
 
         cursor = self._conn.cursor()
