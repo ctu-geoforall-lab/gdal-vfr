@@ -12,7 +12,7 @@ import os
 import sys
 import getopt
 
-from utils import read_file, last_day_of_month, yesterday, get_date_interval
+from utils import read_file, last_day_of_month, yesterday, get_date_interval, list_formats
 
 def get_opt(argv, flags, params, optdir):
     """Parse options.
@@ -26,8 +26,9 @@ def get_opt(argv, flags, params, optdir):
         opts, args = getopt.getopt(argv[1:], flags, params)
     except getopt.GetoptError as err:
         sys.exit(str(err))
-    
+
     for o, a in opts:
+        print o, a
         so = o[2:]
         if o == "--file":
             optdir['filename'] = a
@@ -51,8 +52,8 @@ def get_opt(argv, flags, params, optdir):
             optdir['nogeomskip'] = True
         elif o == "-l":
             optdir['list'] = True
-        elif o == "-f": # unused
-            list_formats() # TODO
+        elif o == "-f":
+            list_formats()
             sys.exit(0)
         elif o == "--format":
             optdir['format'] = a.replace('_', ' ')
@@ -62,7 +63,10 @@ def get_opt(argv, flags, params, optdir):
             else:
                 optdir[so] = True
         else:
-            sys.exit("unhandled option: %s" % o)
+            sys.exit("Unhandled option: %s" % o)
+
+    if optdir.get('format', None) is None:
+        raise getopt.GetoptError("Output format not defined")
 
 def parse_cmd(argv, flags, params, optdir):
     """Parse command.
