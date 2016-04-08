@@ -416,6 +416,24 @@ class VfrOgr:
                     self._remove_option('GEOMETRY_NAME')
                     self._lco_options.append('GEOMETRY_NAME=definicnibod')
 
+            # try to be clever if geometry column specified
+            geom_name = self._geom_name
+            if self._geom_name and self._geom_name.endswith('Hranice'):
+                feat_defn = layer.GetLayerDefn()
+                if 0 > feat_defn.GetGeomFieldIndex(self._geom_name):
+                    if self._geom_name.startswith('GeneralizovaneHranice'):
+                        geom_name = 'OriginalniHranice'
+                    else:
+                        geom_name = 'GeneralizovaneHranice'
+                    if 0 > feat_defn.GetGeomFieldIndex(geom_name):
+                        geom_name = 'DefinicniBod'
+                        if 0 > feat_defn.GetGeomFieldIndex(geom_name):
+                            geom_name = 'DefinicniCara'
+                            if 0 > feat_defn.GetGeomFieldIndex(geom_name):
+                                geom_name = 'AdresniBod'
+                                if 0 > feat_defn.GetGeomFieldIndex(geom_name):
+                                    geom_name = None
+
             # delete layer if exists and append is not True
             if olayer and mode == Mode.write:
                 if self._delete_layer(layer_name_lower):
@@ -423,7 +441,7 @@ class VfrOgr:
 
             # create new output layer if not exists
             if not olayer:
-                olayer = self._create_layer(layer_name_lower, layer)
+                olayer = self._create_layer(layer_name_lower, layer, geom_name)
             if olayer is None:
                 raise VfrError("Unable to export layer '%s'. Exiting..." % layer_name)
 
@@ -497,9 +515,9 @@ class VfrOgr:
                 ofeature.SetFromWithMap(feature, True, field_map)
 
                 # modify geometry columns if requested
-                if self._geom_name:
+                if geom_name:
                     if geom_idx < 0:
-                        geom_idx = feature.GetGeomFieldIndex(self._geom_name)
+                        geom_idx = feature.GetGeomFieldIndex(geom_name)
 
                     self._modify_feature(feature, geom_idx, ofeature)
 
@@ -591,7 +609,7 @@ class VfrOgr:
 
         return False
 
-    def _create_layer(self, layerName, ilayer):
+    def _create_layer(self, layerName, ilayer, force_geom_name=None):
         """Create new layer in output datasource.
 
         @param layerName: name of layer to be created
@@ -601,10 +619,11 @@ class VfrOgr:
         """
         ofrmt = self._ods.GetDriver().GetName()
         # determine geometry type
-        if self._geom_name or not self._create_geom:
+        geom_name = force_geom_name if force_geom_name else self._geom_name
+        if geom_name or not self._create_geom:
             feat_defn = ilayer.GetLayerDefn()
-            if self._geom_name:
-                idx = feat_defn.GetGeomFieldIndex(self._geom_name)
+            if geom_name:
+                idx = feat_defn.GetGeomFieldIndex(geom_name)
             else:
                 idx = 0
 
@@ -644,12 +663,12 @@ class VfrOgr:
             olayer.CreateField(ofield)
 
         # create also geometry attributes
-        if not self._geom_name and \
+        if not geom_name and \
                 olayer.TestCapability(ogr.OLCCreateGeomField):
             for i in range(feat_defn.GetGeomFieldCount()):
                 geom_defn = feat_defn.GetGeomFieldDefn(i) 
-                if self._geom_name and \
-                   geom_defn.GetName() != self._geom_name:
+                if geom_name and \
+                   geom_defn.GetName() != geom_name:
                     continue
                 olayer.CreateGeomField(feat_defn.GetGeomFieldDefn(i))
 
@@ -674,7 +693,7 @@ class VfrOgr:
 
         return geom_list
 
-    def _modify_feature(self, feature, geom_idx, ofeature, suppress=False):
+    def _modify_feature(self, feature, geom_idx, ofeature, suppress=True):
         """Modify output feature - remove remaining geometry columns.
 
         @param feature: input feature
