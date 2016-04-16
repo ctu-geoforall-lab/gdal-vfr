@@ -1,4 +1,5 @@
-#!/bin/sh -e
+#!/bin/sh
+set -e
 
 SCRIPT=`realpath $0` # realpath is a separate package and doesn't need
                      # to be installed
@@ -18,17 +19,12 @@ if test -z "$1" ; then
     PGM=pg
     OPT="--dbname $DB"
 
-    psql -d $DB -f $SCRIPTPATH/cleandb.sql 2>/dev/null
+    psql -d $DB -f $SCRIPTPATH/cleandb.sql
 else
-    if [ "$1" = "ogr" ] ; then
-        PGM=ogr
-        OPT="--format SQLite --dsn ${DB}.db"
-
-        rm -f ${DB}.db
-    else
-        PGM=oci
-        OPT="--user test --passwd test"
-    fi
+    PGM=ogr
+    OPT="--format SQLite --dsn ${DB}.db"
+    
+    rm -f ${DB}.db
 fi
 
 echo "Using vfr2${PGM}..."

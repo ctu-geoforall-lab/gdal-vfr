@@ -1,4 +1,5 @@
-#!/bin/sh -e
+#!/bin/sh
+set -e
 
 SCRIPT=`realpath $0` # realpath is a separate package and doesn't need
                      # to be installed
@@ -17,17 +18,12 @@ if test -z "$1" ; then
     PGM=pg
     OPT="--dbname $DB"
 
-    psql -d $DB -f $SCRIPTPATH/cleandb.sql 2>/dev/null
+    psql -d $DB -f $SCRIPTPATH/cleandb.sql
 else
-    if [ "$1" = "ogr" ] ; then
-        PGM=ogr
-        OPT="--format SQLite --dsn ${DB}.db"
+    PGM=ogr
+    OPT="--format SQLite --dsn ${DB}.db"
 
-        rm -f ${DB}.db
-    else
-        PGM=oci
-        OPT="--user test --passwd test"
-    fi
+    rm -f ${DB}.db
 fi
 
 echo "Using vfr2${PGM}..."
@@ -47,11 +43,11 @@ $SCRIPTPATH/../vfr2${PGM}.py --type OB_554979_UKSH $OPT --a
 echo "5th PASS (geom_name...)"
 $SCRIPTPATH/../vfr2${PGM}.py --type OB_564729_UKSH $OPT --o --geom OriginalniHranice
 
-echo "6th PASS (date...)"
-$SCRIPTPATH/../vfr2${PGM}.py --type OB_564729_UKSH $OPT --o --date 20151031
+#echo "6th PASS (date...)"
+#$SCRIPTPATH/../vfr2${PGM}.py --type OB_564729_UKSH $OPT --o --date 20151031
 
 if [ "$PGM" = "pg" ] ; then
-    echo "7th PASS (schema per file...)"
+    echo "6th PASS (schema per file...)"
     $SCRIPTPATH/../vfr2${PGM}.py --type OB_564729_UKSH $OPT --schema vfr_xxxxxxx_ob_564729_uksh
 fi
 
