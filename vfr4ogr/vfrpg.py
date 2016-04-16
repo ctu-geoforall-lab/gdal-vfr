@@ -24,6 +24,8 @@ class VfrPg(VfrOgr):
         """
         if kwargs['dsn']:
             self._logFile = 'vfr2pg-{}'.format(self._get_dbname(kwargs['dsn']))
+        else:
+            self._logFile = 'vfr2pg'
         VfrOgr.__init__(self, "PostgreSQL", **kwargs)
         self._schema = schema
         self._schema_per_file = schema_per_file

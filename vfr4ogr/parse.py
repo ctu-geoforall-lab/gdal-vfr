@@ -28,7 +28,6 @@ def get_opt(argv, flags, params, optdir):
         sys.exit(str(err))
 
     for o, a in opts:
-        print o, a
         so = o[2:]
         if o == "--file":
             optdir['filename'] = a
@@ -65,7 +64,8 @@ def get_opt(argv, flags, params, optdir):
         else:
             sys.exit("Unhandled option: %s" % o)
 
-    if optdir.get('format', None) is None:
+    if optdir.get('format', None) is None and \
+       (optdir.get('dsn', None) or optdir.get('dbname', None)):
         raise getopt.GetoptError("Output format not defined")
 
 def parse_cmd(argv, flags, params, optdir):

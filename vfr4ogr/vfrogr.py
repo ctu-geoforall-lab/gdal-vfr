@@ -69,7 +69,13 @@ class VfrOgr:
                 self._logFile = self._conf['LOG_FILE']
             else:
                 if not hasattr(self, '_logFile'):
-                    self._logFile = 'vfr2ogr-{}'.format(dsn)
+                    if dsn:
+                        self._logFile = 'vfr2ogr-{}'.format(
+                            os.path.basename(dsn) if os.path.sep in dsn else dsn
+                        )
+                    else:
+                        self._logFile = 'vfr2ogr'
+
             self._logFile = os.path.join(self._conf['LOG_DIR'], self._logFile)
             if not self._logFile.endswith('.log'):
                 self._logFile += '.log'
