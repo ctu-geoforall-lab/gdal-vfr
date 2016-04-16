@@ -60,7 +60,8 @@ def usage():
 
 def main():
     # parse cmdline arguments
-    options = { 'dbname' : None, 'schema' : None, 'user' : None, 'passwd' : None, 'host' : None, 
+    options = { 'format' : 'PostgreSQL',
+                'dbname' : None, 'schema' : None, 'user' : None, 'passwd' : None, 'host' : None, 
                 'overwrite' : False, 'extended' : False, 'layer' : [], 'geom' : None, 'download' : False,
                 'schema_per_file' : False, 'append' : False, 'date' : None, 'nogeomskip': False, 'list' : False}
     try:
