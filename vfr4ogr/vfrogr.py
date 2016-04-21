@@ -252,7 +252,11 @@ class VfrOgr:
                                                                                          os.getcwd(), self._conf['DATA_DIR'], self._logFile),
                       header=True, style='#')
 
-    def download(self, file_list, force_date):
+    def reset(self):
+        """Reset file list"""
+        self._file_list = []
+
+    def download(self, file_list, force_date=None):
         """Download VFR files.
 
         @param file_list: file list to be processed
