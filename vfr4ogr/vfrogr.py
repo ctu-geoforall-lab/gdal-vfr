@@ -116,7 +116,10 @@ class VfrOgr:
         if self._ods is None:
             raise VfrError("Unable to open or create new datasource '%s'" % self.odsn)
         # check also capability to create geometry columns
-        self._create_geom = self._ods.TestCapability(ogr.ODsCCreateGeomFieldAfterCreateLayer)
+        try:
+            self._create_geom = self._ods.TestCapability(ogr.ODsCCreateGeomFieldAfterCreateLayer)
+        except AttributeError:
+            self._create_geom = False
         if not self._geom_name and \
            not self._create_geom:
             VfrLogger.warning("Driver '%s' doesn't support multiple geometry columns. "
