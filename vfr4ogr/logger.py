@@ -46,7 +46,8 @@ class NoNewLineLogHandler(logging.StreamHandler):
         
 class Logger(logging.getLoggerClass()):
     def __init__(self, name, level=logging.NOTSET):
-        super(Logger, self).__init__(name, level)
+        super(Logger, self).__init__(name)
+        self.setLevel(level)
         
     def msg(self, msg, header=False, style='-', *args, **kwargs):
         """Print messages to stdout
