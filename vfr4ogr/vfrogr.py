@@ -71,7 +71,7 @@ class VfrOgr:
                 if not hasattr(self, '_logFile'):
                     if dsn:
                         self._logFile = 'vfr2ogr-{}'.format(
-                            os.path.basename(dsn) if os.path.sep in dsn else dsn
+                            os.path.basename(dsn) if os.path.isabs(dsn) else dsn
                         )
                     else:
                         self._logFile = 'vfr2ogr'
