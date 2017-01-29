@@ -422,12 +422,15 @@ class VfrOgr:
 
             # fix output drivers not to use default geometry names
             if self.frmt in ('PostgreSQL', 'OCI') and not self._geom_name:
+                self._remove_option('GEOMETRY_NAME')
                 if layer_name_lower == 'ulice':
-                    self._remove_option('GEOMETRY_NAME')
-                    self._lco_options.append('GEOMETRY_NAME=definicnicara')
+                    geom_name = 'definicnicara'
+                elif layer_name_lower == 'adresnimista':
+                    geom_name = 'adresnibod'
                 else:
-                    self._remove_option('GEOMETRY_NAME')
-                    self._lco_options.append('GEOMETRY_NAME=definicnibod')
+                    geom_name = 'definicnibod'
+
+                self._lco_options.append('GEOMETRY_NAME={}'.format(geom_name))
 
             # try to be clever if geometry column specified
             geom_name = self._geom_name
