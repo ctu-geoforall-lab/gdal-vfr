@@ -22,7 +22,7 @@ One of input options must be given:
 Usage: vfr2pg [-edsgl] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type=ST_ABCD|OB_XXXXXX_ABCD] [--layer=layer1,layer2,...]
                        [--geom=OriginalniHranice|GeneralizovaneHranice]
                        --dbname <database name>
-                       [--schema <schema name>] [--user <user name>] [--passwd <password>] [--host <host name>]
+                       [--schema <schema name>] [--user <user name>] [--passwd <password>] [--host <host name>]  [--port <port>]
                        [--overwrite] [--append]
 
        -e          Extended layer list statistics
@@ -40,6 +40,7 @@ Usage: vfr2pg [-edsgl] [--file=/path/to/vfr/filename] [--date=YYYYMMDD] [--type=
        --user      User name
        --passwd    Password
        --host      Host name
+       --port      Port
        --overwrite Overwrite existing PostGIS tables
        --append    Append to existing PostGIS tables
 
@@ -61,13 +62,13 @@ def usage():
 def main():
     # parse cmdline arguments
     options = { 'format' : 'PostgreSQL',
-                'dbname' : None, 'schema' : None, 'user' : None, 'passwd' : None, 'host' : None, 
+                'dbname' : None, 'schema' : None, 'user' : None, 'passwd' : None, 'host' : None, 'port' : None,
                 'overwrite' : False, 'extended' : False, 'layer' : [], 'geom' : None, 'download' : False,
                 'schema_per_file' : False, 'append' : False, 'date' : None, 'nogeomskip': False, 'list' : False}
     try:
         file_list = parse_cmd(sys.argv, "haoedsgl", ["help", "overwrite", "extended", "append",
                                                      "file=", "date=", "type=", "layer=", "geom=",
-                                                     "dbname=", "schema=", "user=", "passwd=", "host="],
+                                                     "dbname=", "schema=", "user=", "passwd=", "host=", "port=" ],
                              options)
     except GetoptError as e:
         usage()
@@ -88,6 +89,8 @@ def main():
             odsn += " password=%s" % options['passwd']
         if options['host']:
             odsn += " host=%s" % options['host']
+        if options['port']:
+            odsn += " port=%s" % options['port']
 
     # create convertor
     try:
