@@ -10,3 +10,6 @@
 
 class VfrError(Exception):
     pass
+
+class VfrErrorCmd(Exception):
+    pass
