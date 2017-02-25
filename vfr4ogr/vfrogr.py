@@ -273,7 +273,7 @@ class VfrOgr:
         for line in file_list:
             if os.path.exists(line):
                 ftype, fencoding =  mimetypes.guess_type(line)
-                if ftype == 'application/xml' and fencoding == 'gzip': # downloaded VFR file, skip
+                if ftype in ('application/xml', 'text/xml') and fencoding == 'gzip': # downloaded VFR file, skip
                     self._file_list.append(os.path.abspath(line))
                 else:
                     VfrLogger.warning("File <{}>: unsupported minetype '{}'".format(line, ftype))
