@@ -54,5 +54,6 @@ docs/_build/
 
 *~
 
-data
+data*
 ruian_test.db
+nohup.out
