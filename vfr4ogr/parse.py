@@ -21,7 +21,7 @@ def parse_cmd(optdir):
 
     @return file list
     """
-    if hasattr(optdir, "format"):
+    if hasattr(optdir, "format") and optdir.format:
         optdir.format = optdir.format.replace('_', ' ')
     else:
         optdir.format = None
@@ -30,7 +30,8 @@ def parse_cmd(optdir):
         optdir.dsn = None
 
     if optdir.format is None and \
-            (optdir.dsn or optdir.dbname):
+            ((hasattr(optdir, "dsn") and optdir.dsn) or \
+                 (hasattr(optdir, "dbname") and optdir.dbname)):
         raise VfrErrorCmd("Output format not defined")
 
     if optdir.list:
