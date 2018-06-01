@@ -127,8 +127,10 @@ class VfrOgr:
 
         if self._overwrite:
             # overwrite is not support by Esri Shapefile
-            if self.frmt != 'ESRI Shapefile':
+            if self.frmt != 'Esri Shapefile':
                 self._lco_options.append("OVERWRITE=YES")
+        if self.frmt == 'Esri Shapefile':
+            self._lco_options.append("ENCODING=UTF-8")
 
     def __del__(self):
         if self._ods:
