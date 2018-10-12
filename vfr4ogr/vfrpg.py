@@ -10,9 +10,9 @@
 
 import sys
 
-from vfrogr import VfrOgr, Mode
-from logger import VfrLogger
-from exception import VfrError
+from .vfrogr import VfrOgr, Mode
+from .logger import VfrLogger
+from .exception import VfrError
 
 class VfrPg(VfrOgr):
     def __init__(self, schema='public', schema_per_file=False, **kwargs):
