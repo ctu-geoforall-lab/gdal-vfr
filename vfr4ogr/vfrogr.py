@@ -15,18 +15,23 @@ import time
 import datetime
 import copy
 import logging
-import urllib2
+try:
+    # Python 2
+    from urllib2 import urlopen, HTTPError
+except ImportError:
+    # Python 3
+    from urllib.request import urlopen, HTTPError
 import getpass
 from time import gmtime, strftime
 
 try:
     from osgeo import gdal, ogr
-except ImportError, e:
+except ImportError as e:
     sys.exit('ERROR: Import of ogr from osgeo failed. %s' % e)
 
-from exception import VfrError
-from logger import VfrLogger
-from utils import last_day_of_month, yesterday
+from .exception import VfrError
+from .logger import VfrLogger
+from .utils import last_day_of_month, yesterday
 
 class Mode:
     """File open mode.
@@ -234,8 +239,8 @@ class VfrOgr:
 
         fd = open(local_file, 'wb')
         try:
-            fd.write(urllib2.urlopen(url).read())
-        except urllib2.HTTPError as e:
+            fd.write(urlopen(url).read())
+        except HTTPError as e:
             fd.close()
             if e.code == 404:
                 os.remove(local_file)

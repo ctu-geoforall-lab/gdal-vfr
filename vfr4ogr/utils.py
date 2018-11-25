@@ -17,11 +17,11 @@ from xml.dom.minidom import parse, parseString
 
 try:
     from osgeo import gdal, ogr
-except ImportError, e:
+except ImportError as e:
     sys.exit('ERROR: Import of ogr from osgeo failed. %s' % e)
 
-from exception import VfrError
-from logger import VfrLogger
+from .exception import VfrError
+from .logger import VfrLogger
 
 def list_formats():
     """List supported OGR formats (write access).
@@ -40,7 +40,7 @@ def list_formats():
         formatsList.append(driverName.replace(' ', '_'))
     
     for i in sorted(formatsList):
-        print i
+        print(i)
 
 def read_file(filename, date=None):
     """Read input file to get list of VFR files
@@ -106,11 +106,11 @@ def compare_list(list1, list2):
     """
     for item in list1:
         if item not in list2:
-            print "+ %s" % item
+            print("+ {}".format(item))
     
     for item in list2:
         if item not in list1:
-            print "- %s" % item
+            print("- {}".format(item))
 
 def last_day_of_month(string = True):
     """Get last day of current month.
