@@ -11,7 +11,7 @@
 import os
 import sys
 
-from .utils import read_file, last_day_of_month, yesterday, get_date_interval, list_formats
+from .utils import read_file, first_day_of_month, yesterday, get_date_interval, list_formats
 from .exception import VfrErrorCmd
 
 def parse_cmd(optdir):
@@ -54,7 +54,7 @@ def parse_cmd(optdir):
         if ftype.startswith('ST_Z'):
             date_list = [yesterday()]
         else:
-            date_list = [last_day_of_month()]
+            date_list = [first_day_of_month()]
     elif ftype and date and ':' in date:
             if ftype.startswith('ST_Z'):
                 date_list = get_date_interval(date)
