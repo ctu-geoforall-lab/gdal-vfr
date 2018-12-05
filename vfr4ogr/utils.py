@@ -112,6 +112,19 @@ def compare_list(list1, list2):
         if item not in list1:
             print("- {}".format(item))
 
+def first_day_of_month(string = True):
+    """Get first day of current month.
+
+    @param string: True to return string otherwise DateTime
+
+    @return date as string or DateTime
+    """
+    today = datetime.date.today()
+    day = today.replace(day=1)
+    if string:
+        return day.strftime("%Y%m%d")
+    return day
+
 def last_day_of_month(string = True):
     """Get last day of current month.
 
