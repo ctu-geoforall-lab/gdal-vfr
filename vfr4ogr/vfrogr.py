@@ -31,7 +31,7 @@ except ImportError as e:
 
 from .exception import VfrError
 from .logger import VfrLogger
-from .utils import last_day_of_month, yesterday
+from .utils import first_day_of_month, yesterday
 
 class Mode:
     """File open mode.
@@ -292,7 +292,7 @@ class VfrOgr:
                         if line.startswith('ST_Z'):
                             date = yesterday()
                         else:
-                            date = last_day_of_month()
+                            date = first_day_of_month()
                     else:
                         date = force_date
                     line = date + '_' + line
