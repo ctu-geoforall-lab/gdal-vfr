@@ -31,7 +31,7 @@ except ImportError as e:
 
 from .exception import VfrError
 from .logger import VfrLogger
-from .utils import first_day_of_month, yesterday
+from .utils import last_day_of_month, yesterday
 
 class Mode:
     """File open mode.
@@ -223,9 +223,22 @@ class VfrOgr:
 
         @param url: URL where file can be downloaded
         """
+        def download_file(self, url, local_file):
+            success = True
+            with open(local_file, 'wb') as fd:
+                try:
+                    fd.write(urlopen(url).read())
+                except HTTPError as e:
+                    if e.code == 404:
+                        success = False
+
+            if not success:
+                os.remove(local_file)
+                raise VfrError("File '%s' not found" % url)
+            
         if os.path.exists(url): # single VFR file
             return url
-        
+
         local_file = os.path.join(self._conf['DATA_DIR'], os.path.basename(url))
         VfrLogger.debug('download_vfr(): local_file={}'.format(local_file))
         if os.path.exists(local_file): # don't download file if found
@@ -233,20 +246,31 @@ class VfrOgr:
 
         VfrLogger.msg("Downloading {} ({})...".format(url, self._conf['DATA_DIR']),
                       header=True)
-        
+
         if not url.startswith('http://'):
             url = 'http://vdp.cuzk.cz/vymenny_format/soucasna/' + url
 
-        fd = open(local_file, 'wb')
-        try:
-            fd.write(urlopen(url).read())
-        except HTTPError as e:
-            fd.close()
-            if e.code == 404:
-                os.remove(local_file)
-                raise VfrError("File '%s' not found" % url)
-
-        fd.close()
+        # try more dates when downloading ST_U data (CUZK is
+        # publishing data last day in the month, but there can be
+        # exceptions due to technical reasons)
+        ndays = 0 if 'ST_Z' in url else 3
+        old_date = last_day_of_month(string=False)
+        for day in range(1, ndays+2):
+            try:
+                download_file(self, url, local_file)
+            except VfrError as e:
+                new_date = old_date + datetime.timedelta(days=1)
+                url = url.replace(
+                    old_date.strftime("%Y%m%d"), new_date.strftime("%Y%m%d")
+                )
+                local_file = local_file.replace(
+                    old_date.strftime("%Y%m%d"), new_date.strftime("%Y%m%d")
+                )
+                if day < ndays:
+                    VfrLogger.error('{}'.format(e))
+                    VfrLogger.info("New attempt: '{}'...{}".format(url, os.linesep))
+                else:
+                    raise VfrError('{}'.format(e))
 
         return local_file
 
@@ -292,7 +316,7 @@ class VfrOgr:
                         if line.startswith('ST_Z'):
                             date = yesterday()
                         else:
-                            date = first_day_of_month()
+                            date = last_day_of_month()
                     else:
                         date = force_date
                     line = date + '_' + line
