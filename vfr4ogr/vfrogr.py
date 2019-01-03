@@ -321,6 +321,7 @@ class VfrOgr:
                             date = last_day_of_month()
                     else:
                         date = force_date
+                    line = date + '_' + line
                 else:
                     date = datetime.datetime.date(
                         datetime.datetime.strptime(line.split('_', 1)[0], "%Y%m%d")
