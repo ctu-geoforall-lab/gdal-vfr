@@ -10,7 +10,6 @@
 
 import os
 import sys
-import gzip
 import datetime
 import mimetypes
 from xml.dom.minidom import parse, parseString
@@ -75,7 +74,7 @@ def read_file(filename, date=None):
     
     return file_list
 
-def parse_xml_gz(filename):
+def parse_xml(filename):
     """Parse VFR (XML) file.
 
     @param filename: name of VFR file to be parsed
@@ -83,9 +82,17 @@ def parse_xml_gz(filename):
     @return list of items
     """
     VfrLogger.msg("Comparing OGR layers and input XML file (may take some time)...", header=True)
-    infile = gzip.open(filename)
-    content = infile.read()
-    
+    if date > datetime.date(2018, 12, 7):
+        from zipfile import ZipFile
+        with ZipFile(filename) as zipfile:
+            item = os.path.splitext(os.path.basename(filename))[0]
+            with zipfile.open(item) as fd:
+                content = fd.read()
+    else:
+        import gzip
+        with gzip.open(filename) as fd:
+            content = fd.read()
+
     # parse xml file content
     dom = parseString(content)
     data = dom.getElementsByTagName('vf:Data')[0]
@@ -167,4 +174,8 @@ def get_date_interval(date):
         d += delta
     
     return dlist
+
+def extension():
+    """Return valid file extension"""
+    return 'zip' if datetime.date.today() > datetime.date(2018, 12, 7) else 'gz'
 

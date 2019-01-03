@@ -41,7 +41,7 @@ def parse_args():
                         action='store_true',
                         help="List existing layers in output datasource and exit")
     parser.add_argument("--file",
-                        help="Path to xml.gz or URL list file")
+                        help="Path to xml.gz|zip or URL list file")
     parser.add_argument("--date",
                         help="Date in format 'YYYYMMDD'")
     parser.add_argument("--type",
