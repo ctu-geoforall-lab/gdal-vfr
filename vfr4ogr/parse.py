@@ -11,7 +11,7 @@
 import os
 import sys
 
-from .utils import read_file, last_day_of_month, yesterday, get_date_interval, list_formats
+from .utils import read_file, last_day_of_month, yesterday, get_date_interval, list_formats, extension
 from .exception import VfrErrorCmd
 
 def parse_cmd(optdir):
@@ -76,7 +76,7 @@ def parse_cmd(optdir):
     else:                      # --date && --type
         file_list = []
         for d in date_list:
-            file_list.append("%s_%s.xml.gz" % (d, ftype))
+            file_list.append("{}_{}.xml.{}".format(d, ftype, extension()))
     
     if not file_list:
         raise VfrErrorCmd("Empty date range")

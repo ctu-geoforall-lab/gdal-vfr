@@ -31,7 +31,7 @@ except ImportError as e:
 
 from .exception import VfrError
 from .logger import VfrLogger
-from .utils import last_day_of_month, yesterday
+from .utils import last_day_of_month, yesterday, parse_xml, extension
 
 class Mode:
     """File open mode.
@@ -304,7 +304,9 @@ class VfrOgr:
         for line in file_list:
             if os.path.exists(line):
                 ftype, fencoding =  mimetypes.guess_type(line)
-                if ftype in ('application/xml', 'text/xml') and fencoding == 'gzip': # downloaded VFR file, skip
+                if ((ftype in ('application/xml', 'text/xml') and fencoding == 'gzip') or \
+                    (ftype == 'application/zip' and fencoding is None)):
+                    # downloaded VFR file, skip
                     self._file_list.append(os.path.abspath(line))
                 else:
                     VfrLogger.warning("File <{}>: unsupported minetype '{}'".format(line, ftype))
@@ -319,7 +321,10 @@ class VfrOgr:
                             date = last_day_of_month()
                     else:
                         date = force_date
-                    line = date + '_' + line
+                else:
+                    date = datetime.datetime.date(
+                        datetime.datetime.strptime(line.split('_', 1)[0], "%Y%m%d")
+                    )
 
                 if not line.startswith('http'):
                     # add base url if missing
@@ -331,9 +336,11 @@ class VfrOgr:
 
                     line = base_url_line + line
 
-                if not line.endswith('.xml.gz'):
+
+                ext = '.xml.{}'.format(extension())
+                if not line.endswith(ext):
                     # add extension if missing
-                    line += '.xml.gz'
+                    line += ext
 
                 self._file_list.append(self._download_vfr(line))
                
@@ -368,7 +375,8 @@ class VfrOgr:
 
         @return datasource instance
         """
-        self._ids = self._idrv.Open(filename, False)
+        vsi = '/vsizip/' if extension() == 'zip' else '/vsigzip/'
+        self._ids = self._idrv.Open(vsi + filename, False)
         if self._ids is None:
             raise VfrError("Unable to open file '%s'. Skipping.\n" % filename)
 
@@ -921,7 +929,7 @@ class VfrOgr:
                 # no output datasource given -> list available layers and exit
                 layer_list = self._list_layers(extended, sys.stdout)
                 if extended and os.path.exists(filename):
-                    compare_list(layer_list, parse_xml_gz(filename))
+                    compare_list(layer_list, parse_xml(filename))
             else:
                 if self.odsn is None:
                     self.odsn = '.' # current directory
@@ -943,7 +951,8 @@ class VfrOgr:
                     if self._schema_per_file or self._schema:
                         if self._schema_per_file:
                             # set schema per file
-                            schema_name = os.path.basename(fname).rstrip('.xml.gz').lower()
+                            ext = fname.split('.', 1)[1]
+                            schema_name = os.path.basename(fname).rstrip('.' + ext).lower()
                             if schema_name[0].isdigit():
                                 schema_name = 'vfr_' + schema_name
                         else:
