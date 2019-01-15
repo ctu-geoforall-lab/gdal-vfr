@@ -58,7 +58,7 @@ def read_file(filename, date=None):
     
     file_list = []
     mtype = mimetypes.guess_type(filename)[0]
-    if mtype is None or 'xml' not in mtype:
+    if mtype is None and 'xml' not in mtype and 'zip' not in mtype:
         with open(filename, 'r') as fi:
             for line in fi.readlines():
                 line = line.strip()
@@ -70,7 +70,7 @@ def read_file(filename, date=None):
                 else:
                     file_list.append(line)
     else:
-        file_list.append(filename)
+        file_list.append(os.path.abspath(filename))
     
     return file_list
 

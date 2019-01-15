@@ -302,12 +302,16 @@ class VfrOgr:
         
         base_url = "http://vdp.cuzk.cz/vymenny_format/"
         for line in file_list:
-            if os.path.exists(line):
-                ftype, fencoding =  mimetypes.guess_type(line)
+            if not os.path.isabs(line):
+                file_path = os.path.abspath(os.path.join(self._conf['DATA_DIR'], line))
+            else:
+                file_path = line
+            if os.path.exists(file_path):
+                ftype, fencoding =  mimetypes.guess_type(file_path)
                 if ((ftype in ('application/xml', 'text/xml') and fencoding == 'gzip') or \
-                    (ftype == 'application/zip' and fencoding is None)):
+                    (ftype in ('application/zip', 'application/x-zip-compressed') and fencoding is None)):
                     # downloaded VFR file, skip
-                    self._file_list.append(os.path.abspath(line))
+                    self._file_list.append(file_path)
                 else:
                     VfrLogger.warning("File <{}>: unsupported minetype '{}'".format(line, ftype))
             else:
