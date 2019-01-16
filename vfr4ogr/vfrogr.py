@@ -325,6 +325,7 @@ class VfrOgr:
                             date = last_day_of_month()
                     else:
                         date = force_date
+                    line = date + '_' + line
                 else:
                     date = datetime.datetime.date(
                         datetime.datetime.strptime(line.split('_', 1)[0], "%Y%m%d")
@@ -351,6 +352,8 @@ class VfrOgr:
     def print_summary(self):
         """Print summary for multiple file input.
         """
+        if self._ods is None:
+            return
         stime = time.time()
         layer_list = copy.deepcopy(self._layer_list)
         if not layer_list:
