@@ -58,13 +58,12 @@ def read_file(filename, date=None):
     
     file_list = []
     mtype = mimetypes.guess_type(filename)[0]
-    if mtype is None and 'xml' not in mtype and 'zip' not in mtype:
+    if mtype is None or ('xml' not in mtype and 'zip' not in mtype):
         with open(filename, 'r') as fi:
             for line in fi.readlines():
                 line = line.strip()
                 if len(line) < 1 or line.startswith('#'):
                     continue # skip empty or commented lines 
-            
                 if date and not line.startswith('20'):
                     file_list.append('{}_{}'.format(date, line))
                 else:

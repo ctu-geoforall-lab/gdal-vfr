@@ -352,6 +352,8 @@ class VfrOgr:
     def print_summary(self):
         """Print summary for multiple file input.
         """
+        if self._ods is None:
+            return
         stime = time.time()
         layer_list = copy.deepcopy(self._layer_list)
         if not layer_list:
