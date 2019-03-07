@@ -15,6 +15,7 @@ import time
 import datetime
 import copy
 import logging
+import re
 try:
     # Python 2
     from urllib2 import urlopen, HTTPError
@@ -327,8 +328,11 @@ class VfrOgr:
                         date = force_date
                     line = date + '_' + line
                 else:
+                    reg = re.match('(.*)(\d{8})_(.*)', line)
+                    if not reg:
+                        raise VfrError("Unable to determine date")
                     date = datetime.datetime.date(
-                        datetime.datetime.strptime(line.split('_', 1)[0], "%Y%m%d")
+                        datetime.datetime.strptime(reg.group(2), "%Y%m%d")
                     )
 
                 if not line.startswith('http'):
