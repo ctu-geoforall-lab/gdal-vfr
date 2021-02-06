@@ -33,7 +33,7 @@
       <Name>Nespravny</Name>
       <ElementPath>Nespravny</ElementPath>
       <Type>String</Type>
-      <Width>5</Width>
+      <SubType>Boolean</SubType>
     </PropertyDefn>
     <!-- Číslo domovní -->
     <PropertyDefn>
@@ -72,19 +72,25 @@
       <ElementPath>Ulice|Kod</ElementPath>
       <Type>Integer</Type>
     </PropertyDefn>
+    <!-- Kód nadřazeného volebního okrsku -->
+    <PropertyDefn>
+      <Name>VOKod</Name>
+      <ElementPath>VOKod</ElementPath>
+      <Type>Integer</Type>
+    </PropertyDefn>
     <!-- Začátek platnosti -->
     <PropertyDefn>
       <Name>PlatiOd</Name>
       <ElementPath>PlatiOd</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
     <!-- Konec platnosti -->
     <PropertyDefn>
       <Name>PlatiDo</Name>
       <ElementPath>PlatiDo</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
     <!-- ID transakce v RUIAN -->
     <PropertyDefn>
@@ -100,12 +106,24 @@
       <Type>Integer</Type>
       <SubType>Integer64</SubType>
     </PropertyDefn>
-    <!-- ID budovy v ISKN -->
+    <!-- Nesprávné údaje -->
     <PropertyDefn>
-      <Name>IsknBudovaId</Name>
-      <ElementPath>IsknBudovaId</ElementPath>
-      <Type>Integer</Type>
-      <SubType>Integer64</SubType>
+      <Name>NespravnyUdajNazevUdaje</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|NazevUdaje</ElementPath>
+      <Type>String</Type>
+      <Width>4</Width>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>NespravnyUdajOznacenoDne</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|OznacenoDne</ElementPath>
+      <Type>String</Type>
+      <SubType>DateTime</SubType>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>NespravnyUdajOznacenoInfo</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|OznacenoInfo</ElementPath>
+      <Type>String</Type>
+      <Width>500</Width>
     </PropertyDefn>
   </GMLFeatureClass>
 </GMLFeatureClassList>

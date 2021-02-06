@@ -17,7 +17,6 @@ merge_st() {
     FILE="ruian_vf_st_v1.gfs"
     merge "Staty" \
         "RegionySoudrznosti" \
-        "Kraje" \
         "Vusc" \
         "Okresy" \
         "Orp" \
@@ -50,7 +49,6 @@ merge_all() {
     FILE="ruian_vf_v1.gfs"
     merge "Staty" \
         "RegionySoudrznosti" \
-        "Kraje" \
         "Vusc" \
         "Okresy" \
         "Orp" \

@@ -34,7 +34,7 @@
       <Name>Nespravny</Name>
       <ElementPath>Nespravny</ElementPath>
       <Type>String</Type>
-      <Width>5</Width>
+      <SubType>Boolean</SubType>
     </PropertyDefn>
     <!-- Nadřazená MOP -->
     <PropertyDefn>
@@ -59,14 +59,14 @@
       <Name>PlatiOd</Name>
       <ElementPath>PlatiOd</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
     <!-- Konec platnosti -->
     <PropertyDefn>
       <Name>PlatiDo</Name>
       <ElementPath>PlatiDo</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
     <!-- ID transakce v RUIAN -->
     <PropertyDefn>
@@ -93,6 +93,19 @@
     <PropertyDefn>
       <Name>VlajkaObrazek</Name>
       <ElementPath>VlajkaObrazek</ElementPath>
+      <Type>Complex</Type> <!-- ??? -->
+    </PropertyDefn>
+    <!-- Text popisující znak MOMC -->
+    <PropertyDefn>
+      <Name>ZnakText</Name>
+      <ElementPath>ZnakText</ElementPath>
+      <Type>String</Type>
+      <Width>4000</Width>
+    </PropertyDefn>
+    <!-- Obrázek znaku MOMC -->
+    <PropertyDefn>
+      <Name>ZnakObrazek</Name>
+      <ElementPath>ZnakObrazek</ElementPath>
       <Type>Complex</Type> <!-- ??? -->
     </PropertyDefn>
     <!-- Mluvnické charakteristiky 2 až 7 pád -->
@@ -126,25 +139,31 @@
       <Type>String</Type>
       <Width>48</Width>
     </PropertyDefn>
-    <!-- Text popisující znak MOMC -->
+    <!-- Nesprávné údaje -->
     <PropertyDefn>
-      <Name>ZnakText</Name>
-      <ElementPath>ZnakText</ElementPath>
+      <Name>NespravnyUdajNazevUdaje</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|NazevUdaje</ElementPath>
       <Type>String</Type>
-      <Width>4000</Width>
+      <Width>4</Width>
     </PropertyDefn>
-    <!-- Obrázek znaku MOMC -->
     <PropertyDefn>
-      <Name>ZnakObrazek</Name>
-      <ElementPath>ZnakObrazek</ElementPath>
-      <Type>Complex</Type> <!-- ??? -->
+      <Name>NespravnyUdajOznacenoDne</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|OznacenoDne</ElementPath>
+      <Type>String</Type>
+      <SubType>DateTime</SubType>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>NespravnyUdajOznacenoInfo</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|OznacenoInfo</ElementPath>
+      <Type>String</Type>
+      <Width>500</Width>
     </PropertyDefn>
     <!-- Datum vzniku -->
     <PropertyDefn>
       <Name>DatumVzniku</Name>
       <ElementPath>DatumVzniku</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
   </GMLFeatureClass>
 </GMLFeatureClassList>

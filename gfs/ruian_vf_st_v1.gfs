@@ -40,21 +40,21 @@
       <Name>Nespravny</Name>
       <ElementPath>Nespravny</ElementPath>
       <Type>String</Type>
-      <Width>5</Width>
+      <SubType>Boolean</SubType>
     </PropertyDefn>
     <!-- Začátek platnosti -->
     <PropertyDefn>
       <Name>PlatiOd</Name>
       <ElementPath>PlatiOd</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
     <!-- Konec platnosti -->
     <PropertyDefn>
       <Name>PlatiDo</Name>
       <ElementPath>PlatiDo</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
     <!-- ID transakce v RUIAN -->
     <PropertyDefn>
@@ -75,14 +75,33 @@
       <Name>NutsLau</Name>
       <ElementPath>NutsLau</ElementPath>
       <Type>String</Type>
-      <Width>2</Width>
+      <Width>6</Width>
+    </PropertyDefn>
+    <!-- Nesprávné údaje -->
+    <PropertyDefn>
+      <Name>NespravnyUdajNazevUdaje</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|NazevUdaje</ElementPath>
+      <Type>String</Type>
+      <Width>4</Width>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>NespravnyUdajOznacenoDne</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|OznacenoDne</ElementPath>
+      <Type>String</Type>
+      <SubType>DateTime</SubType>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>NespravnyUdajOznacenoInfo</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|OznacenoInfo</ElementPath>
+      <Type>String</Type>
+      <Width>500</Width>
     </PropertyDefn>
     <!-- Datum vzniku -->
     <PropertyDefn>
       <Name>DatumVzniku</Name>
       <ElementPath>DatumVzniku</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
   </GMLFeatureClass>
   <!-- Regiony soudržnosti -->
@@ -126,7 +145,7 @@
       <Name>Nespravny</Name>
       <ElementPath>Nespravny</ElementPath>
       <Type>String</Type>
-      <Width>5</Width>
+      <SubType>Boolean</SubType>
     </PropertyDefn>
     <!-- Nadřazený stát -->
     <PropertyDefn>
@@ -139,14 +158,14 @@
       <Name>PlatiOd</Name>
       <ElementPath>PlatiOd</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
     <!-- Konec platnosti -->
     <PropertyDefn>
       <Name>PlatiDo</Name>
       <ElementPath>PlatiDo</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
     <!-- ID transakce v RUIAN -->
     <PropertyDefn>
@@ -167,106 +186,33 @@
       <Name>NutsLau</Name>
       <ElementPath>NutsLau</ElementPath>
       <Type>String</Type>
+      <Width>6</Width>
+    </PropertyDefn>
+    <!-- Nesprávné údaje -->
+    <PropertyDefn>
+      <Name>NespravnyUdajNazevUdaje</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|NazevUdaje</ElementPath>
+      <Type>String</Type>
       <Width>4</Width>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>NespravnyUdajOznacenoDne</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|OznacenoDne</ElementPath>
+      <Type>String</Type>
+      <SubType>DateTime</SubType>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>NespravnyUdajOznacenoInfo</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|OznacenoInfo</ElementPath>
+      <Type>String</Type>
+      <Width>500</Width>
     </PropertyDefn>
     <!-- Datum vzniku -->
     <PropertyDefn>
       <Name>DatumVzniku</Name>
       <ElementPath>DatumVzniku</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
-    </PropertyDefn>
-  </GMLFeatureClass>
-  <!-- Kraje -->
-  <GMLFeatureClass>
-    <Name>Kraje</Name>
-    <ElementPath>Data|Kraje|Kraj</ElementPath>
-    <SRSName>urn:ogc:def:crs:EPSG::5514</SRSName>
-    <!-- Geometrie definičního bodu kraje -->
-    <GeomPropertyDefn>
-      <Name>DefinicniBod</Name> 
-      <ElementPath>Geometrie|DefinicniBod</ElementPath> 
-      <Type>Point</Type>
-    </GeomPropertyDefn>
-    <!-- Originální geometrie hranice kraje -->
-    <GeomPropertyDefn>
-      <Name>OriginalniHranice</Name> 
-      <ElementPath>Geometrie|OriginalniHranice</ElementPath> 
-      <Type>MultiPolygon</Type>
-    </GeomPropertyDefn>
-    <!-- Generalizovaná geometrie hranice kraje (stupeň generalizace 5) -->
-    <GeomPropertyDefn>
-      <Name>GeneralizovaneHranice</Name> 
-      <ElementPath>Geometrie|GeneralizovaneHranice5</ElementPath> 
-      <Type>MultiPolygon</Type>
-    </GeomPropertyDefn>
-    <!-- Kód kraje -->
-    <PropertyDefn>
-      <Name>Kod</Name>
-      <ElementPath>Kod</ElementPath>
-      <Type>Integer</Type>
-    </PropertyDefn>
-    <!-- Název kraje -->
-    <PropertyDefn>
-      <Name>Nazev</Name>
-      <ElementPath>Nazev</ElementPath>
-      <Type>String</Type>
-      <Width>32</Width>
-    </PropertyDefn>
-    <!-- Identifikátor nesprávnosti na prvku -->
-    <PropertyDefn>
-      <Name>Nespravny</Name>
-      <ElementPath>Nespravny</ElementPath>
-      <Type>String</Type>
-      <Width>5</Width>
-    </PropertyDefn>
-    <!-- Nadřazený stát -->
-    <PropertyDefn>
-      <Name>StatKod</Name>
-      <ElementPath>Stat|Kod</ElementPath>
-      <Type>Integer</Type>
-    </PropertyDefn>
-    <!-- Začátek platnosti -->
-    <PropertyDefn>
-      <Name>PlatiOd</Name>
-      <ElementPath>PlatiOd</ElementPath>
-      <Type>String</Type>
-      <Width>19</Width>
-    </PropertyDefn>
-    <!-- Konec platnosti -->
-    <PropertyDefn>
-      <Name>PlatiDo</Name>
-      <ElementPath>PlatiDo</ElementPath>
-      <Type>String</Type>
-      <Width>19</Width>
-    </PropertyDefn>
-    <!-- ID transakce v RUIAN -->
-    <PropertyDefn>
-      <Name>IdTransakce</Name>
-      <ElementPath>IdTransakce</ElementPath>
-      <Type>Integer</Type>
-      <SubType>Integer64</SubType>
-    </PropertyDefn>
-    <!-- ID návrhu změn v ISUI -->
-    <PropertyDefn>
-      <Name>GlobalniIdNavrhuZmeny</Name>
-      <ElementPath>GlobalniIdNavrhuZmeny</ElementPath>
-      <Type>Integer</Type>
-      <SubType>Integer64</SubType>
-    </PropertyDefn>
-    <!-- Kód územního celku v NUTS / LAU -->
-    <PropertyDefn>
-      <Name>NutsLau</Name>
-      <ElementPath>NutsLau</ElementPath>
-      <Type>String</Type>
-      <Width>4</Width>
-    </PropertyDefn>
-    <!-- Datum vzniku -->
-    <PropertyDefn>
-      <Name>DatumVzniku</Name>
-      <ElementPath>DatumVzniku</ElementPath>
-      <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
   </GMLFeatureClass>
   <!-- VÚSC -->
@@ -297,7 +243,6 @@
       <Name>Kod</Name>
       <ElementPath>Kod</ElementPath>
       <Type>Integer</Type>
-      <Width>6</Width>
     </PropertyDefn>
     <!-- Název VÚSC -->
     <PropertyDefn>
@@ -311,7 +256,7 @@
       <Name>Nespravny</Name>
       <ElementPath>Nespravny</ElementPath>
       <Type>String</Type>
-      <Width>5</Width>
+      <SubType>Boolean</SubType>
     </PropertyDefn>
     <!-- Nadřazený region soudržnosti -->
     <PropertyDefn>
@@ -324,14 +269,14 @@
       <Name>PlatiOd</Name>
       <ElementPath>PlatiOd</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
     <!-- Konec platnosti -->
     <PropertyDefn>
       <Name>PlatiDo</Name>
       <ElementPath>PlatiDo</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
     <!-- ID transakce v RUIAN -->
     <PropertyDefn>
@@ -352,14 +297,33 @@
       <Name>NutsLau</Name>
       <ElementPath>NutsLau</ElementPath>
       <Type>String</Type>
-      <Width>5</Width>
+      <Width>6</Width>
+    </PropertyDefn>
+    <!-- Nesprávné údaje -->
+    <PropertyDefn>
+      <Name>NespravnyUdajNazevUdaje</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|NazevUdaje</ElementPath>
+      <Type>String</Type>
+      <Width>4</Width>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>NespravnyUdajOznacenoDne</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|OznacenoDne</ElementPath>
+      <Type>String</Type>
+      <SubType>DateTime</SubType>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>NespravnyUdajOznacenoInfo</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|OznacenoInfo</ElementPath>
+      <Type>String</Type>
+      <Width>500</Width>
     </PropertyDefn>
     <!-- Datum vzniku -->
     <PropertyDefn>
       <Name>DatumVzniku</Name>
       <ElementPath>DatumVzniku</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
   </GMLFeatureClass>
   <!-- Okresy -->
@@ -403,7 +367,7 @@
       <Name>Nespravny</Name>
       <ElementPath>Nespravny</ElementPath>
       <Type>String</Type>
-      <Width>5</Width>
+      <SubType>Boolean</SubType>
     </PropertyDefn>
     <!-- Nadřazený kraj -->
     <PropertyDefn>
@@ -422,14 +386,14 @@
       <Name>PlatiOd</Name>
       <ElementPath>PlatiOd</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
     <!-- Konec platnosti -->
     <PropertyDefn>
       <Name>PlatiDo</Name>
       <ElementPath>PlatiDo</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
     <!-- ID transakce v RUIAN -->
     <PropertyDefn>
@@ -452,12 +416,31 @@
       <Type>String</Type>
       <Width>6</Width>
     </PropertyDefn>
+    <!-- Nesprávné údaje -->
+    <PropertyDefn>
+      <Name>NespravnyUdajNazevUdaje</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|NazevUdaje</ElementPath>
+      <Type>String</Type>
+      <Width>4</Width>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>NespravnyUdajOznacenoDne</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|OznacenoDne</ElementPath>
+      <Type>String</Type>
+      <SubType>DateTime</SubType>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>NespravnyUdajOznacenoInfo</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|OznacenoInfo</ElementPath>
+      <Type>String</Type>
+      <Width>500</Width>
+    </PropertyDefn>
     <!-- Datum vzniku -->
     <PropertyDefn>
       <Name>DatumVzniku</Name>
       <ElementPath>DatumVzniku</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
   </GMLFeatureClass>
   <!-- ORP -->
@@ -501,7 +484,7 @@
       <Name>Nespravny</Name>
       <ElementPath>Nespravny</ElementPath>
       <Type>String</Type>
-      <Width>5</Width>
+      <SubType>Boolean</SubType>
     </PropertyDefn>
     <!-- Kód správni obce -->
     <PropertyDefn>
@@ -515,19 +498,25 @@
       <ElementPath>Vusc|Kod</ElementPath>
       <Type>Integer</Type>
     </PropertyDefn>
+    <!-- Nadřazený okres -->
+    <PropertyDefn>
+      <Name>OkresKod</Name>
+      <ElementPath>Okres|Kod</ElementPath>
+      <Type>Integer</Type>
+    </PropertyDefn>
     <!-- Začátek platnosti -->
     <PropertyDefn>
       <Name>PlatiOd</Name>
       <ElementPath>PlatiOd</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
     <!-- Konec platnosti -->
     <PropertyDefn>
       <Name>PlatiDo</Name>
       <ElementPath>PlatiDo</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
     <!-- ID transakce v RUIAN -->
     <PropertyDefn>
@@ -543,12 +532,31 @@
       <Type>Integer</Type>
       <SubType>Integer64</SubType>
     </PropertyDefn>
+    <!-- Nesprávné údaje -->
+    <PropertyDefn>
+      <Name>NespravnyUdajNazevUdaje</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|NazevUdaje</ElementPath>
+      <Type>String</Type>
+      <Width>4</Width>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>NespravnyUdajOznacenoDne</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|OznacenoDne</ElementPath>
+      <Type>String</Type>
+      <SubType>DateTime</SubType>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>NespravnyUdajOznacenoInfo</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|OznacenoInfo</ElementPath>
+      <Type>String</Type>
+      <Width>500</Width>
+    </PropertyDefn>
     <!-- Datum vzniku -->
     <PropertyDefn>
       <Name>DatumVzniku</Name>
       <ElementPath>DatumVzniku</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
   </GMLFeatureClass>
   <!-- POU -->
@@ -592,35 +600,33 @@
       <Name>Nespravny</Name>
       <ElementPath>Nespravny</ElementPath>
       <Type>String</Type>
-      <Width>5</Width>
+      <SubType>Boolean</SubType>
     </PropertyDefn>
     <!-- Kód správni obce -->
     <PropertyDefn>
       <Name>SpravniObecKod</Name>
       <ElementPath>SpravniObecKod</ElementPath>
       <Type>Integer</Type>
-      <Width>6</Width>
     </PropertyDefn>
     <!-- Nadřazený ORP -->
     <PropertyDefn>
       <Name>OrpKod</Name>
       <ElementPath>Orp|Kod</ElementPath>
       <Type>Integer</Type>
-      <Width>6</Width>
     </PropertyDefn>
     <!-- Začátek platnosti -->
     <PropertyDefn>
       <Name>PlatiOd</Name>
       <ElementPath>PlatiOd</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
     <!-- Konec platnosti -->
     <PropertyDefn>
       <Name>PlatiDo</Name>
       <ElementPath>PlatiDo</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
     <!-- ID transakce v RUIAN -->
     <PropertyDefn>
@@ -636,12 +642,31 @@
       <Type>Integer</Type>
       <SubType>Integer64</SubType>
     </PropertyDefn>
+    <!-- Nesprávné údaje -->
+    <PropertyDefn>
+      <Name>NespravnyUdajNazevUdaje</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|NazevUdaje</ElementPath>
+      <Type>String</Type>
+      <Width>4</Width>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>NespravnyUdajOznacenoDne</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|OznacenoDne</ElementPath>
+      <Type>String</Type>
+      <SubType>DateTime</SubType>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>NespravnyUdajOznacenoInfo</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|OznacenoInfo</ElementPath>
+      <Type>String</Type>
+      <Width>500</Width>
+    </PropertyDefn>
     <!-- Datum vzniku -->
     <PropertyDefn>
       <Name>DatumVzniku</Name>
       <ElementPath>DatumVzniku</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
   </GMLFeatureClass>
   <!-- Obce -->
@@ -685,7 +710,7 @@
       <Name>Nespravny</Name>
       <ElementPath>Nespravny</ElementPath>
       <Type>String</Type>
-      <Width>5</Width>
+      <SubType>Boolean</SubType>
     </PropertyDefn>
     <!-- Status obce -->
     <PropertyDefn>
@@ -710,14 +735,14 @@
       <Name>PlatiOd</Name>
       <ElementPath>PlatiOd</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
     <!-- Konec platnosti -->
     <PropertyDefn>
       <Name>PlatiDo</Name>
       <ElementPath>PlatiDo</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
     <!-- ID transakce v RUIAN -->
     <PropertyDefn>
@@ -809,12 +834,31 @@
       <Type>String</Type>
       <Width>12</Width>
     </PropertyDefn>
+    <!-- Nesprávné údaje -->
+    <PropertyDefn>
+      <Name>NespravnyUdajNazevUdaje</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|NazevUdaje</ElementPath>
+      <Type>String</Type>
+      <Width>4</Width>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>NespravnyUdajOznacenoDne</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|OznacenoDne</ElementPath>
+      <Type>String</Type>
+      <SubType>DateTime</SubType>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>NespravnyUdajOznacenoInfo</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|OznacenoInfo</ElementPath>
+      <Type>String</Type>
+      <Width>500</Width>
+    </PropertyDefn>
     <!-- Datum vzniku -->
     <PropertyDefn>
       <Name>DatumVzniku</Name>
       <ElementPath>DatumVzniku</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
   </GMLFeatureClass>
   <!-- Spravní obvody -->
@@ -852,7 +896,7 @@
       <Name>Nespravny</Name>
       <ElementPath>Nespravny</ElementPath>
       <Type>String</Type>
-      <Width>5</Width>
+      <SubType>Boolean</SubType>
     </PropertyDefn>
     <!-- Kód správniho MOMC -->
     <PropertyDefn>
@@ -871,14 +915,14 @@
       <Name>PlatiOd</Name>
       <ElementPath>PlatiOd</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
     <!-- Konec platnosti -->
     <PropertyDefn>
       <Name>PlatiDo</Name>
       <ElementPath>PlatiDo</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
     <!-- ID transakce v RUIAN -->
     <PropertyDefn>
@@ -894,12 +938,31 @@
       <Type>Integer</Type>
       <SubType>Integer64</SubType>
     </PropertyDefn>
+    <!-- Nesprávné údaje -->
+    <PropertyDefn>
+      <Name>NespravnyUdajNazevUdaje</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|NazevUdaje</ElementPath>
+      <Type>String</Type>
+      <Width>4</Width>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>NespravnyUdajOznacenoDne</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|OznacenoDne</ElementPath>
+      <Type>String</Type>
+      <SubType>DateTime</SubType>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>NespravnyUdajOznacenoInfo</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|OznacenoInfo</ElementPath>
+      <Type>String</Type>
+      <Width>500</Width>
+    </PropertyDefn>
     <!-- Datum vzniku -->
     <PropertyDefn>
       <Name>DatumVzniku</Name>
       <ElementPath>DatumVzniku</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
   </GMLFeatureClass>
   <!-- MOP -->
@@ -937,7 +1000,7 @@
       <Name>Nespravny</Name>
       <ElementPath>Nespravny</ElementPath>
       <Type>String</Type>
-      <Width>5</Width>
+      <SubType>Boolean</SubType>
     </PropertyDefn>
     <!-- Nadřazená obec -->
     <PropertyDefn>
@@ -950,14 +1013,14 @@
       <Name>PlatiOd</Name>
       <ElementPath>PlatiOd</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
     <!-- Konec platnosti -->
     <PropertyDefn>
       <Name>PlatiDo</Name>
       <ElementPath>PlatiDo</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
     <!-- ID transakce v RUIAN -->
     <PropertyDefn>
@@ -973,12 +1036,31 @@
       <Type>Integer</Type>
       <SubType>Integer64</SubType>
     </PropertyDefn>
+    <!-- Nesprávné údaje -->
+    <PropertyDefn>
+      <Name>NespravnyUdajNazevUdaje</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|NazevUdaje</ElementPath>
+      <Type>String</Type>
+      <Width>4</Width>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>NespravnyUdajOznacenoDne</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|OznacenoDne</ElementPath>
+      <Type>String</Type>
+      <SubType>DateTime</SubType>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>NespravnyUdajOznacenoInfo</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|OznacenoInfo</ElementPath>
+      <Type>String</Type>
+      <Width>500</Width>
+    </PropertyDefn>
     <!-- Datum vzniku -->
     <PropertyDefn>
       <Name>DatumVzniku</Name>
       <ElementPath>DatumVzniku</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
   </GMLFeatureClass>
   <!-- MOMC -->
@@ -1016,7 +1098,7 @@
       <Name>Nespravny</Name>
       <ElementPath>Nespravny</ElementPath>
       <Type>String</Type>
-      <Width>5</Width>
+      <SubType>Boolean</SubType>
     </PropertyDefn>
     <!-- Nadřazená MOP -->
     <PropertyDefn>
@@ -1041,14 +1123,14 @@
       <Name>PlatiOd</Name>
       <ElementPath>PlatiOd</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
     <!-- Konec platnosti -->
     <PropertyDefn>
       <Name>PlatiDo</Name>
       <ElementPath>PlatiDo</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
     <!-- ID transakce v RUIAN -->
     <PropertyDefn>
@@ -1075,6 +1157,19 @@
     <PropertyDefn>
       <Name>VlajkaObrazek</Name>
       <ElementPath>VlajkaObrazek</ElementPath>
+      <Type>Complex</Type> <!-- ??? -->
+    </PropertyDefn>
+    <!-- Text popisující znak MOMC -->
+    <PropertyDefn>
+      <Name>ZnakText</Name>
+      <ElementPath>ZnakText</ElementPath>
+      <Type>String</Type>
+      <Width>4000</Width>
+    </PropertyDefn>
+    <!-- Obrázek znaku MOMC -->
+    <PropertyDefn>
+      <Name>ZnakObrazek</Name>
+      <ElementPath>ZnakObrazek</ElementPath>
       <Type>Complex</Type> <!-- ??? -->
     </PropertyDefn>
     <!-- Mluvnické charakteristiky 2 až 7 pád -->
@@ -1108,25 +1203,31 @@
       <Type>String</Type>
       <Width>48</Width>
     </PropertyDefn>
-    <!-- Text popisující znak MOMC -->
+    <!-- Nesprávné údaje -->
     <PropertyDefn>
-      <Name>ZnakText</Name>
-      <ElementPath>ZnakText</ElementPath>
+      <Name>NespravnyUdajNazevUdaje</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|NazevUdaje</ElementPath>
       <Type>String</Type>
-      <Width>4000</Width>
+      <Width>4</Width>
     </PropertyDefn>
-    <!-- Obrázek znaku MOMC -->
     <PropertyDefn>
-      <Name>ZnakObrazek</Name>
-      <ElementPath>ZnakObrazek</ElementPath>
-      <Type>Complex</Type> <!-- ??? -->
+      <Name>NespravnyUdajOznacenoDne</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|OznacenoDne</ElementPath>
+      <Type>String</Type>
+      <SubType>DateTime</SubType>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>NespravnyUdajOznacenoInfo</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|OznacenoInfo</ElementPath>
+      <Type>String</Type>
+      <Width>500</Width>
     </PropertyDefn>
     <!-- Datum vzniku -->
     <PropertyDefn>
       <Name>DatumVzniku</Name>
       <ElementPath>DatumVzniku</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
   </GMLFeatureClass>
   <!-- CastiObci -->
@@ -1158,7 +1259,7 @@
       <Name>Nespravny</Name>
       <ElementPath>Nespravny</ElementPath>
       <Type>String</Type>
-      <Width>5</Width>
+      <SubType>Boolean</SubType>
     </PropertyDefn>
     <!-- Nadřazená obec -->
     <PropertyDefn>
@@ -1171,14 +1272,14 @@
       <Name>PlatiOd</Name>
       <ElementPath>PlatiOd</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
     <!-- Konec platnosti -->
     <PropertyDefn>
       <Name>PlatiDo</Name>
       <ElementPath>PlatiDo</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
     <!-- ID transakce v RUIAN -->
     <PropertyDefn>
@@ -1225,12 +1326,31 @@
       <Type>String</Type>
       <Width>48</Width>
     </PropertyDefn>
+    <!-- Nesprávné údaje -->
+    <PropertyDefn>
+      <Name>NespravnyUdajNazevUdaje</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|NazevUdaje</ElementPath>
+      <Type>String</Type>
+      <Width>4</Width>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>NespravnyUdajOznacenoDne</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|OznacenoDne</ElementPath>
+      <Type>String</Type>
+      <SubType>DateTime</SubType>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>NespravnyUdajOznacenoInfo</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|OznacenoInfo</ElementPath>
+      <Type>String</Type>
+      <Width>500</Width>
+    </PropertyDefn>
     <!-- Datum vzniku -->
     <PropertyDefn>
       <Name>DatumVzniku</Name>
       <ElementPath>DatumVzniku</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
   </GMLFeatureClass>
   <!-- Katastralní území -->
@@ -1274,14 +1394,14 @@
       <Name>Nespravny</Name>
       <ElementPath>Nespravny</ElementPath>
       <Type>String</Type>
-      <Width>5</Width>
+      <SubType>Boolean</SubType>
     </PropertyDefn>
     <!-- Příznak existence digitální mapy -->
     <PropertyDefn>
       <Name>ExistujeDigitalniMapa</Name>
       <ElementPath>ExistujeDigitalniMapa</ElementPath>
       <Type>String</Type>
-      <Width>5</Width>
+      <SubType>Boolean</SubType>
     </PropertyDefn>
     <!-- Nadřazená obec -->
     <PropertyDefn>
@@ -1294,14 +1414,14 @@
       <Name>PlatiOd</Name>
       <ElementPath>PlatiOd</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
     <!-- Konec platnosti -->
     <PropertyDefn>
       <Name>PlatiDo</Name>
       <ElementPath>PlatiDo</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
     <!-- ID transakce v RUIAN -->
     <PropertyDefn>
@@ -1355,12 +1475,31 @@
       <Type>String</Type>
       <Width>48</Width>
     </PropertyDefn>
+    <!-- Nesprávné údaje -->
+    <PropertyDefn>
+      <Name>NespravnyUdajNazevUdaje</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|NazevUdaje</ElementPath>
+      <Type>String</Type>
+      <Width>4</Width>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>NespravnyUdajOznacenoDne</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|OznacenoDne</ElementPath>
+      <Type>String</Type>
+      <SubType>DateTime</SubType>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>NespravnyUdajOznacenoInfo</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|OznacenoInfo</ElementPath>
+      <Type>String</Type>
+      <Width>500</Width>
+    </PropertyDefn>
     <!-- Datum vzniku -->
     <PropertyDefn>
       <Name>DatumVzniku</Name>
       <ElementPath>DatumVzniku</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
   </GMLFeatureClass>
   <!-- ZSJ -->
@@ -1398,7 +1537,7 @@
       <Name>Nespravny</Name>
       <ElementPath>Nespravny</ElementPath>
       <Type>String</Type>
-      <Width>5</Width>
+      <SubType>Boolean</SubType>
     </PropertyDefn>
     <!-- Nadřazené katastrální území -->
     <PropertyDefn>
@@ -1411,14 +1550,14 @@
       <Name>PlatiOd</Name>
       <ElementPath>PlatiOd</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
     <!-- Konec platnosti -->
     <PropertyDefn>
       <Name>PlatiDo</Name>
       <ElementPath>PlatiDo</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
     <!-- ID transakce v RUIAN -->
     <PropertyDefn>
@@ -1478,12 +1617,31 @@
       <ElementPath>CharakterZsjKod</ElementPath>
       <Type>Integer</Type>
     </PropertyDefn>
+    <!-- Nesprávné údaje -->
+    <PropertyDefn>
+      <Name>NespravnyUdajNazevUdaje</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|NazevUdaje</ElementPath>
+      <Type>String</Type>
+      <Width>4</Width>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>NespravnyUdajOznacenoDne</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|OznacenoDne</ElementPath>
+      <Type>String</Type>
+      <SubType>DateTime</SubType>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>NespravnyUdajOznacenoInfo</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|OznacenoInfo</ElementPath>
+      <Type>String</Type>
+      <Width>500</Width>
+    </PropertyDefn>
     <!-- Datum vzniku -->
     <PropertyDefn>
       <Name>DatumVzniku</Name>
       <ElementPath>DatumVzniku</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
   </GMLFeatureClass>
 </GMLFeatureClassList>

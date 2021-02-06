@@ -1,66 +1,72 @@
 <GMLFeatureClassList>
-  <!-- Kraje -->
+  <!-- Seznam volebních okrsků -->
   <GMLFeatureClass>
-    <Name>Kraje</Name>
-    <ElementPath>Data|Kraje|Kraj</ElementPath>
+    <Name>VolebniOkrsek</Name>
+    <ElementPath>Data|VolebniOkrsek|VO</ElementPath>
     <SRSName>urn:ogc:def:crs:EPSG::5514</SRSName>
-    <!-- Geometrie definičního bodu kraje -->
+    <!-- Geometrie definičního bodu volebního okrsku -->
     <GeomPropertyDefn>
       <Name>DefinicniBod</Name> 
       <ElementPath>Geometrie|DefinicniBod</ElementPath> 
       <Type>Point</Type>
     </GeomPropertyDefn>
-    <!-- Originální geometrie hranice kraje -->
+    <!-- Originální geometrie hranice volebního okrsku -->
     <GeomPropertyDefn>
       <Name>OriginalniHranice</Name> 
       <ElementPath>Geometrie|OriginalniHranice</ElementPath> 
       <Type>MultiPolygon</Type>
     </GeomPropertyDefn>
-    <!-- Generalizovaná geometrie hranice kraje (stupeň generalizace 5) -->
-    <GeomPropertyDefn>
-      <Name>GeneralizovaneHranice</Name> 
-      <ElementPath>Geometrie|GeneralizovaneHranice5</ElementPath> 
-      <Type>MultiPolygon</Type>
-    </GeomPropertyDefn>
-    <!-- Kód kraje -->
+    <!-- Kód volebního okrsku -->
     <PropertyDefn>
       <Name>Kod</Name>
       <ElementPath>Kod</ElementPath>
       <Type>Integer</Type>
     </PropertyDefn>
-    <!-- Název kraje -->
+    <!-- Číslo volebního okrsku -->
     <PropertyDefn>
-      <Name>Nazev</Name>
-      <ElementPath>Nazev</ElementPath>
-      <Type>String</Type>
-      <Width>32</Width>
+      <Name>Cislo</Name>
+      <ElementPath>Cislo</ElementPath>
+      <Type>Integer</Type>
     </PropertyDefn>
-    <!-- Identifikátor nesprávnosti na prvku -->
+    <!-- Příznak nesprávnosti -->
     <PropertyDefn>
       <Name>Nespravny</Name>
       <ElementPath>Nespravny</ElementPath>
       <Type>String</Type>
-      <Width>5</Width>
+      <SubType>Boolean</SubType>
     </PropertyDefn>
-    <!-- Nadřazený stát -->
+    <!-- Nadřazená obec -->
     <PropertyDefn>
-      <Name>StatKod</Name>
-      <ElementPath>Stat|Kod</ElementPath>
+      <Name>ObecKod</Name>
+      <ElementPath>Obec|Kod</ElementPath>
       <Type>Integer</Type>
+    </PropertyDefn>
+    <!-- Nadřazený MOMC -->
+    <PropertyDefn>
+      <Name>MomcKod</Name>
+      <ElementPath>Momc|Kod</ElementPath>
+      <Type>Integer</Type>
+    </PropertyDefn>
+    <!-- Poznámka -->
+    <PropertyDefn>
+      <Name>Poznamka</Name>
+      <ElementPath>Poznamka</ElementPath>
+      <Type>String</Type>
+      <Width>60</Width>
     </PropertyDefn>
     <!-- Začátek platnosti -->
     <PropertyDefn>
       <Name>PlatiOd</Name>
       <ElementPath>PlatiOd</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
     <!-- Konec platnosti -->
     <PropertyDefn>
       <Name>PlatiDo</Name>
       <ElementPath>PlatiDo</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
     </PropertyDefn>
     <!-- ID transakce v RUIAN -->
     <PropertyDefn>
@@ -69,26 +75,31 @@
       <Type>Integer</Type>
       <SubType>Integer64</SubType>
     </PropertyDefn>
-    <!-- ID návrhu změn v ISUI -->
+    <!-- ID návrhu změny v ISUI -->
     <PropertyDefn>
       <Name>GlobalniIdNavrhuZmeny</Name>
       <ElementPath>GlobalniIdNavrhuZmeny</ElementPath>
       <Type>Integer</Type>
       <SubType>Integer64</SubType>
     </PropertyDefn>
-    <!-- Kód územního celku v NUTS / LAU -->
+    <!-- Nesprávné údaje -->
     <PropertyDefn>
-      <Name>NutsLau</Name>
-      <ElementPath>NutsLau</ElementPath>
+      <Name>NespravnyUdajNazevUdaje</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|NazevUdaje</ElementPath>
       <Type>String</Type>
       <Width>4</Width>
     </PropertyDefn>
-    <!-- Datum vzniku -->
     <PropertyDefn>
-      <Name>DatumVzniku</Name>
-      <ElementPath>DatumVzniku</ElementPath>
+      <Name>NespravnyUdajOznacenoDne</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|OznacenoDne</ElementPath>
       <Type>String</Type>
-      <Width>19</Width>
+      <SubType>DateTime</SubType>
+    </PropertyDefn>
+    <PropertyDefn>
+      <Name>NespravnyUdajOznacenoInfo</Name>
+      <ElementPath>NespravneUdaje|NespravnyUdaj|OznacenoInfo</ElementPath>
+      <Type>String</Type>
+      <Width>500</Width>
     </PropertyDefn>
   </GMLFeatureClass>
 </GMLFeatureClassList>

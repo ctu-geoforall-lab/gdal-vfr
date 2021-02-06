@@ -8,7 +8,7 @@
       <Name>TypPrvkuKod</Name>
       <ElementPath>TypPrvkuKod</ElementPath>
       <Type>String</Type>
-      <Width>2</Width>
+      <Width>3</Width>
     </PropertyDefn>
     <!-- ID (kód) prvku -->
     <PropertyDefn>
