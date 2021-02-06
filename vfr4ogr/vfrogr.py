@@ -248,8 +248,8 @@ class VfrOgr:
         VfrLogger.msg("Downloading {} ({})...".format(url, self._conf['DATA_DIR']),
                       header=True)
 
-        if not url.startswith('http://'):
-            url = 'http://vdp.cuzk.cz/vymenny_format/soucasna/' + url
+        if not url.startswith('https://'):
+            url = 'https://vdp.cuzk.cz/vymenny_format/soucasna/' + url
 
         # try more dates when downloading ST_U data (CUZK is
         # publishing data last day in the month, but there can be
@@ -301,7 +301,7 @@ class VfrOgr:
         """
         VfrLogger.msg("%d VFR file(s) will be processed..." % len(file_list), header=True)
         
-        base_url = "http://vdp.cuzk.cz/vymenny_format/"
+        base_url = "https://vdp.cuzk.cz/vymenny_format/"
         for line in file_list:
             if not os.path.isabs(line):
                 file_path = os.path.abspath(os.path.join(self._conf['DATA_DIR'], line))
@@ -316,7 +316,7 @@ class VfrOgr:
                 else:
                     VfrLogger.warning("File <{}>: unsupported minetype '{}'".format(line, ftype))
             else:
-                if not line.startswith('http://') and \
+                if not line.startswith('https://') and \
                         not line.startswith('20'):
                     # determine date if missing
                     if not force_date:
@@ -335,7 +335,7 @@ class VfrOgr:
                         datetime.datetime.strptime(reg.group(2), "%Y%m%d")
                     )
 
-                if not line.startswith('http'):
+                if not line.startswith('https'):
                     # add base url if missing
                     base_url_line = base_url
                     if 'ST_UVOH' not in line:
