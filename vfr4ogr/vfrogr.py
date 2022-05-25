@@ -721,7 +721,7 @@ class VfrOgr:
             if ofrmt == 'ESRI Shapefile':
                 # StringList not supported by Esri Shapefile
                 types = [ogr.OFTIntegerList, ogr.OFTRealList, ogr.OFTStringList]
-                if gdal.__version__.split('.')[0] == '2':
+                if int(gdal.__version__.split('.')[0]) >= 2:
                     types.append(ogr.OFTInteger64List)
                 if ifield.GetType() in types:
                     ofield.SetType(ogr.OFTString)
