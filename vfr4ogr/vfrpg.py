@@ -71,7 +71,7 @@ class VfrPg(VfrOgr):
         cursor = conn.cursor()
         try:
             cursor.execute("SELECT postgis_version()")
-        except StandardError as e:
+        except Exception as e:
             raise VfrError("PostGIS doesn't seems to be installed.\n\n%s" % e)
             
         cursor.close()
@@ -91,7 +91,7 @@ class VfrPg(VfrOgr):
                 # cursor.execute("CREATE SCHEMA IF NOT EXISTS %s" % name)
                 cursor.execute("CREATE SCHEMA %s" % name)
                 self._conn.commit()
-        except StandardError as e:
+        except Exception as e:
             raise VfrError("Unable to create schema %s: %s" % (name, e))
 
         cursor.close()
@@ -105,7 +105,7 @@ class VfrPg(VfrOgr):
         cursor = self._conn.cursor()
         try:
             cursor.execute("SELECT srid FROM spatial_ref_sys WHERE srid = 5514")
-        except StandardError as e:
+        except Exception as e:
             raise VfrError("PostGIS doesn't seems to be activated. %s" % e)
 
         epsg_exists = bool(cursor.fetchall())
@@ -156,7 +156,7 @@ class VfrPg(VfrOgr):
                     cursor.execute("CREATE INDEX %s ON %s.%s (%s)" % \
                                        (indexname, schema, table, column))
                     cursor.execute('COMMIT')
-                except StandardError as e:
+                except Exception as e:
                     VfrLogger.warning("Unable to create index %s_%s: %s" % (table, column, e))
                     cursor.execute('ROLLBACK')
 
@@ -176,7 +176,7 @@ class VfrPg(VfrOgr):
         cursor = self._conn.cursor()
         try:
             cursor.execute("SELECT setval('%s_%s_seq', %d)" % (table, column, fid))
-        except StandardError as e:
+        except Exception as e:
             VfrLogger.warning("Unable to update FID sequence for table '%s': %s" % (table, e))
 
         cursor.close()
@@ -196,7 +196,7 @@ class VfrPg(VfrOgr):
         cursor = self._conn.cursor()
         try:
             cursor.execute("SELECT max(%s) FROM %s" % (column, table))
-        except StandardError as e:
+        except Exception as e:
             cursor.execute('ROLLBACK')
             cursor.close()
             return -1
