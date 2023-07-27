@@ -483,11 +483,11 @@ class VfrOgr:
                 self._lco_options.append('GEOMETRY_NAME={}'.format(geom_name))
 
             # try to be clever if geometry column specified
-            geom_name = self._geom_name
-            if self._geom_name and self._geom_name.endswith('Hranice'):
+            geom_name = self._geom_name[0] if self._geom_name is not None else None
+            if self._geom_name and self._geom_name[0].endswith('Hranice'):
                 feat_defn = layer.GetLayerDefn()
-                if 0 > feat_defn.GetGeomFieldIndex(self._geom_name):
-                    if self._geom_name.startswith('GeneralizovaneHranice'):
+                if 0 > feat_defn.GetGeomFieldIndex(self._geom_name[0]):
+                    if self._geom_name[0].startswith('GeneralizovaneHranice'):
                         geom_name = 'OriginalniHranice'
                     else:
                         geom_name = 'GeneralizovaneHranice'
@@ -582,10 +582,7 @@ class VfrOgr:
 
                 # modify geometry columns if requested
                 if geom_name:
-                    if geom_idx < 0:
-                        geom_idx = feature.GetGeomFieldIndex(geom_name)
-
-                    self._modify_feature(feature, geom_idx, ofeature)
+                    geom_idx = self._modify_feature(feature, geom_idx, ofeature)
 
                 if ofeature.GetGeometryRef() is None:
                     n_nogeom += 1
@@ -768,6 +765,14 @@ class VfrOgr:
         @param suppress: suppress warnings
         """
         # set requested geometry
+        if geom_idx < 0:
+            for geom_name in self._geom_name:
+                geom_idx = feature.GetGeomFieldIndex(geom_name)
+                if geom_idx > -1:
+                    geom = feature.GetGeomFieldRef(geom_idx)
+                    if geom:
+                        break
+
         if geom_idx > -1:
             geom = feature.GetGeomFieldRef(geom_idx)
             if geom:
