@@ -81,7 +81,7 @@ def main():
 
     # create convertor
     ogr = VfrOgr(frmt=options.format, dsn=options.dsn,
-                 geom_name=options.geom.split(','), layers=options.layer,
+                 geom_name=options.geom.split(',') if options.geom else None, layers=options.layer,
                  nogeomskip=options.nogeomskip, overwrite=options.overwrite,
                  lco_options=lco_options)
 
