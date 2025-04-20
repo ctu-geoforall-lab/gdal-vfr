@@ -142,7 +142,7 @@ class VfrOgr:
     def __del__(self):
         if self._ods:
             # close output datasource
-            self._ods.Destroy()
+            self._ods.Close()
 
     def _check_ogr(self):
         """Check GDAL/OGR library, version >= 1.11 required.
@@ -980,7 +980,7 @@ class VfrOgr:
                         self.odsn += ' active_schema=%s' % schema_name
                         if schema_name not in self.schema_list:
                             self.schema_list.append(schema_name)
-                        self._ods.Destroy() # TODO: do it better
+                        self._ods.Close() # TODO: do it better
                         self._ods = self._odrv.Open(self.odsn, True)
                         if self._ods is None:
                             raise VfrError("Unable to open or create new datasource '%s'" % self.odsn)
@@ -1008,7 +1008,7 @@ class VfrOgr:
                     # reset datasource string per file
                     if self._schema_per_file or self._schema:
                         self.odsn = odsn_reset
-                        self._ods.Destroy()
+                        self._ods.Close()
                         self._ods = self._odrv.Open(self.odsn, True)
                         if self._ods is None:
                             raise VfrError("Unable to open or create new datasource '%s'" % self.odsn)
@@ -1016,7 +1016,7 @@ class VfrOgr:
                 if nfeat > 0:
                     append = True # append on next passes
 
-            ids.Destroy()
+            ids.Close()
             self._ids = None
             ipass += 1
         

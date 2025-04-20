@@ -223,8 +223,8 @@ def main():
     export_layers(ids, ods, layer_list_all, options['overwrite'], options['nogeomskip'], options['schema'])
 
     # close input and output datasources
-    ids.Destroy()
-    ods.Destroy()
+    ids.Close()
+    ods.Close()
     
     # delete layers with 0 features
     ods = odrv.Open(options['dsn'], True)
@@ -238,7 +238,7 @@ def main():
                 deleted = True
                 break
             
-    ods.Destroy()
+    ods.Close()
     
     return 0
 
