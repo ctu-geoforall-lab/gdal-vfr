@@ -27,6 +27,7 @@ from time import gmtime, strftime
 
 try:
     from osgeo import gdal, ogr
+    gdal.DontUseExceptions()
 except ImportError as e:
     sys.exit('ERROR: Import of ogr from osgeo failed. %s' % e)
 
