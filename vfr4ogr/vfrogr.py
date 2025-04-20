@@ -329,7 +329,7 @@ class VfrOgr:
                         date = force_date
                     line = date + '_' + line
                 else:
-                    reg = re.match('(.*)(\d{8})_(.*)', line)
+                    reg = re.match(r'(.*)(\d{8})_(.*)', line)
                     if not reg:
                         raise VfrError("Unable to determine date")
                     date = datetime.datetime.date(
