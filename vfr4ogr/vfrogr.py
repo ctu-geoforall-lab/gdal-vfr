@@ -116,7 +116,10 @@ class VfrOgr:
             raise VfrError("Format '%s' is not supported" % frmt)
         
         # try to open output datasource
-        self._ods = self._odrv.Open(self.odsn, True)
+        try:
+            self._ods = self._odrv.Open(self.odsn, True)
+        except RuntimeError:
+            self._ods = None
         if self._ods is None:
             # if fails, try to create new datasource
             self._ods = self._odrv.CreateDataSource(self.odsn)
