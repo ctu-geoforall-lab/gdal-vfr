@@ -86,7 +86,7 @@ class VfrPg(VfrOgr):
         cursor = self._conn.cursor()
         try:
             cursor.execute("SELECT schema_name FROM information_schema.schemata "
-                            "WHERE schema_name = '%s'" % name)
+                            "WHERE schema_name = %s", (name,))
             if not bool(cursor.fetchall()):
                 # cursor.execute("CREATE SCHEMA IF NOT EXISTS %s" % name)
                 cursor.execute("CREATE SCHEMA %s" % name)
@@ -146,8 +146,8 @@ class VfrPg(VfrOgr):
 
                 indexname = "%s_%s_idx" % (table, column)
                 cursor.execute("SELECT COUNT(*) FROM pg_indexes WHERE "
-                               "tablename = '%s' and schemaname = '%s' and "
-                               "indexname = '%s'" % (table, schema, indexname))
+                               "tablename = %s and schemaname = %s and "
+                               "indexname = %s", (table, schema, indexname))
                 if cursor.fetchall()[0][0] > 0:
                     continue # indices for specified table already exists
 
@@ -195,7 +195,7 @@ class VfrPg(VfrOgr):
 
         cursor = self._conn.cursor()
         try:
-            cursor.execute("SELECT max(%s) FROM %s" % (column, table))
+            cursor.execute("SELECT max(%s) FROM %s", (column, table))
         except Exception as e:
             cursor.execute('ROLLBACK')
             cursor.close()

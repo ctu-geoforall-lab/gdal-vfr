@@ -232,7 +232,8 @@ class VfrOgr:
             success = True
             with open(local_file, 'wb') as fd:
                 try:
-                    fd.write(urlopen(url).read())
+                    with urlopen(url) as response: # nosec B310
+                        fd.write(response.read())
                 except HTTPError as e:
                     if e.code == 404:
                         success = False

@@ -12,7 +12,7 @@ import os
 import sys
 import datetime
 import mimetypes
-from xml.dom.minidom import parse, parseString
+from defusedxml.minidom import parseString
 
 try:
     from osgeo import gdal, ogr
