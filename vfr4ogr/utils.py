@@ -12,7 +12,7 @@ import os
 import sys
 import datetime
 import mimetypes
-from xml.dom.minidom import parseString
+from xml.dom.minidom import parseString  # nosec B408
 
 
 try:
@@ -94,7 +94,7 @@ def parse_xml(filename):
             content = fd.read()
 
     # parse xml file content
-    dom = parseString(content) # nosec B314
+    dom = parseString(content) # nosec B318
     data = dom.getElementsByTagName('vf:Data')[0]
     if data is None:
         raise VfrError("vf:Data not found")
