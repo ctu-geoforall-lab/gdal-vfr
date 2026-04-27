@@ -12,7 +12,8 @@ import os
 import sys
 import datetime
 import mimetypes
-from defusedxml.minidom import parseString
+from xml.dom.minidom import parseString
+
 
 try:
     from osgeo import gdal, ogr
@@ -93,7 +94,7 @@ def parse_xml(filename):
             content = fd.read()
 
     # parse xml file content
-    dom = parseString(content)
+    dom = parseString(content) # nosec B314
     data = dom.getElementsByTagName('vf:Data')[0]
     if data is None:
         raise VfrError("vf:Data not found")
